@@ -1,0 +1,145 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".g.cs" #>
+<#
+    const string Scope = "Scope";
+
+	string[] logLevels = { "Trace", "Debug", "Information", "Warning", "Error", "Critical", null, Scope }; 
+
+    string GetTypeName(string logLevel) => logLevel + "LogInterpolatedStringHandler";
+#>
+#nullable enable
+using System.Runtime.CompilerServices;
+using System.Text;
+using Microsoft.Extensions.Logging;
+using Isle.Configuration;
+
+namespace Isle.Extensions.Logging;
+
+<# foreach (var logLevel in logLevels) { #>
+
+[InterpolatedStringHandler]
+public ref partial struct <#= GetTypeName(logLevel) #>
+{
+    private const string OriginalFormatName = "{OriginalFormat}";
+    private const char DestructureOperator = '@';
+    private const char StringifyOperator = '$';
+
+    private StringBuilder _originalFormatBuilder = null!;
+    private FormattedLogValue[] _formattedLogValues = null!;
+    private Segment[] _segments = null!;
+    private int _valueIndex = 0;
+    private int _segmentIndex = 0;
+
+    public <#= GetTypeName(logLevel) #>(
+        int literalLength, 
+        int formattedCount,
+        ILogger logger<# if (logLevel != Scope) { #>,
+<# } #>
+<# if (logLevel == null) { #>
+        LogLevel logLevel,
+<# } #>
+<# if (logLevel != Scope) { #>
+        out bool isEnabled
+<# } #>
+    )
+    {
+<# if (logLevel != Scope) { #>
+        isEnabled = logger.IsEnabled(<#= logLevel != null ? "LogLevel." + logLevel : "logLevel" #>);
+        if (isEnabled)
+        {
+<# } #>
+            _originalFormatBuilder = StringBuilderCache.Acquire(Math.Max(literalLength + formattedCount * 16, StringBuilderCache.MaxBuilderSize));
+            _formattedLogValues = new FormattedLogValue[formattedCount + 1];
+            _segments = GC.AllocateUninitializedArray<Segment>(formattedCount * 2 + 1);
+<# if (logLevel != Scope) { #>
+        }
+<# } #>
+    }
+
+<# if (logLevel != Scope) { #>
+    public bool IsEnabled => _originalFormatBuilder != null;
+<# } #>
+
+    public void AppendLiteral(string? str)
+    {
+        var start = _originalFormatBuilder.Length;
+        _originalFormatBuilder.EscapeAndAppend(str);
+        var end = _originalFormatBuilder.Length;
+        var length = end - start;
+        if (length > 0)
+        {
+            if (_segmentIndex > 0 && _segments[_segmentIndex - 1].IsLiteral)
+            {
+                Segment.Grow(ref _segments[_segmentIndex - 1], length);
+            }
+            else
+            {
+                _segments[_segmentIndex++] = new Segment(start, length);
+            }
+        }
+    }
+
+    public void AppendFormatted(string? value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "") => AppendFormatted(
+        new NamedLogValue(value, name, default, default), 
+        alignment, 
+        format);
+
+    public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "") => AppendFormatted(
+        new NamedLogValue(value, name, IsleConfiguration.Current.ValueRepresentationPolicy.GetRepresentationOfType<T>(), default), 
+        alignment, 
+        format);
+
+    [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.AggressiveOptimization)]
+    public void AppendFormatted(in NamedLogValue namedLogValue, int alignment = 0, string? format = null)
+    {
+        _originalFormatBuilder.Append('{');
+        var name = namedLogValue.HasExplicitName ? namedLogValue.Name : IsleConfiguration.Current.ValueNameConverter(namedLogValue.Name);
+        if (!name.StartsWith(DestructureOperator) && !name.StartsWith(StringifyOperator))
+        {
+            switch (namedLogValue.Representation)
+            {
+                case ValueRepresentation.Destructure:
+                    name = DestructureOperator + name;
+                    break;
+                case ValueRepresentation.Stringify:
+                    name = StringifyOperator + name;
+                    break;
+            }
+        }
+
+        _originalFormatBuilder.Append(name);
+
+        if (alignment != 0)
+        {
+            _originalFormatBuilder.Append(',');
+            _originalFormatBuilder.Append(alignment);
+        }
+
+        if (!string.IsNullOrEmpty(format))
+        {
+
+            _originalFormatBuilder.Append(':');
+            _originalFormatBuilder.Append(format);
+        }
+
+        _originalFormatBuilder.Append('}');
+        _segments[_segmentIndex++] = new Segment(alignment);
+        _formattedLogValues[_valueIndex++] = new (name, namedLogValue.Value, format);
+    }
+
+    internal FormattedLogValues GetFormattedLogValuesAndReset()
+    {
+        _formattedLogValues[_valueIndex] = new FormattedLogValue(OriginalFormatName, StringBuilderCache.GetStringAndRelease(_originalFormatBuilder));
+        var result = new FormattedLogValues(_formattedLogValues, _segments, _segmentIndex);
+        _formattedLogValues = null!;
+        _originalFormatBuilder = null!;
+        _segments = null!;
+        return result;
+    }
+}
+
+<# } #>

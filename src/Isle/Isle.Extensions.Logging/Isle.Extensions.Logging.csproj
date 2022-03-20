@@ -1,0 +1,53 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+			<_Parameter1>Isle.Extensions.Logging.Tests</_Parameter1>
+		</AssemblyAttribute>
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Isle.Core\Isle.Core.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Update="LoggerExtensions.tt">
+			<Generator>TextTemplatingFileGenerator</Generator>
+			<LastGenOutput>LoggerExtensions.g.cs</LastGenOutput>
+		</None>
+		<None Update="LogHandlers.tt">
+			<Generator>TextTemplatingFileGenerator</Generator>
+			<LastGenOutput>LogHandlers.g.cs</LastGenOutput>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Update="LoggerExtensions.g.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>LoggerExtensions.tt</DependentUpon>
+		</Compile>
+		<Compile Update="LogHandlers.g.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>LogHandlers.tt</DependentUpon>
+		</Compile>
+	</ItemGroup>
+
+
+
+</Project>

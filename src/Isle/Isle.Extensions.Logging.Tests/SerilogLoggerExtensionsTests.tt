@@ -1,0 +1,417 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".g.cs" #>
+<#
+    const string Scope = "Scope";
+
+	string[] logLevels = { "Trace", "Debug", "Information", "Warning", "Error", "Critical", "" }; 
+
+    string GetTestName(string name, string logLevel, bool withEventId, bool withException) => 
+        $"Log{logLevel}_{name}{(withEventId ? "_WithEventId" : "")}{(withException ? "_WithException" : "")}";
+#>
+#nullable enable
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using Microsoft.Extensions.Logging;
+using NUnit.Framework;
+using FluentAssertions;
+using Serilog.Events;
+
+namespace Isle.Extensions.Logging.Tests;
+
+[TestFixtureSource(nameof(FixtureArgs))]
+public class SerilogLoggerExtensionsTests : SerilogBaseFixture
+{
+    public SerilogLoggerExtensionsTests(LogLevel minLogLevel) : base(minLogLevel)
+    {
+    }
+
+<# foreach (var logLevel in logLevels) { #>
+
+    #region Log<#= (logLevel) #>
+
+<# foreach (var withEventId in new[] { false, true }) { #>
+<# foreach (var withException in new[] { false, true }) { #>
+
+    [Test]
+    public void <#= GetTestName("Literal", logLevel, withEventId, withException) #>(<#if (logLevel == "") { #>[ValueSource(nameof(LogLevels))] LogLevel logLevel<# } #>)
+    {
+<#if (logLevel != "") { #> 
+        const LogLevel logLevel = LogLevel.<#= (logLevel) #>;
+<# } #>
+        const string message = "Test";
+
+        <#if (withEventId) { #>EventId eventId = 5;<# } #>
+
+        <#if (withException) { #>Exception exception = new InvalidOperationException("Test exception."); <# } #>
+
+        Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(1);
+            var logEvent = LogEvents.Single();
+            logEvent.Should().BeEquivalentTo(new 
+            {
+                Exception = <#= withException ? "exception" : "default(Exception)" #>,
+                Level = ToSerilogLevel(logLevel),
+                MessageTemplate = Parser.Parse(message),
+                Properties = new Dictionary<string, LogEventPropertyValue>
+                {
+                    ["SourceContext"] = new ScalarValue(GetType().FullName),
+                    <#if (withEventId) { #>["EventId"] = new ScalarValue(eventId)<# } #>
+
+                }
+            });
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(message);
+        }
+    }
+
+    [Test]
+    public void <#= GetTestName("Scalar", logLevel, withEventId, withException) #>(<#if (logLevel == "") { #>[ValueSource(nameof(LogLevels))] LogLevel logLevel<# } #>)
+    {
+<#if (logLevel != "") { #> 
+        const LogLevel logLevel = LogLevel.<#= (logLevel) #>;
+<# } #>
+        int value = 7;
+
+        <#if (withEventId) { #>EventId eventId = 5;<# } #>
+
+        <#if (withException) { #>Exception exception = new InvalidOperationException("Test exception."); <# } #>
+
+        Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>$"{value}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(1);
+            var logEvent = LogEvents.Single();
+            logEvent.Should().BeEquivalentTo(new 
+            {
+                Exception = <#= withException ? "exception" : "default(Exception)" #>,
+                Level = ToSerilogLevel(logLevel),
+                MessageTemplate = Parser.Parse("{value}"),
+                Properties = new Dictionary<string, LogEventPropertyValue>
+                {
+                    ["value"] = new ScalarValue(value),
+                    ["SourceContext"] = new ScalarValue(GetType().FullName),
+                    <#if (withEventId) { #>["EventId"] = new ScalarValue(eventId)<# } #>
+
+                }
+            });
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(string.Format(CultureInfo.InvariantCulture, "{0}", value));
+        }
+    }
+
+    [Test]
+    public void <#= GetTestName("ScalarWithAlignment", logLevel, withEventId, withException) #>(<#if (logLevel == "") { #>[ValueSource(nameof(LogLevels))] LogLevel logLevel<# } #>)
+    {
+<#if (logLevel != "") { #> 
+        const LogLevel logLevel = LogLevel.<#= (logLevel) #>;
+<# } #>
+        int value = 7;
+
+        <#if (withEventId) { #>EventId eventId = 5;<# } #>
+
+        <#if (withException) { #>Exception exception = new InvalidOperationException("Test exception."); <# } #>
+
+        Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>$"{value,3}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(1);
+            var logEvent = LogEvents.Single();
+            logEvent.Should().BeEquivalentTo(new 
+            {
+                Exception = <#= withException ? "exception" : "default(Exception)" #>,
+                Level = ToSerilogLevel(logLevel),
+                MessageTemplate = Parser.Parse("{value,3}"),
+                Properties = new Dictionary<string, LogEventPropertyValue>
+                {
+                    ["value"] = new ScalarValue(value),
+                    ["SourceContext"] = new ScalarValue(GetType().FullName),
+                    <#if (withEventId) { #>["EventId"] = new ScalarValue(eventId)<# } #>
+
+                }
+            });
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(string.Format(CultureInfo.InvariantCulture, "{0,3}", value));
+        }
+    }
+
+    [Test]
+    public void <#= GetTestName("ScalarWithFormat", logLevel, withEventId, withException) #>(<#if (logLevel == "") { #>[ValueSource(nameof(LogLevels))] LogLevel logLevel<# } #>)
+    {
+<#if (logLevel != "") { #> 
+        const LogLevel logLevel = LogLevel.<#= (logLevel) #>;
+<# } #>
+        int value = 7000;
+
+        <#if (withEventId) { #>EventId eventId = 5;<# } #>
+
+        <#if (withException) { #>Exception exception = new InvalidOperationException("Test exception."); <# } #>
+
+        Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>$"{value:N}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(1);
+            var logEvent = LogEvents.Single();
+            logEvent.Should().BeEquivalentTo(new 
+            {
+                Exception = <#= withException ? "exception" : "default(Exception)" #>,
+                Level = ToSerilogLevel(logLevel),
+                MessageTemplate = Parser.Parse("{value:N}"),
+                Properties = new Dictionary<string, LogEventPropertyValue>
+                {
+                    ["value"] = new ScalarValue(value),
+                    ["SourceContext"] = new ScalarValue(GetType().FullName),
+                    <#if (withEventId) { #>["EventId"] = new ScalarValue(eventId)<# } #>
+
+                }
+            });
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(string.Format(CultureInfo.InvariantCulture, "{0:N}", value));
+        }
+    }
+
+    [Test]
+    public void <#= GetTestName("ScalarWithAlignmentAndFormat", logLevel, withEventId, withException) #>(<#if (logLevel == "") { #>[ValueSource(nameof(LogLevels))] LogLevel logLevel<# } #>)
+    {
+<#if (logLevel != "") { #> 
+        const LogLevel logLevel = LogLevel.<#= (logLevel) #>;
+<# } #>
+        int value = 7000;
+
+        <#if (withEventId) { #>EventId eventId = 5;<# } #>
+
+        <#if (withException) { #>Exception exception = new InvalidOperationException("Test exception."); <# } #>
+
+        Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>$"{value,8:N}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(1);
+            var logEvent = LogEvents.Single();
+            logEvent.Should().BeEquivalentTo(new 
+            {
+                Exception = <#= withException ? "exception" : "default(Exception)" #>,
+                Level = ToSerilogLevel(logLevel),
+                MessageTemplate = Parser.Parse("{value,8:N}"),
+                Properties = new Dictionary<string, LogEventPropertyValue>
+                {
+                    ["value"] = new ScalarValue(value),
+                    ["SourceContext"] = new ScalarValue(GetType().FullName),
+                    <#if (withEventId) { #>["EventId"] = new ScalarValue(eventId)<# } #>
+
+                }
+            });
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(string.Format(CultureInfo.InvariantCulture, "{0,8:N}", value));
+        }
+    }
+
+    [Test]
+    public void <#= GetTestName("Complex", logLevel, withEventId, withException) #>(<#if (logLevel == "") { #>[ValueSource(nameof(LogLevels))] LogLevel logLevel<# } #>)
+    {
+<#if (logLevel != "") { #> 
+        const LogLevel logLevel = LogLevel.<#= (logLevel) #>;
+<# } #>
+        var value = new TestObject(3, 5);
+
+        <#if (withEventId) { #>EventId eventId = 5;<# } #>
+
+        <#if (withException) { #>Exception exception = new InvalidOperationException("Test exception."); <# } #>
+
+        Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>$"{value}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(1);
+            var logEvent = LogEvents.Single();
+            logEvent.Should().BeEquivalentTo(new 
+            {
+                Exception = <#= withException ? "exception" : "default(Exception)" #>,
+                Level = ToSerilogLevel(logLevel),
+                MessageTemplate = Parser.Parse("{@value}"),
+                Properties = new Dictionary<string, LogEventPropertyValue>
+                {
+                    ["value"] = new ScalarValue(value),
+                    ["SourceContext"] = new ScalarValue(GetType().FullName),
+                    <#if (withEventId) { #>["EventId"] = new ScalarValue(eventId)<# } #>
+
+                }
+            });
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(string.Format(CultureInfo.InvariantCulture, 
+                "TestObject {{ X: {0}, Y: {1} }}", value.X, value.Y));          
+        }
+    }
+
+    [Test]
+    public void <#= GetTestName("Collection", logLevel, withEventId, withException) #>(<#if (logLevel == "") { #>[ValueSource(nameof(LogLevels))] LogLevel logLevel<# } #>)
+    {
+<#if (logLevel != "") { #> 
+        const LogLevel logLevel = LogLevel.<#= (logLevel) #>;
+<# } #>
+        var value = new int[] {1, 2, 3};
+
+        <#if (withEventId) { #>EventId eventId = 5;<# } #>
+
+        <#if (withException) { #>Exception exception = new InvalidOperationException("Test exception."); <# } #>
+
+        Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>$"{value}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(1);
+            var logEvent = LogEvents.Single();
+            logEvent.Should().BeEquivalentTo(new 
+            {
+                Exception = <#= withException ? "exception" : "default(Exception)" #>,
+                Level = ToSerilogLevel(logLevel),
+                MessageTemplate = Parser.Parse("{@value}"),
+                Properties = new Dictionary<string, LogEventPropertyValue>
+                {
+                    ["value"] = new ScalarValue(value),
+                    ["SourceContext"] = new ScalarValue(GetType().FullName),
+                    <#if (withEventId) { #>["EventId"] = new ScalarValue(eventId)<# } #>
+
+                }
+            });
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(string.Format(CultureInfo.InvariantCulture, "[1, 2, 3]", value));
+        }
+    }
+
+    [Test]
+    public void <#= GetTestName("String", logLevel, withEventId, withException) #>(<#if (logLevel == "") { #>[ValueSource(nameof(LogLevels))] LogLevel logLevel<# } #>)
+    {
+<#if (logLevel != "") { #> 
+        const LogLevel logLevel = LogLevel.<#= (logLevel) #>;
+<# } #>
+        var value = "Test";
+
+        <#if (withEventId) { #>EventId eventId = 5;<# } #>
+
+        <#if (withException) { #>Exception exception = new InvalidOperationException("Test exception."); <# } #>
+
+        Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>$"{value}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(1);
+            var logEvent = LogEvents.Single();
+            logEvent.Should().BeEquivalentTo(new 
+            {
+                Exception = <#= withException ? "exception" : "default(Exception)" #>,
+                Level = ToSerilogLevel(logLevel),
+                MessageTemplate = Parser.Parse("{value}"),
+                Properties = new Dictionary<string, LogEventPropertyValue>
+                {
+                    ["value"] = new ScalarValue(value),
+                    ["SourceContext"] = new ScalarValue(GetType().FullName),
+                    <#if (withEventId) { #>["EventId"] = new ScalarValue(eventId)<# } #>
+
+                }
+            });
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(string.Format(CultureInfo.InvariantCulture, "\"{0}\"", value));
+        }
+    }
+
+    [Test]
+    public void <#= GetTestName("Mixed", logLevel, withEventId, withException) #>(<#if (logLevel == "") { #>[ValueSource(nameof(LogLevels))] LogLevel logLevel<# } #>)
+    {
+<#if (logLevel != "") { #> 
+        const LogLevel logLevel = LogLevel.<#= (logLevel) #>;
+<# } #>
+        var arg1 = "Test";
+        var arg2 = 5000;
+        var arg3 = 4.5;
+        var arg4 = new TestObject(7, 11);
+        var arg5 = new int[] {5, 4, 3};
+        var veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg = "veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongValue";
+
+        <#if (withEventId) { #>EventId eventId = 5;<# } #>
+
+        <#if (withException) { #>Exception exception = new InvalidOperationException("Test exception."); <# } #>
+
+        Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>
+            $"ABCD{arg1,7}EFGH{arg2:N}IJKL{arg3,10:F3}MNOP{arg4}QRST{arg5}UVWX{veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg}YZ");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(1);
+            var logEvent = LogEvents.Single();
+            logEvent.Should().BeEquivalentTo(new 
+            {
+                Exception = <#= withException ? "exception" : "default(Exception)" #>,
+                Level = ToSerilogLevel(logLevel),
+                MessageTemplate = Parser.Parse("ABCD{arg1,7}EFGH{arg2:N}IJKL{arg3,10:F3}MNOP{@arg4}QRST{@arg5}UVWX{veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg}YZ"),
+                Properties = new Dictionary<string, LogEventPropertyValue>
+                {
+                    ["arg1"] = new ScalarValue(arg1),
+                    ["arg2"] = new ScalarValue(arg2),
+                    ["arg3"] = new ScalarValue(arg3),
+                    ["arg4"] = new ScalarValue(arg4),
+                    ["arg5"] = new ScalarValue(arg5),
+                    ["veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg"] = new ScalarValue(veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg),
+                    ["SourceContext"] = new ScalarValue(GetType().FullName),
+                    <#if (withEventId) { #>["EventId"] = new ScalarValue(eventId)<# } #>
+
+                }
+            });
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(string.Format(CultureInfo.InvariantCulture, 
+                "ABCD{0,7}EFGH{1:N}IJKL{2,10:F3}MNOP{3}QRST{4}UVWX{5}YZ",
+                "\"" + arg1 + "\"", 
+                arg2, 
+                arg3, 
+                "TestObject { X: 7, Y: 11 }", 
+                "[5, 4, 3]",
+                "\"" + veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg + "\""));
+        }
+    }
+
+<# } #>
+<# } #>
+
+    #endregion // Log<#= (logLevel) #>
+
+<# } #>
+
+}

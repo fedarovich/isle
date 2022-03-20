@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Copyright>© Pavel Fedarovich, 2022</Copyright>
+    <PackageProjectUrl>https://github.com/fedarovich/isle</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/fedarovich/isle.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>structured logging; interpolated strings</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <RootNamespace>Isle</RootNamespace>
+  </PropertyGroup>
+
+</Project>

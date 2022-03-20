@@ -1,0 +1,63 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".g.cs" #>
+<#
+	string[] logLevels = { "Trace", "Debug", "Information", "Warning", "Error", "Critical", null }; 
+	
+	string GetTypeName(string logLevel) => logLevel + "LogInterpolatedStringHandler";
+	
+	string GetMethodName(string logLevel) => "Log" + logLevel;
+
+	string GetLogLevel(string logLevel) => logLevel != null ? "LogLevel." + logLevel : "logLevel";
+#>
+#nullable enable
+using System.Runtime.CompilerServices;
+using Microsoft.Extensions.Logging;
+
+namespace Isle.Extensions.Logging;
+
+public static class LoggerExtensions
+{
+	private static readonly Func<FormattedLogValues, Exception?, string> _messageFormatter = MessageFormatter;
+
+<# foreach (var logLevel in logLevels) { #>
+<# foreach (var withEventId in new[] { false, true }) { #>
+<# foreach (var withException in new[] { false, true }) { #>
+	public static void <#= GetMethodName(logLevel) #>(
+		this ILogger logger,
+<# if (logLevel == null) { #>
+		LogLevel logLevel,
+<# } #>
+<# if (withEventId) { #>
+		EventId eventId,
+<# } #>
+<# if (withException) { #>
+		Exception? exception,
+<# } #>
+		[InterpolatedStringHandlerArgument("logger"<#= logLevel == null ? ", \"logLevel\"" : "" #>)] ref <#= GetTypeName(logLevel) #> handler
+	)
+	{
+		if (handler.IsEnabled)
+		{
+			Log(logger, <#= GetLogLevel(logLevel) #>, <#= withEventId ? "eventId" : "default" #>, <#= withException ? "exception" : "null" #>, handler.GetFormattedLogValuesAndReset());
+		}
+	}
+
+<# } #>
+<# } #>
+<# } #>
+	private static void Log(ILogger logger, LogLevel logLevel, EventId eventId, Exception? exception, in FormattedLogValues formattedLogValues)
+	{
+		logger.Log(logLevel, eventId, formattedLogValues, exception, _messageFormatter);
+	}
+
+	public static IDisposable BeginScopeInterpolated(this ILogger logger, [InterpolatedStringHandlerArgument("logger")] ref ScopeLogInterpolatedStringHandler handler)
+	{
+		return logger.BeginScope(handler.GetFormattedLogValuesAndReset());
+	}
+
+	private static string MessageFormatter(FormattedLogValues state, Exception? error) => state.ToString();
+}

@@ -1,0 +1,308 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".g.cs" #>
+<#
+    const string Scope = "Scope";
+
+	string[] logLevels = { "Trace", "Debug", "Information", "Warning", "Error", "Critical", null }; 
+
+    string GetTypeName(string logLevel) => logLevel + "LogInterpolatedStringHandler";
+    string GetTestName(string logLevel) => GetTypeName(logLevel) + "Tests";
+#>
+#nullable enable
+using System.Collections.Generic;
+using System.Globalization;
+using Microsoft.Extensions.Logging;
+using NUnit.Framework;
+using FluentAssertions;
+
+namespace Isle.Extensions.Logging.Tests;
+
+<# foreach (var logLevel in logLevels) { #>
+
+[TestFixtureSource(nameof(FixtureArgs))]
+public class <#= GetTestName(logLevel) #> : BaseFixture
+{
+<#if (logLevel != null) { #>
+    private const LogLevel logLevel = LogLevel.<#= logLevel #>;
+<# } #>
+
+    public <#= GetTestName(logLevel) #>(LogLevel minLogLevel) : base(minLogLevel)
+    {
+    }
+
+    [Test]
+    public void CreateHandler(<#if (logLevel == null) { #> [ValueSource(nameof(LogLevels))] LogLevel logLevel <# } #>)
+    {
+        var handler = new <#= GetTypeName(logLevel) #>(0, 0, Logger, <#if (logLevel == null) { #> logLevel, <# } #> out bool isEnabled);
+        handler.IsEnabled.Should().Be(logLevel >= MinLogLevel);
+        isEnabled.Should().Be(logLevel >= MinLogLevel);
+        if (logLevel >= MinLogLevel)
+        {
+            handler.GetFormattedLogValuesAndReset();
+        }
+    }
+
+    [Test]
+    public void AppendLiteral(<#if (logLevel == null) { #> [ValueSource(nameof(LogLevels))] LogLevel logLevel, <# } #>[ValueSource(nameof(Literals))] string? literal)
+    {
+        Assume.That(logLevel >= MinLogLevel);
+
+        var handler = new <#= GetTypeName(logLevel) #>(3, 0, Logger, <#if (logLevel == null) { #> logLevel, <# } #> out _);
+        handler.AppendLiteral(literal);
+        var values = handler.GetFormattedLogValuesAndReset();
+        values.Count.Should().Be(1);
+        values[0].Should().Be(new KeyValuePair<string, object>("{OriginalFormat}", literal ?? ""));
+        values.ToString().Should().Be(literal ?? "");
+    }
+
+    #region AppendFormatted with Scalar
+
+    [Test]
+    public void AppendFormattedScalar<T>(<#if (logLevel == null) { #> [ValueSource(nameof(LogLevels))] LogLevel logLevel, <# } #>[ValueSource(nameof(Scalars))] T value)
+    {
+        Assume.That(logLevel >= MinLogLevel);
+
+        var handler = new <#= GetTypeName(logLevel) #>(0, 1, Logger, <#if (logLevel == null) { #> logLevel, <# } #> out _);
+        handler.AppendFormatted(value);
+        var values = handler.GetFormattedLogValuesAndReset();
+        values.Count.Should().Be(2);
+        values.Should().BeEquivalentTo(
+            new []
+            {
+                new KeyValuePair<string, object?>(nameof(value), value),
+                new KeyValuePair<string, object?>("{OriginalFormat}", "{value}")
+            });
+        values.ToString().Should().Be(string.Format(CultureInfo.InvariantCulture, "{0}", value));
+    }
+
+    [Test]
+    public void AppendFormattedScalar<T>(<#if (logLevel == null) { #> [ValueSource(nameof(LogLevels))] LogLevel logLevel, <# } #>[ValueSource(nameof(Scalars))] T value, [Values(-6, 5)] int alignment)
+    {
+        Assume.That(logLevel >= MinLogLevel);
+
+        var handler = new <#= GetTypeName(logLevel) #>(0, 1, Logger, <#if (logLevel == null) { #> logLevel, <# } #> out _);
+        handler.IsEnabled.Should().BeTrue();
+        handler.AppendFormatted(value, alignment);
+        var values = handler.GetFormattedLogValuesAndReset();
+        values.Count.Should().Be(2);
+        values.Should().BeEquivalentTo(
+            new[]
+            {
+                new KeyValuePair<string, object?>(nameof(value), value),
+                new KeyValuePair<string, object?>("{OriginalFormat}", "{value," + alignment + "}")
+            });
+        values.ToString().Should().Be(string.Format(CultureInfo.InvariantCulture, "{0," + alignment + "}", value));
+    }
+
+    [Test]
+    public void AppendFormattedScalar<T>(<#if (logLevel == null) { #> [ValueSource(nameof(LogLevels))] LogLevel logLevel, <# } #>[ValueSource(nameof(Scalars))] T value, [Values("00000", "N")] string format)
+    {
+        Assume.That(logLevel >= MinLogLevel);
+
+        var handler = new <#= GetTypeName(logLevel) #>(0, 1, Logger, <#if (logLevel == null) { #> logLevel, <# } #> out _);
+        handler.AppendFormatted(value, format: format);
+        var values = handler.GetFormattedLogValuesAndReset();
+        values.Count.Should().Be(2);
+        values.Should().BeEquivalentTo(
+            new[]
+            {
+                new KeyValuePair<string, object?>(nameof(value), value),
+                new KeyValuePair<string, object?>("{OriginalFormat}", "{value:" + format + "}")
+            });
+        values.ToString().Should().Be(string.Format(CultureInfo.InvariantCulture, "{0:" + format + "}", value));
+    }
+
+    [Test]
+    public void AppendFormattedScalar<T>(<#if (logLevel == null) { #> [ValueSource(nameof(LogLevels))] LogLevel logLevel, <# } #>[ValueSource(nameof(Scalars))] T value, [Values(-3, 5)] int alignment, [Values("00000", "N")] string format)
+    {
+        Assume.That(logLevel >= MinLogLevel);
+
+        var handler = new <#= GetTypeName(logLevel) #>(0, 1, Logger, <#if (logLevel == null) { #> logLevel, <# } #> out _);
+        handler.AppendFormatted(value, alignment, format);
+        var values = handler.GetFormattedLogValuesAndReset();
+        values.Count.Should().Be(2);
+        values.Should().BeEquivalentTo(
+            new[]
+            {
+                new KeyValuePair<string, object?>(nameof(value), value),
+                new KeyValuePair<string, object?>("{OriginalFormat}", "{value," + alignment + ":" + format + "}")
+            });
+        values.ToString().Should().Be(string.Format(CultureInfo.InvariantCulture, "{0," + alignment + ":" + format + "}", value));
+    }
+
+    #endregion
+
+    #region AppendFormatted with Collection
+
+    [Test]
+    public void AppendFormattedCollection(<#if (logLevel == null) { #> [ValueSource(nameof(LogLevels))] LogLevel logLevel <# } #>)
+    {
+        Assume.That(logLevel >= MinLogLevel);
+
+        var value = new[] { 1, 2, 3 };
+
+        var handler = new <#= GetTypeName(logLevel) #>(0, 1, Logger, <#if (logLevel == null) { #> logLevel, <# } #> out _);
+        handler.AppendFormatted(value);
+        var values = handler.GetFormattedLogValuesAndReset();
+        values.Count.Should().Be(2);
+        values.Should().BeEquivalentTo(
+            new[]
+            {
+                new KeyValuePair<string, object>("@" + nameof(value), value),
+                new KeyValuePair<string, object>("{OriginalFormat}", "{@value}")
+            });
+        values.ToString().Should().Be("1, 2, 3");
+    }
+
+    [Test]
+    public void AppendFormattedCollection(<#if (logLevel == null) { #> [ValueSource(nameof(LogLevels))] LogLevel logLevel, <# } #>[Values(-6, 5)] int alignment)
+    {
+        Assume.That(logLevel >= MinLogLevel);
+
+        var value = new[] { 1, 2, 3 };
+
+        var handler = new <#= GetTypeName(logLevel) #>(0, 1, Logger, <#if (logLevel == null) { #> logLevel, <# } #> out _);
+        handler.AppendFormatted(value, alignment);
+        var values = handler.GetFormattedLogValuesAndReset();
+        values.Count.Should().Be(2);
+        values.Should().BeEquivalentTo(
+            new[]
+            {
+                new KeyValuePair<string, object>("@" + nameof(value), value),
+                new KeyValuePair<string, object>("{OriginalFormat}", "{@value," + alignment + "}")
+            });
+        values.ToString().Should().Be("1, 2, 3");
+    }
+
+    [Test]
+    public void AppendFormattedCollection(<#if (logLevel == null) { #> [ValueSource(nameof(LogLevels))] LogLevel logLevel, <# } #>[Values("00000", "N")] string format)
+    {
+        Assume.That(logLevel >= MinLogLevel);
+
+        var value = new[] { 1, 2, 3 };
+
+        var handler = new <#= GetTypeName(logLevel) #>(0, 1, Logger, <#if (logLevel == null) { #> logLevel, <# } #> out _);
+        handler.AppendFormatted(value, format: format);
+        var values = handler.GetFormattedLogValuesAndReset();
+        values.Count.Should().Be(2);
+        values.Should().BeEquivalentTo(
+            new[]
+            {
+                new KeyValuePair<string, object>("@" + nameof(value), value),
+                new KeyValuePair<string, object>("{OriginalFormat}", "{@value:" + format + "}")
+            });
+        values.ToString().Should().Be("1, 2, 3");
+    }
+
+    [Test]
+    public void AppendFormattedCollection(<#if (logLevel == null) { #> [ValueSource(nameof(LogLevels))] LogLevel logLevel, <# } #>[Values(-6, 5)] int alignment, [Values("00000", "N")] string format)
+    {
+        Assume.That(logLevel >= MinLogLevel);
+
+        var value = new[] { 1, 2, 3 };
+
+        var handler = new <#= GetTypeName(logLevel) #>(0, 1, Logger, <#if (logLevel == null) { #> logLevel, <# } #> out _);
+        handler.AppendFormatted(value, alignment, format);
+        var values = handler.GetFormattedLogValuesAndReset();
+        values.Count.Should().Be(2);
+        values.Should().BeEquivalentTo(
+            new[]
+            {
+                new KeyValuePair<string, object>("@" + nameof(value), value),
+                new KeyValuePair<string, object>("{OriginalFormat}", "{@value," + alignment + ":" + format + "}")
+            });
+        values.ToString().Should().Be("1, 2, 3");
+    }
+
+    #endregion
+
+    #region AppendFormat with Complex Object
+
+    [Test]
+    public void AppendFormattedComplexType(<#if (logLevel == null) { #> [ValueSource(nameof(LogLevels))] LogLevel logLevel <# } #>)
+    {
+        Assume.That(logLevel >= MinLogLevel);
+
+        var value = new TestObject(1, 2);
+
+        var handler = new <#= GetTypeName(logLevel) #>(0, 1, Logger, <#if (logLevel == null) { #> logLevel, <# } #> out _);
+        handler.AppendFormatted(value);
+        var values = handler.GetFormattedLogValuesAndReset();
+        values.Count.Should().Be(2);
+        values.Should().BeEquivalentTo(
+            new[]
+            {
+                new KeyValuePair<string, object>("@" + nameof(value), value),
+                new KeyValuePair<string, object>("{OriginalFormat}", "{@value}")
+            });
+        values.ToString().Should().Be(value.ToString());
+    }
+
+    [Test]
+    public void AppendFormattedComplexType(<#if (logLevel == null) { #> [ValueSource(nameof(LogLevels))] LogLevel logLevel, <# } #>[Values(-6, 5)] int alignment)
+    {
+        Assume.That(logLevel >= MinLogLevel);
+
+        var value = new TestObject(1, 2);
+
+        var handler = new <#= GetTypeName(logLevel) #>(0, 1, Logger, <#if (logLevel == null) { #> logLevel, <# } #> out _);
+        handler.AppendFormatted(value, alignment);
+        var values = handler.GetFormattedLogValuesAndReset();
+        values.Count.Should().Be(2);
+        values.Should().BeEquivalentTo(
+            new[]
+            {
+                new KeyValuePair<string, object>("@" + nameof(value), value),
+                new KeyValuePair<string, object>("{OriginalFormat}", "{@value," + alignment + "}")
+            });
+        values.ToString().Should().Be(value.ToString());
+    }
+
+    [Test]
+    public void AppendFormattedComplexType(<#if (logLevel == null) { #> [ValueSource(nameof(LogLevels))] LogLevel logLevel, <# } #>[Values("00000", "N")] string format)
+    {
+        Assume.That(logLevel >= MinLogLevel);
+
+        var value = new TestObject(1, 2);
+
+        var handler = new <#= GetTypeName(logLevel) #>(0, 1, Logger, <#if (logLevel == null) { #> logLevel, <# } #> out _);
+        handler.AppendFormatted(value, format: format);
+        var values = handler.GetFormattedLogValuesAndReset();
+        values.Count.Should().Be(2);
+        values.Should().BeEquivalentTo(
+            new[]
+            {
+                new KeyValuePair<string, object>("@" + nameof(value), value),
+                new KeyValuePair<string, object>("{OriginalFormat}", "{@value:" + format + "}")
+            });
+        values.ToString().Should().Be(value.ToString());
+    }
+
+    [Test]
+    public void AppendFormattedComplexType(<#if (logLevel == null) { #> [ValueSource(nameof(LogLevels))] LogLevel logLevel, <# } #>[Values(-6, 5)] int alignment, [Values("00000", "N")] string format)
+    {
+        Assume.That(logLevel >= MinLogLevel);
+
+        var value = new TestObject(1, 2);
+
+        var handler = new <#= GetTypeName(logLevel) #>(0, 1, Logger, <#if (logLevel == null) { #> logLevel, <# } #> out _);
+        handler.AppendFormatted(value, alignment, format);
+        var values = handler.GetFormattedLogValuesAndReset();
+        values.Count.Should().Be(2);
+        values.Should().BeEquivalentTo(
+            new[]
+            {
+                new KeyValuePair<string, object>("@" + nameof(value), value),
+                new KeyValuePair<string, object>("{OriginalFormat}", "{@value," + alignment + ":" + format + "}")
+            });
+        values.ToString().Should().Be(value.ToString());
+    }
+
+    #endregion
+}
+
+<# } #>
