@@ -17,20 +17,39 @@ steps:
   displayName: 'dotnet restore'
   inputs:
     command: restore
+    projects: 'src/Isle/Isle.sln'
+    arguments: '-c Release'
 
 - task: DotNetCoreCLI@2
   displayName: 'dotnet build'
   inputs:
-    command: build
+    command: build    
+    projects: 'src/Isle/Isle.sln'
+    arguments: '-c Release'
 
 - task: DotNetCoreCLI@2
   displayName: 'dotnet test'
   inputs:
     command: test
+    projects: 'src/Isle/Isle.sln'
+    arguments: '-c Release'
 
 - task: DotNetCoreCLI@2
-  displayName: 'dotnet pack'
+  displayName: 'dotnet pack Isle.Core'
   inputs:
-   command: pack
-   majorVersion: 1
-   minorVersion: 0 
+    command: pack
+    projects: 'src/Isle/Isle.Core/Isle.Core.csproj'
+    arguments: '-c Release'
+    includesymbols: true
+    majorVersion: 1
+    minorVersion: 0
+
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet pack Isle.Extensions.Logging'
+  inputs:
+    command: pack
+    projects: 'src/Isle/Isle.Extensions.Logging/Isle.Extensions.Logging.csproj'
+    arguments: '-c Release'
+    includesymbols: true
+    majorVersion: 1
+    minorVersion: 0 
