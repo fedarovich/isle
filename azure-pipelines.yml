@@ -7,15 +7,12 @@ trigger:
 - main
 
 pool:
-  vmImage: ubuntu-latest
+  vmImage: windows-2022
+
+variables:
+  buildConfiguration: 'Release'
 
 steps:
-- task: UseDotNet@2
-  displayName: 'Use .Net 6 SDK'
-  inputs:
-    packageType: sdk
-    version: 6.x
-
 - task: DotNetCoreCLI@2
   displayName: 'dotnet restore'
   inputs:
