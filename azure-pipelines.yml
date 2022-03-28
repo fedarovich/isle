@@ -52,7 +52,8 @@ steps:
 - task: DotNetCoreCLI@2
   displayName: 'dotnet pack Isle.Core'
   inputs:
-    command: pack
+    command: custom
+    custom: pack
     projects: 'src/Isle/Isle.Core/Isle.Core.csproj'
     arguments: '-c $(BuildConfiguration) -p:VersionPrefix=$(MajorVersion).$(MinorVersion).$(rev:r) --version-suffix "$(Suffix)"'
     includesymbols: true
@@ -61,7 +62,8 @@ steps:
 - task: DotNetCoreCLI@2
   displayName: 'dotnet pack Isle.Extensions.Logging'
   inputs:
-    command: pack
+    command: custom
+    custom: pack
     projects: 'src/Isle/Isle.Extensions.Logging/Isle.Extensions.Logging.csproj'
     arguments: '-c $(BuildConfiguration) -p:VersionPrefix=$(MajorVersion).$(MinorVersion).$(rev:r) --version-suffix "$(Suffix)"'
     includesymbols: true
