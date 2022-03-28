@@ -23,9 +23,8 @@ variables:
     Suffix: '-pre' 
   ${{ else }}:
     Suffix: ''
-  Version: '$(MajorVersion).$(MinorVersion).$(rev:r)$(Suffix)'
 
-name: '$(Version)'
+name: '$(MajorVersion).$(MinorVersion).$(rev:r)$(Suffix)'
 
 steps:
 - task: DotNetCoreCLI@2
@@ -55,7 +54,7 @@ steps:
   inputs:
     command: pack
     projects: 'src/Isle/Isle.Core/Isle.Core.csproj'
-    arguments: '-c $(BuildConfiguration) -p:Version=$(Version)'
+    arguments: '-c $(BuildConfiguration) -p:Version=$(MajorVersion).$(MinorVersion).$(rev:r)$(Suffix)'
     includesymbols: true
     nobuild: true
 
@@ -64,7 +63,7 @@ steps:
   inputs:
     command: pack
     projects: 'src/Isle/Isle.Extensions.Logging/Isle.Extensions.Logging.csproj'
-    arguments: '-c $(BuildConfiguration) -p:Version=$(Version)'
+    arguments: '-c $(BuildConfiguration) -p:Version=$(MajorVersion).$(MinorVersion).$(rev:r)$(Suffix)'
     includesymbols: true
     nobuild: true
 
