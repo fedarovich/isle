@@ -63,3 +63,5 @@ steps:
     majorVersion: $(MajorVersion)
     minorVersion: $(MinorVersion)
     patchVersion: $(rev:r)
+
+- task: PublishBuildArtifacts@1
