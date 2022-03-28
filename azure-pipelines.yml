@@ -10,7 +10,15 @@ pool:
   vmImage: windows-2022
 
 variables:
-  buildConfiguration: 'Release'
+  BuildConfiguration: 'Release'
+  MajorVersion: 1
+  MinorVersion: 0
+  ${{ if eq(variables['IsRelease'], '0' ) }}:
+    Suffix: '-pre' 
+  ${{ else }}:
+    Suffix: ''
+
+name: '$(MajorVersion).$(MinorVersion).$(rev:r)$(Suffix)'
 
 steps:
 - task: DotNetCoreCLI@2
@@ -18,38 +26,40 @@ steps:
   inputs:
     command: restore
     projects: 'src/Isle/Isle.sln'
-    arguments: '-c Release'
+    arguments: '-c $(BuildConfiguration)'
 
 - task: DotNetCoreCLI@2
   displayName: 'dotnet build'
   inputs:
     command: build    
     projects: 'src/Isle/Isle.sln'
-    arguments: '-c Release'
+    arguments: '-c $(BuildConfiguration)'
 
 - task: DotNetCoreCLI@2
   displayName: 'dotnet test'
   inputs:
     command: test
     projects: 'src/Isle/Isle.sln'
-    arguments: '-c Release'
+    arguments: '-c $(BuildConfiguration)'
 
 - task: DotNetCoreCLI@2
   displayName: 'dotnet pack Isle.Core'
   inputs:
     command: pack
     projects: 'src/Isle/Isle.Core/Isle.Core.csproj'
-    arguments: '-c Release'
+    arguments: '-c $(BuildConfiguration)'
     includesymbols: true
-    majorVersion: 1
-    minorVersion: 0
+    majorVersion: $(MajorVersion)
+    minorVersion: $(MinorVersion)
+    patchVersion: $(rev:r)
 
 - task: DotNetCoreCLI@2
   displayName: 'dotnet pack Isle.Extensions.Logging'
   inputs:
     command: pack
     projects: 'src/Isle/Isle.Extensions.Logging/Isle.Extensions.Logging.csproj'
-    arguments: '-c Release'
+    arguments: '-c $(BuildConfiguration)'
     includesymbols: true
-    majorVersion: 1
-    minorVersion: 0 
+    majorVersion: $(MajorVersion)
+    minorVersion: $(MinorVersion)
+    patchVersion: $(rev:r)
