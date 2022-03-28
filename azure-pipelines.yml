@@ -55,6 +55,6 @@ steps:
     command: custom
     custom: pack
     projects: 'src/Isle/Isle.sln'
-    arguments: 'src/Isle/Isle.sln -c $(BuildConfiguration) -p:VersionPrefix=$(Build.BuildNumber) --version-suffix "$(Suffix)" --no-build'
+    arguments: '-c $(BuildConfiguration) -p:VersionPrefix=$(Build.BuildNumber) --version-suffix "$(Suffix)" --no-build'
 
 - task: PublishBuildArtifacts@1
