@@ -50,23 +50,11 @@ steps:
     nobuild: true
 
 - task: DotNetCoreCLI@2
-  displayName: 'dotnet pack Isle.Core'
+  displayName: 'dotnet pack'
   inputs:
     command: custom
     custom: pack
-    projects: 'src/Isle/Isle.Core/Isle.Core.csproj'
-    arguments: '-c $(BuildConfiguration) -p:VersionPrefix=$(MajorVersion).$(MinorVersion).$(rev:r) --version-suffix "$(Suffix)"'
-    includesymbols: true
-    nobuild: true
-
-- task: DotNetCoreCLI@2
-  displayName: 'dotnet pack Isle.Extensions.Logging'
-  inputs:
-    command: custom
-    custom: pack
-    projects: 'src/Isle/Isle.Extensions.Logging/Isle.Extensions.Logging.csproj'
-    arguments: '-c $(BuildConfiguration) -p:VersionPrefix=$(MajorVersion).$(MinorVersion).$(rev:r) --version-suffix "$(Suffix)"'
-    includesymbols: true
-    nobuild: true
+    projects: 'src/Isle/Isle.sln'
+    arguments: 'src/Isle/Isle.sln -c $(BuildConfiguration) -p:VersionPrefix=$(Build.BuildNumber) --version-suffix "$(Suffix)" --no-build'
 
 - task: PublishBuildArtifacts@1
