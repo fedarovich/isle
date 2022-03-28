@@ -20,11 +20,11 @@ variables:
   MajorVersion: 1
   MinorVersion: 0
   ${{ if eq(parameters.IsRelease, false) }}:
-    Suffix: '-pre' 
+    Suffix: 'pre' 
   ${{ else }}:
     Suffix: ''
 
-name: '$(MajorVersion).$(MinorVersion).$(rev:r)$(Suffix)'
+name: '$(MajorVersion).$(MinorVersion).$(rev:r)'
 
 steps:
 - task: DotNetCoreCLI@2
@@ -54,7 +54,7 @@ steps:
   inputs:
     command: pack
     projects: 'src/Isle/Isle.Core/Isle.Core.csproj'
-    arguments: '-c $(BuildConfiguration) -p:Version=$(MajorVersion).$(MinorVersion).$(rev:r)$(Suffix)'
+    arguments: '-c $(BuildConfiguration) -p:VersionPrefix=$(MajorVersion).$(MinorVersion).$(rev:r) --version-suffix "$(Suffix)"'
     includesymbols: true
     nobuild: true
 
@@ -63,7 +63,7 @@ steps:
   inputs:
     command: pack
     projects: 'src/Isle/Isle.Extensions.Logging/Isle.Extensions.Logging.csproj'
-    arguments: '-c $(BuildConfiguration) -p:Version=$(MajorVersion).$(MinorVersion).$(rev:r)$(Suffix)'
+    arguments: '-c $(BuildConfiguration) -p:VersionPrefix=$(MajorVersion).$(MinorVersion).$(rev:r) --version-suffix "$(Suffix)"'
     includesymbols: true
     nobuild: true
 
