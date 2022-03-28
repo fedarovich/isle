@@ -9,11 +9,17 @@ trigger:
 pool:
   vmImage: windows-2022
 
+parameters:
+  - name: IsRelease
+    displayName: 'Is Release'
+    default: false
+    type: boolean
+
 variables:
   BuildConfiguration: 'Release'
   MajorVersion: 1
   MinorVersion: 0
-  ${{ if eq(variables['IsRelease'], '0' ) }}:
+  ${{ if eq(parameters.IsRelease, false) }}:
     Suffix: '-pre' 
   ${{ else }}:
     Suffix: ''
@@ -41,27 +47,22 @@ steps:
     command: test
     projects: 'src/Isle/Isle.sln'
     arguments: '-c $(BuildConfiguration)'
+    nobuild: true
 
 - task: DotNetCoreCLI@2
   displayName: 'dotnet pack Isle.Core'
   inputs:
     command: pack
     projects: 'src/Isle/Isle.Core/Isle.Core.csproj'
-    arguments: '-c $(BuildConfiguration)'
+    arguments: '-c $(BuildConfiguration) -p:PackageVersion=$(MajorVersion).$(MinorVersion).$(rev:r)$(Suffix)'
     includesymbols: true
-    majorVersion: $(MajorVersion)
-    minorVersion: $(MinorVersion)
-    patchVersion: $(rev:r)
 
 - task: DotNetCoreCLI@2
   displayName: 'dotnet pack Isle.Extensions.Logging'
   inputs:
     command: pack
     projects: 'src/Isle/Isle.Extensions.Logging/Isle.Extensions.Logging.csproj'
-    arguments: '-c $(BuildConfiguration)'
+    arguments: '-c $(BuildConfiguration) -p:PackageVersion=$(MajorVersion).$(MinorVersion).$(rev:r)$(Suffix)'
     includesymbols: true
-    majorVersion: $(MajorVersion)
-    minorVersion: $(MinorVersion)
-    patchVersion: $(rev:r)
 
 - task: PublishBuildArtifacts@1
