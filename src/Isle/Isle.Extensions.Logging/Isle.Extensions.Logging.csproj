@@ -4,7 +4,13 @@
 		<TargetFramework>net6.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<Copyright>© Pavel Fedarovich, 2022</Copyright>
+		<PackageProjectUrl>https://github.com/fedarovich/isle</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/fedarovich/isle.git</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageTags>structured logging; interpolated strings</PackageTags>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<Description>Adds support of structured logging using interpolated strings in C# 10 to Microsoft.Extensions.Logging.</Description>
 	</PropertyGroup>
 
 	<ItemGroup>
