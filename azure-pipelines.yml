@@ -39,7 +39,7 @@ steps:
   inputs:
     command: build    
     projects: 'src/Isle/Isle.sln'
-    arguments: '-c $(BuildConfiguration)'
+    arguments: '-c $(BuildConfiguration) -p:FileVersion=$(Build.BuildNumber)'
 
 - task: DotNetCoreCLI@2
   displayName: 'dotnet test'
@@ -66,3 +66,10 @@ steps:
     arguments: '-c $(BuildConfiguration) -p:VersionPrefix=$(Build.BuildNumber) --version-suffix "$(Suffix)" --no-build --include-symbols -o "$(Build.ArtifactStagingDirectory)"'
 
 - task: PublishBuildArtifacts@1
+
+- task: NuGetCommand@2
+  displayName: 'MyGet push'
+  inputs:
+    command: push
+    nuGetFeedType: external
+    publishFeedCredentials: MyGet
