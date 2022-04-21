@@ -46,7 +46,7 @@ steps:
   inputs:
     command: test
     projects: 'src/Isle/Isle.sln'
-    arguments: '-c $(BuildConfiguration)'
+    arguments: '-c $(BuildConfiguration) --no-build'
     nobuild: true
 
 - task: DotNetCoreCLI@2
