@@ -57,7 +57,7 @@ namespace Isle.Extensions.Logging.Tests
         [SetUp]
         protected virtual void Setup()
         {
-            Logger = LoggerFactory.CreateLogger(GetType().FullName);
+            Logger = LoggerFactory.CreateLogger(GetType().FullName!);
         }
 
         [TearDown]
