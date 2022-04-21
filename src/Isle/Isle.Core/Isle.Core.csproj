@@ -15,4 +15,8 @@
     <RootNamespace>Isle</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Update="buildTransitive/**" Pack="True" PackagePath="/" />
+  </ItemGroup>
+
 </Project>
