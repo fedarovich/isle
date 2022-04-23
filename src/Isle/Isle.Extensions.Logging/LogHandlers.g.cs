@@ -7,6 +7,12 @@ using Isle.Configuration;
 namespace Isle.Extensions.Logging;
 
 
+/// <summary>
+/// Interpolated string handler for LogTrace() method.
+/// </summary>
+/// <remarks>
+/// This class should not be used directly in your code.
+/// </remarks>
 [InterpolatedStringHandler]
 public ref partial struct TraceLogInterpolatedStringHandler
 {
@@ -20,6 +26,9 @@ public ref partial struct TraceLogInterpolatedStringHandler
     private int _valueIndex = 0;
     private int _segmentIndex = 0;
 
+    /// <summary>
+    /// Creates a new instance of <see cref="TraceLogInterpolatedStringHandler" />.
+    /// </summary>
     public TraceLogInterpolatedStringHandler(
         int literalLength, 
         int formattedCount,
@@ -36,8 +45,14 @@ public ref partial struct TraceLogInterpolatedStringHandler
         }
     }
 
+    /// <summary>
+    /// Gets the value indicating whether the handler is enabled.
+    /// </summary>
     public bool IsEnabled => _originalFormatBuilder != null;
 
+    /// <summary>
+    /// Appends a string literal to the template string.
+    /// </summary>
     public void AppendLiteral(string? str)
     {
         var start = _originalFormatBuilder.Length;
@@ -57,16 +72,25 @@ public ref partial struct TraceLogInterpolatedStringHandler
         }
     }
 
+    /// <summary>
+    /// Appends a <paramref name="value" /> to the string log message.
+    /// </summary>
     public void AppendFormatted(string? value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "") => AppendFormatted(
         new NamedLogValue(value, name, default, default), 
         alignment, 
         format);
 
+    /// <summary>
+    /// Appends a <paramref name="value" /> to the string log message.
+    /// </summary>
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "") => AppendFormatted(
         new NamedLogValue(value, name, IsleConfiguration.Current.ValueRepresentationPolicy.GetRepresentationOfType<T>(), default), 
         alignment, 
         format);
 
+    /// <summary>
+    /// Appends a <paramref name="namedLogValue" /> to the string log message.
+    /// </summary>
     [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.AggressiveOptimization)]
     public void AppendFormatted(in NamedLogValue namedLogValue, int alignment = 0, string? format = null)
     {
@@ -117,6 +141,12 @@ public ref partial struct TraceLogInterpolatedStringHandler
 }
 
 
+/// <summary>
+/// Interpolated string handler for LogDebug() method.
+/// </summary>
+/// <remarks>
+/// This class should not be used directly in your code.
+/// </remarks>
 [InterpolatedStringHandler]
 public ref partial struct DebugLogInterpolatedStringHandler
 {
@@ -130,6 +160,9 @@ public ref partial struct DebugLogInterpolatedStringHandler
     private int _valueIndex = 0;
     private int _segmentIndex = 0;
 
+    /// <summary>
+    /// Creates a new instance of <see cref="DebugLogInterpolatedStringHandler" />.
+    /// </summary>
     public DebugLogInterpolatedStringHandler(
         int literalLength, 
         int formattedCount,
@@ -146,8 +179,14 @@ public ref partial struct DebugLogInterpolatedStringHandler
         }
     }
 
+    /// <summary>
+    /// Gets the value indicating whether the handler is enabled.
+    /// </summary>
     public bool IsEnabled => _originalFormatBuilder != null;
 
+    /// <summary>
+    /// Appends a string literal to the template string.
+    /// </summary>
     public void AppendLiteral(string? str)
     {
         var start = _originalFormatBuilder.Length;
@@ -167,16 +206,25 @@ public ref partial struct DebugLogInterpolatedStringHandler
         }
     }
 
+    /// <summary>
+    /// Appends a <paramref name="value" /> to the string log message.
+    /// </summary>
     public void AppendFormatted(string? value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "") => AppendFormatted(
         new NamedLogValue(value, name, default, default), 
         alignment, 
         format);
 
+    /// <summary>
+    /// Appends a <paramref name="value" /> to the string log message.
+    /// </summary>
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "") => AppendFormatted(
         new NamedLogValue(value, name, IsleConfiguration.Current.ValueRepresentationPolicy.GetRepresentationOfType<T>(), default), 
         alignment, 
         format);
 
+    /// <summary>
+    /// Appends a <paramref name="namedLogValue" /> to the string log message.
+    /// </summary>
     [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.AggressiveOptimization)]
     public void AppendFormatted(in NamedLogValue namedLogValue, int alignment = 0, string? format = null)
     {
@@ -227,6 +275,12 @@ public ref partial struct DebugLogInterpolatedStringHandler
 }
 
 
+/// <summary>
+/// Interpolated string handler for LogInformation() method.
+/// </summary>
+/// <remarks>
+/// This class should not be used directly in your code.
+/// </remarks>
 [InterpolatedStringHandler]
 public ref partial struct InformationLogInterpolatedStringHandler
 {
@@ -240,6 +294,9 @@ public ref partial struct InformationLogInterpolatedStringHandler
     private int _valueIndex = 0;
     private int _segmentIndex = 0;
 
+    /// <summary>
+    /// Creates a new instance of <see cref="InformationLogInterpolatedStringHandler" />.
+    /// </summary>
     public InformationLogInterpolatedStringHandler(
         int literalLength, 
         int formattedCount,
@@ -256,8 +313,14 @@ public ref partial struct InformationLogInterpolatedStringHandler
         }
     }
 
+    /// <summary>
+    /// Gets the value indicating whether the handler is enabled.
+    /// </summary>
     public bool IsEnabled => _originalFormatBuilder != null;
 
+    /// <summary>
+    /// Appends a string literal to the template string.
+    /// </summary>
     public void AppendLiteral(string? str)
     {
         var start = _originalFormatBuilder.Length;
@@ -277,16 +340,25 @@ public ref partial struct InformationLogInterpolatedStringHandler
         }
     }
 
+    /// <summary>
+    /// Appends a <paramref name="value" /> to the string log message.
+    /// </summary>
     public void AppendFormatted(string? value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "") => AppendFormatted(
         new NamedLogValue(value, name, default, default), 
         alignment, 
         format);
 
+    /// <summary>
+    /// Appends a <paramref name="value" /> to the string log message.
+    /// </summary>
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "") => AppendFormatted(
         new NamedLogValue(value, name, IsleConfiguration.Current.ValueRepresentationPolicy.GetRepresentationOfType<T>(), default), 
         alignment, 
         format);
 
+    /// <summary>
+    /// Appends a <paramref name="namedLogValue" /> to the string log message.
+    /// </summary>
     [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.AggressiveOptimization)]
     public void AppendFormatted(in NamedLogValue namedLogValue, int alignment = 0, string? format = null)
     {
@@ -337,6 +409,12 @@ public ref partial struct InformationLogInterpolatedStringHandler
 }
 
 
+/// <summary>
+/// Interpolated string handler for LogWarning() method.
+/// </summary>
+/// <remarks>
+/// This class should not be used directly in your code.
+/// </remarks>
 [InterpolatedStringHandler]
 public ref partial struct WarningLogInterpolatedStringHandler
 {
@@ -350,6 +428,9 @@ public ref partial struct WarningLogInterpolatedStringHandler
     private int _valueIndex = 0;
     private int _segmentIndex = 0;
 
+    /// <summary>
+    /// Creates a new instance of <see cref="WarningLogInterpolatedStringHandler" />.
+    /// </summary>
     public WarningLogInterpolatedStringHandler(
         int literalLength, 
         int formattedCount,
@@ -366,8 +447,14 @@ public ref partial struct WarningLogInterpolatedStringHandler
         }
     }
 
+    /// <summary>
+    /// Gets the value indicating whether the handler is enabled.
+    /// </summary>
     public bool IsEnabled => _originalFormatBuilder != null;
 
+    /// <summary>
+    /// Appends a string literal to the template string.
+    /// </summary>
     public void AppendLiteral(string? str)
     {
         var start = _originalFormatBuilder.Length;
@@ -387,16 +474,25 @@ public ref partial struct WarningLogInterpolatedStringHandler
         }
     }
 
+    /// <summary>
+    /// Appends a <paramref name="value" /> to the string log message.
+    /// </summary>
     public void AppendFormatted(string? value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "") => AppendFormatted(
         new NamedLogValue(value, name, default, default), 
         alignment, 
         format);
 
+    /// <summary>
+    /// Appends a <paramref name="value" /> to the string log message.
+    /// </summary>
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "") => AppendFormatted(
         new NamedLogValue(value, name, IsleConfiguration.Current.ValueRepresentationPolicy.GetRepresentationOfType<T>(), default), 
         alignment, 
         format);
 
+    /// <summary>
+    /// Appends a <paramref name="namedLogValue" /> to the string log message.
+    /// </summary>
     [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.AggressiveOptimization)]
     public void AppendFormatted(in NamedLogValue namedLogValue, int alignment = 0, string? format = null)
     {
@@ -447,6 +543,12 @@ public ref partial struct WarningLogInterpolatedStringHandler
 }
 
 
+/// <summary>
+/// Interpolated string handler for LogError() method.
+/// </summary>
+/// <remarks>
+/// This class should not be used directly in your code.
+/// </remarks>
 [InterpolatedStringHandler]
 public ref partial struct ErrorLogInterpolatedStringHandler
 {
@@ -460,6 +562,9 @@ public ref partial struct ErrorLogInterpolatedStringHandler
     private int _valueIndex = 0;
     private int _segmentIndex = 0;
 
+    /// <summary>
+    /// Creates a new instance of <see cref="ErrorLogInterpolatedStringHandler" />.
+    /// </summary>
     public ErrorLogInterpolatedStringHandler(
         int literalLength, 
         int formattedCount,
@@ -476,8 +581,14 @@ public ref partial struct ErrorLogInterpolatedStringHandler
         }
     }
 
+    /// <summary>
+    /// Gets the value indicating whether the handler is enabled.
+    /// </summary>
     public bool IsEnabled => _originalFormatBuilder != null;
 
+    /// <summary>
+    /// Appends a string literal to the template string.
+    /// </summary>
     public void AppendLiteral(string? str)
     {
         var start = _originalFormatBuilder.Length;
@@ -497,16 +608,25 @@ public ref partial struct ErrorLogInterpolatedStringHandler
         }
     }
 
+    /// <summary>
+    /// Appends a <paramref name="value" /> to the string log message.
+    /// </summary>
     public void AppendFormatted(string? value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "") => AppendFormatted(
         new NamedLogValue(value, name, default, default), 
         alignment, 
         format);
 
+    /// <summary>
+    /// Appends a <paramref name="value" /> to the string log message.
+    /// </summary>
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "") => AppendFormatted(
         new NamedLogValue(value, name, IsleConfiguration.Current.ValueRepresentationPolicy.GetRepresentationOfType<T>(), default), 
         alignment, 
         format);
 
+    /// <summary>
+    /// Appends a <paramref name="namedLogValue" /> to the string log message.
+    /// </summary>
     [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.AggressiveOptimization)]
     public void AppendFormatted(in NamedLogValue namedLogValue, int alignment = 0, string? format = null)
     {
@@ -557,6 +677,12 @@ public ref partial struct ErrorLogInterpolatedStringHandler
 }
 
 
+/// <summary>
+/// Interpolated string handler for LogCritical() method.
+/// </summary>
+/// <remarks>
+/// This class should not be used directly in your code.
+/// </remarks>
 [InterpolatedStringHandler]
 public ref partial struct CriticalLogInterpolatedStringHandler
 {
@@ -570,6 +696,9 @@ public ref partial struct CriticalLogInterpolatedStringHandler
     private int _valueIndex = 0;
     private int _segmentIndex = 0;
 
+    /// <summary>
+    /// Creates a new instance of <see cref="CriticalLogInterpolatedStringHandler" />.
+    /// </summary>
     public CriticalLogInterpolatedStringHandler(
         int literalLength, 
         int formattedCount,
@@ -586,8 +715,14 @@ public ref partial struct CriticalLogInterpolatedStringHandler
         }
     }
 
+    /// <summary>
+    /// Gets the value indicating whether the handler is enabled.
+    /// </summary>
     public bool IsEnabled => _originalFormatBuilder != null;
 
+    /// <summary>
+    /// Appends a string literal to the template string.
+    /// </summary>
     public void AppendLiteral(string? str)
     {
         var start = _originalFormatBuilder.Length;
@@ -607,16 +742,25 @@ public ref partial struct CriticalLogInterpolatedStringHandler
         }
     }
 
+    /// <summary>
+    /// Appends a <paramref name="value" /> to the string log message.
+    /// </summary>
     public void AppendFormatted(string? value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "") => AppendFormatted(
         new NamedLogValue(value, name, default, default), 
         alignment, 
         format);
 
+    /// <summary>
+    /// Appends a <paramref name="value" /> to the string log message.
+    /// </summary>
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "") => AppendFormatted(
         new NamedLogValue(value, name, IsleConfiguration.Current.ValueRepresentationPolicy.GetRepresentationOfType<T>(), default), 
         alignment, 
         format);
 
+    /// <summary>
+    /// Appends a <paramref name="namedLogValue" /> to the string log message.
+    /// </summary>
     [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.AggressiveOptimization)]
     public void AppendFormatted(in NamedLogValue namedLogValue, int alignment = 0, string? format = null)
     {
@@ -667,6 +811,12 @@ public ref partial struct CriticalLogInterpolatedStringHandler
 }
 
 
+/// <summary>
+/// Interpolated string handler for Log() method.
+/// </summary>
+/// <remarks>
+/// This class should not be used directly in your code.
+/// </remarks>
 [InterpolatedStringHandler]
 public ref partial struct LogInterpolatedStringHandler
 {
@@ -680,6 +830,9 @@ public ref partial struct LogInterpolatedStringHandler
     private int _valueIndex = 0;
     private int _segmentIndex = 0;
 
+    /// <summary>
+    /// Creates a new instance of <see cref="LogInterpolatedStringHandler" />.
+    /// </summary>
     public LogInterpolatedStringHandler(
         int literalLength, 
         int formattedCount,
@@ -697,8 +850,14 @@ public ref partial struct LogInterpolatedStringHandler
         }
     }
 
+    /// <summary>
+    /// Gets the value indicating whether the handler is enabled.
+    /// </summary>
     public bool IsEnabled => _originalFormatBuilder != null;
 
+    /// <summary>
+    /// Appends a string literal to the template string.
+    /// </summary>
     public void AppendLiteral(string? str)
     {
         var start = _originalFormatBuilder.Length;
@@ -718,16 +877,25 @@ public ref partial struct LogInterpolatedStringHandler
         }
     }
 
+    /// <summary>
+    /// Appends a <paramref name="value" /> to the string log message.
+    /// </summary>
     public void AppendFormatted(string? value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "") => AppendFormatted(
         new NamedLogValue(value, name, default, default), 
         alignment, 
         format);
 
+    /// <summary>
+    /// Appends a <paramref name="value" /> to the string log message.
+    /// </summary>
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "") => AppendFormatted(
         new NamedLogValue(value, name, IsleConfiguration.Current.ValueRepresentationPolicy.GetRepresentationOfType<T>(), default), 
         alignment, 
         format);
 
+    /// <summary>
+    /// Appends a <paramref name="namedLogValue" /> to the string log message.
+    /// </summary>
     [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.AggressiveOptimization)]
     public void AppendFormatted(in NamedLogValue namedLogValue, int alignment = 0, string? format = null)
     {
@@ -778,6 +946,12 @@ public ref partial struct LogInterpolatedStringHandler
 }
 
 
+/// <summary>
+/// Interpolated string handler for BeginScope() method.
+/// </summary>
+/// <remarks>
+/// This class should not be used directly in your code.
+/// </remarks>
 [InterpolatedStringHandler]
 public ref partial struct ScopeLogInterpolatedStringHandler
 {
@@ -791,6 +965,9 @@ public ref partial struct ScopeLogInterpolatedStringHandler
     private int _valueIndex = 0;
     private int _segmentIndex = 0;
 
+    /// <summary>
+    /// Creates a new instance of <see cref="ScopeLogInterpolatedStringHandler" />.
+    /// </summary>
     public ScopeLogInterpolatedStringHandler(
         int literalLength, 
         int formattedCount,
@@ -802,6 +979,9 @@ public ref partial struct ScopeLogInterpolatedStringHandler
     }
 
 
+    /// <summary>
+    /// Appends a string literal to the template string.
+    /// </summary>
     public void AppendLiteral(string? str)
     {
         var start = _originalFormatBuilder.Length;
@@ -821,16 +1001,25 @@ public ref partial struct ScopeLogInterpolatedStringHandler
         }
     }
 
+    /// <summary>
+    /// Appends a <paramref name="value" /> to the string log message.
+    /// </summary>
     public void AppendFormatted(string? value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "") => AppendFormatted(
         new NamedLogValue(value, name, default, default), 
         alignment, 
         format);
 
+    /// <summary>
+    /// Appends a <paramref name="value" /> to the string log message.
+    /// </summary>
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "") => AppendFormatted(
         new NamedLogValue(value, name, IsleConfiguration.Current.ValueRepresentationPolicy.GetRepresentationOfType<T>(), default), 
         alignment, 
         format);
 
+    /// <summary>
+    /// Appends a <paramref name="namedLogValue" /> to the string log message.
+    /// </summary>
     [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.AggressiveOptimization)]
     public void AppendFormatted(in NamedLogValue namedLogValue, int alignment = 0, string? format = null)
     {

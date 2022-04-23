@@ -21,6 +21,12 @@ namespace Isle.Extensions.Logging;
 
 <# foreach (var logLevel in logLevels) { #>
 
+/// <summary>
+/// Interpolated string handler for <#= logLevel != Scope ? $"Log{logLevel}()" : "BeginScope()" #> method.
+/// </summary>
+/// <remarks>
+/// This class should not be used directly in your code.
+/// </remarks>
 [InterpolatedStringHandler]
 public ref partial struct <#= GetTypeName(logLevel) #>
 {
@@ -34,6 +40,9 @@ public ref partial struct <#= GetTypeName(logLevel) #>
     private int _valueIndex = 0;
     private int _segmentIndex = 0;
 
+    /// <summary>
+    /// Creates a new instance of <see cref="<#= GetTypeName(logLevel) #>" />.
+    /// </summary>
     public <#= GetTypeName(logLevel) #>(
         int literalLength, 
         int formattedCount,
@@ -61,9 +70,15 @@ public ref partial struct <#= GetTypeName(logLevel) #>
     }
 
 <# if (logLevel != Scope) { #>
+    /// <summary>
+    /// Gets the value indicating whether the handler is enabled.
+    /// </summary>
     public bool IsEnabled => _originalFormatBuilder != null;
 <# } #>
 
+    /// <summary>
+    /// Appends a string literal to the template string.
+    /// </summary>
     public void AppendLiteral(string? str)
     {
         var start = _originalFormatBuilder.Length;
@@ -83,16 +98,25 @@ public ref partial struct <#= GetTypeName(logLevel) #>
         }
     }
 
+    /// <summary>
+    /// Appends a <paramref name="value" /> to the string log message.
+    /// </summary>
     public void AppendFormatted(string? value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "") => AppendFormatted(
         new NamedLogValue(value, name, default, default), 
         alignment, 
         format);
 
+    /// <summary>
+    /// Appends a <paramref name="value" /> to the string log message.
+    /// </summary>
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "") => AppendFormatted(
         new NamedLogValue(value, name, IsleConfiguration.Current.ValueRepresentationPolicy.GetRepresentationOfType<T>(), default), 
         alignment, 
         format);
 
+    /// <summary>
+    /// Appends a <paramref name="namedLogValue" /> to the string log message.
+    /// </summary>
     [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.AggressiveOptimization)]
     public void AppendFormatted(in NamedLogValue namedLogValue, int alignment = 0, string? format = null)
     {

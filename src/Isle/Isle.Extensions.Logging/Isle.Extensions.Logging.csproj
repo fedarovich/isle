@@ -11,6 +11,7 @@
 		<PackageTags>structured logging; interpolated strings</PackageTags>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<Description>Adds support of structured logging using interpolated strings in C# 10 to Microsoft.Extensions.Logging.</Description>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 	</PropertyGroup>
 
 	<ItemGroup>

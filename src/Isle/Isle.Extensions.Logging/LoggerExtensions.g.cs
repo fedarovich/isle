@@ -4,10 +4,18 @@ using Microsoft.Extensions.Logging;
 
 namespace Isle.Extensions.Logging;
 
+/// <summary>
+/// Provides extensions methods for <see cref="ILogger" /> to enable structured logging using interpolated strings.
+/// </summary>
 public static class LoggerExtensions
 {
 	private static readonly Func<FormattedLogValues, Exception?, string> _messageFormatter = MessageFormatter;
 
+	/// <summary>
+	/// Formats and writes a trace log message.
+	/// </summary>
+	/// <param name="logger">The <see cref="ILogger" /> to write to.</param>
+    /// <param name="handler">The interpolated string of the log message.</param>
 	public static void LogTrace(
 		this ILogger logger,
 		[InterpolatedStringHandlerArgument("logger")] ref TraceLogInterpolatedStringHandler handler
@@ -19,6 +27,12 @@ public static class LoggerExtensions
 		}
 	}
 
+	/// <summary>
+	/// Formats and writes a trace log message.
+	/// </summary>
+	/// <param name="logger">The <see cref="ILogger" /> to write to.</param>
+    /// <param name="exception">The exception to log.</param>
+    /// <param name="handler">The interpolated string of the log message.</param>
 	public static void LogTrace(
 		this ILogger logger,
 		Exception? exception,
@@ -31,6 +45,12 @@ public static class LoggerExtensions
 		}
 	}
 
+	/// <summary>
+	/// Formats and writes a trace log message.
+	/// </summary>
+	/// <param name="logger">The <see cref="ILogger" /> to write to.</param>
+    /// <param name="eventId">The event id associated with the log.</param>
+    /// <param name="handler">The interpolated string of the log message.</param>
 	public static void LogTrace(
 		this ILogger logger,
 		EventId eventId,
@@ -43,6 +63,13 @@ public static class LoggerExtensions
 		}
 	}
 
+	/// <summary>
+	/// Formats and writes a trace log message.
+	/// </summary>
+	/// <param name="logger">The <see cref="ILogger" /> to write to.</param>
+    /// <param name="eventId">The event id associated with the log.</param>
+    /// <param name="exception">The exception to log.</param>
+    /// <param name="handler">The interpolated string of the log message.</param>
 	public static void LogTrace(
 		this ILogger logger,
 		EventId eventId,
@@ -56,6 +83,11 @@ public static class LoggerExtensions
 		}
 	}
 
+	/// <summary>
+	/// Formats and writes a debug log message.
+	/// </summary>
+	/// <param name="logger">The <see cref="ILogger" /> to write to.</param>
+    /// <param name="handler">The interpolated string of the log message.</param>
 	public static void LogDebug(
 		this ILogger logger,
 		[InterpolatedStringHandlerArgument("logger")] ref DebugLogInterpolatedStringHandler handler
@@ -67,6 +99,12 @@ public static class LoggerExtensions
 		}
 	}
 
+	/// <summary>
+	/// Formats and writes a debug log message.
+	/// </summary>
+	/// <param name="logger">The <see cref="ILogger" /> to write to.</param>
+    /// <param name="exception">The exception to log.</param>
+    /// <param name="handler">The interpolated string of the log message.</param>
 	public static void LogDebug(
 		this ILogger logger,
 		Exception? exception,
@@ -79,6 +117,12 @@ public static class LoggerExtensions
 		}
 	}
 
+	/// <summary>
+	/// Formats and writes a debug log message.
+	/// </summary>
+	/// <param name="logger">The <see cref="ILogger" /> to write to.</param>
+    /// <param name="eventId">The event id associated with the log.</param>
+    /// <param name="handler">The interpolated string of the log message.</param>
 	public static void LogDebug(
 		this ILogger logger,
 		EventId eventId,
@@ -91,6 +135,13 @@ public static class LoggerExtensions
 		}
 	}
 
+	/// <summary>
+	/// Formats and writes a debug log message.
+	/// </summary>
+	/// <param name="logger">The <see cref="ILogger" /> to write to.</param>
+    /// <param name="eventId">The event id associated with the log.</param>
+    /// <param name="exception">The exception to log.</param>
+    /// <param name="handler">The interpolated string of the log message.</param>
 	public static void LogDebug(
 		this ILogger logger,
 		EventId eventId,
@@ -104,6 +155,11 @@ public static class LoggerExtensions
 		}
 	}
 
+	/// <summary>
+	/// Formats and writes an informational log message.
+	/// </summary>
+	/// <param name="logger">The <see cref="ILogger" /> to write to.</param>
+    /// <param name="handler">The interpolated string of the log message.</param>
 	public static void LogInformation(
 		this ILogger logger,
 		[InterpolatedStringHandlerArgument("logger")] ref InformationLogInterpolatedStringHandler handler
@@ -115,6 +171,12 @@ public static class LoggerExtensions
 		}
 	}
 
+	/// <summary>
+	/// Formats and writes an informational log message.
+	/// </summary>
+	/// <param name="logger">The <see cref="ILogger" /> to write to.</param>
+    /// <param name="exception">The exception to log.</param>
+    /// <param name="handler">The interpolated string of the log message.</param>
 	public static void LogInformation(
 		this ILogger logger,
 		Exception? exception,
@@ -127,6 +189,12 @@ public static class LoggerExtensions
 		}
 	}
 
+	/// <summary>
+	/// Formats and writes an informational log message.
+	/// </summary>
+	/// <param name="logger">The <see cref="ILogger" /> to write to.</param>
+    /// <param name="eventId">The event id associated with the log.</param>
+    /// <param name="handler">The interpolated string of the log message.</param>
 	public static void LogInformation(
 		this ILogger logger,
 		EventId eventId,
@@ -139,6 +207,13 @@ public static class LoggerExtensions
 		}
 	}
 
+	/// <summary>
+	/// Formats and writes an informational log message.
+	/// </summary>
+	/// <param name="logger">The <see cref="ILogger" /> to write to.</param>
+    /// <param name="eventId">The event id associated with the log.</param>
+    /// <param name="exception">The exception to log.</param>
+    /// <param name="handler">The interpolated string of the log message.</param>
 	public static void LogInformation(
 		this ILogger logger,
 		EventId eventId,
@@ -152,6 +227,11 @@ public static class LoggerExtensions
 		}
 	}
 
+	/// <summary>
+	/// Formats and writes a warning log message.
+	/// </summary>
+	/// <param name="logger">The <see cref="ILogger" /> to write to.</param>
+    /// <param name="handler">The interpolated string of the log message.</param>
 	public static void LogWarning(
 		this ILogger logger,
 		[InterpolatedStringHandlerArgument("logger")] ref WarningLogInterpolatedStringHandler handler
@@ -163,6 +243,12 @@ public static class LoggerExtensions
 		}
 	}
 
+	/// <summary>
+	/// Formats and writes a warning log message.
+	/// </summary>
+	/// <param name="logger">The <see cref="ILogger" /> to write to.</param>
+    /// <param name="exception">The exception to log.</param>
+    /// <param name="handler">The interpolated string of the log message.</param>
 	public static void LogWarning(
 		this ILogger logger,
 		Exception? exception,
@@ -175,6 +261,12 @@ public static class LoggerExtensions
 		}
 	}
 
+	/// <summary>
+	/// Formats and writes a warning log message.
+	/// </summary>
+	/// <param name="logger">The <see cref="ILogger" /> to write to.</param>
+    /// <param name="eventId">The event id associated with the log.</param>
+    /// <param name="handler">The interpolated string of the log message.</param>
 	public static void LogWarning(
 		this ILogger logger,
 		EventId eventId,
@@ -187,6 +279,13 @@ public static class LoggerExtensions
 		}
 	}
 
+	/// <summary>
+	/// Formats and writes a warning log message.
+	/// </summary>
+	/// <param name="logger">The <see cref="ILogger" /> to write to.</param>
+    /// <param name="eventId">The event id associated with the log.</param>
+    /// <param name="exception">The exception to log.</param>
+    /// <param name="handler">The interpolated string of the log message.</param>
 	public static void LogWarning(
 		this ILogger logger,
 		EventId eventId,
@@ -200,6 +299,11 @@ public static class LoggerExtensions
 		}
 	}
 
+	/// <summary>
+	/// Formats and writes an error log message.
+	/// </summary>
+	/// <param name="logger">The <see cref="ILogger" /> to write to.</param>
+    /// <param name="handler">The interpolated string of the log message.</param>
 	public static void LogError(
 		this ILogger logger,
 		[InterpolatedStringHandlerArgument("logger")] ref ErrorLogInterpolatedStringHandler handler
@@ -211,6 +315,12 @@ public static class LoggerExtensions
 		}
 	}
 
+	/// <summary>
+	/// Formats and writes an error log message.
+	/// </summary>
+	/// <param name="logger">The <see cref="ILogger" /> to write to.</param>
+    /// <param name="exception">The exception to log.</param>
+    /// <param name="handler">The interpolated string of the log message.</param>
 	public static void LogError(
 		this ILogger logger,
 		Exception? exception,
@@ -223,6 +333,12 @@ public static class LoggerExtensions
 		}
 	}
 
+	/// <summary>
+	/// Formats and writes an error log message.
+	/// </summary>
+	/// <param name="logger">The <see cref="ILogger" /> to write to.</param>
+    /// <param name="eventId">The event id associated with the log.</param>
+    /// <param name="handler">The interpolated string of the log message.</param>
 	public static void LogError(
 		this ILogger logger,
 		EventId eventId,
@@ -235,6 +351,13 @@ public static class LoggerExtensions
 		}
 	}
 
+	/// <summary>
+	/// Formats and writes an error log message.
+	/// </summary>
+	/// <param name="logger">The <see cref="ILogger" /> to write to.</param>
+    /// <param name="eventId">The event id associated with the log.</param>
+    /// <param name="exception">The exception to log.</param>
+    /// <param name="handler">The interpolated string of the log message.</param>
 	public static void LogError(
 		this ILogger logger,
 		EventId eventId,
@@ -248,6 +371,11 @@ public static class LoggerExtensions
 		}
 	}
 
+	/// <summary>
+	/// Formats and writes a critical log message.
+	/// </summary>
+	/// <param name="logger">The <see cref="ILogger" /> to write to.</param>
+    /// <param name="handler">The interpolated string of the log message.</param>
 	public static void LogCritical(
 		this ILogger logger,
 		[InterpolatedStringHandlerArgument("logger")] ref CriticalLogInterpolatedStringHandler handler
@@ -259,6 +387,12 @@ public static class LoggerExtensions
 		}
 	}
 
+	/// <summary>
+	/// Formats and writes a critical log message.
+	/// </summary>
+	/// <param name="logger">The <see cref="ILogger" /> to write to.</param>
+    /// <param name="exception">The exception to log.</param>
+    /// <param name="handler">The interpolated string of the log message.</param>
 	public static void LogCritical(
 		this ILogger logger,
 		Exception? exception,
@@ -271,6 +405,12 @@ public static class LoggerExtensions
 		}
 	}
 
+	/// <summary>
+	/// Formats and writes a critical log message.
+	/// </summary>
+	/// <param name="logger">The <see cref="ILogger" /> to write to.</param>
+    /// <param name="eventId">The event id associated with the log.</param>
+    /// <param name="handler">The interpolated string of the log message.</param>
 	public static void LogCritical(
 		this ILogger logger,
 		EventId eventId,
@@ -283,6 +423,13 @@ public static class LoggerExtensions
 		}
 	}
 
+	/// <summary>
+	/// Formats and writes a critical log message.
+	/// </summary>
+	/// <param name="logger">The <see cref="ILogger" /> to write to.</param>
+    /// <param name="eventId">The event id associated with the log.</param>
+    /// <param name="exception">The exception to log.</param>
+    /// <param name="handler">The interpolated string of the log message.</param>
 	public static void LogCritical(
 		this ILogger logger,
 		EventId eventId,
@@ -296,6 +443,12 @@ public static class LoggerExtensions
 		}
 	}
 
+	/// <summary>
+	/// Formats and writes a log message at the specified log level.
+	/// </summary>
+	/// <param name="logger">The <see cref="ILogger" /> to write to.</param>
+	/// <param name="logLevel">Entry will be written on this level.</param>
+    /// <param name="handler">The interpolated string of the log message.</param>
 	public static void Log(
 		this ILogger logger,
 		LogLevel logLevel,
@@ -308,6 +461,13 @@ public static class LoggerExtensions
 		}
 	}
 
+	/// <summary>
+	/// Formats and writes a log message at the specified log level.
+	/// </summary>
+	/// <param name="logger">The <see cref="ILogger" /> to write to.</param>
+	/// <param name="logLevel">Entry will be written on this level.</param>
+    /// <param name="exception">The exception to log.</param>
+    /// <param name="handler">The interpolated string of the log message.</param>
 	public static void Log(
 		this ILogger logger,
 		LogLevel logLevel,
@@ -321,6 +481,13 @@ public static class LoggerExtensions
 		}
 	}
 
+	/// <summary>
+	/// Formats and writes a log message at the specified log level.
+	/// </summary>
+	/// <param name="logger">The <see cref="ILogger" /> to write to.</param>
+	/// <param name="logLevel">Entry will be written on this level.</param>
+    /// <param name="eventId">The event id associated with the log.</param>
+    /// <param name="handler">The interpolated string of the log message.</param>
 	public static void Log(
 		this ILogger logger,
 		LogLevel logLevel,
@@ -334,6 +501,14 @@ public static class LoggerExtensions
 		}
 	}
 
+	/// <summary>
+	/// Formats and writes a log message at the specified log level.
+	/// </summary>
+	/// <param name="logger">The <see cref="ILogger" /> to write to.</param>
+	/// <param name="logLevel">Entry will be written on this level.</param>
+    /// <param name="eventId">The event id associated with the log.</param>
+    /// <param name="exception">The exception to log.</param>
+    /// <param name="handler">The interpolated string of the log message.</param>
 	public static void Log(
 		this ILogger logger,
 		LogLevel logLevel,
@@ -353,7 +528,18 @@ public static class LoggerExtensions
 		logger.Log(logLevel, eventId, formattedLogValues, exception, _messageFormatter);
 	}
 
-	public static IDisposable BeginScopeInterpolated(this ILogger logger, [InterpolatedStringHandlerArgument("logger")] ref ScopeLogInterpolatedStringHandler handler)
+	/// <summary>
+	/// Formats the message and creates a logical operation scope.
+	/// </summary>
+	/// <returns>
+	/// An <see cref="T:System.IDisposable" /> that ends the logical operation scope on dispose.
+	/// </returns>
+    /// <example>
+    /// using(logger.BeginScopeInterpolated($"Processing request from {Address}"))
+    /// {
+    /// }
+    /// </example>
+    public static IDisposable BeginScopeInterpolated(this ILogger logger, [InterpolatedStringHandlerArgument("logger")] ref ScopeLogInterpolatedStringHandler handler)
 	{
 		return logger.BeginScope(handler.GetFormattedLogValuesAndReset());
 	}

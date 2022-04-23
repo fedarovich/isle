@@ -12,6 +12,17 @@
 	string GetMethodName(string logLevel) => "Log" + logLevel;
 
 	string GetLogLevel(string logLevel) => logLevel != null ? "LogLevel." + logLevel : "logLevel";
+
+	string GetDescription(string logLevel) => logLevel switch
+    {
+        "Trace" => "Formats and writes a trace log message.",
+        "Debug" => "Formats and writes a debug log message.",
+		"Information" => "Formats and writes an informational log message.",
+		"Warning" => "Formats and writes a warning log message.",
+		"Error" => "Formats and writes an error log message.",
+		"Critical" => "Formats and writes a critical log message.",
+        _ => "Formats and writes a log message at the specified log level."
+    };
 #>
 #nullable enable
 using System.Runtime.CompilerServices;
@@ -19,6 +30,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Isle.Extensions.Logging;
 
+/// <summary>
+/// Provides extensions methods for <see cref="ILogger" /> to enable structured logging using interpolated strings.
+/// </summary>
 public static class LoggerExtensions
 {
 	private static readonly Func<FormattedLogValues, Exception?, string> _messageFormatter = MessageFormatter;
@@ -26,6 +40,18 @@ public static class LoggerExtensions
 <# foreach (var logLevel in logLevels) { #>
 <# foreach (var withEventId in new[] { false, true }) { #>
 <# foreach (var withException in new[] { false, true }) { #>
+	/// <summary>
+	/// <#= GetDescription(logLevel) #>
+	/// </summary>
+	/// <param name="logger">The <see cref="ILogger" /> to write to.</param>
+<#if (logLevel == null) { #>
+	/// <param name="logLevel">Entry will be written on this level.</param>
+<# } #><#if (withEventId) { #>
+    /// <param name="eventId">The event id associated with the log.</param>
+<# } #><#if (withException) { #>
+    /// <param name="exception">The exception to log.</param>
+<# } #>
+    /// <param name="handler">The interpolated string of the log message.</param>
 	public static void <#= GetMethodName(logLevel) #>(
 		this ILogger logger,
 <# if (logLevel == null) { #>
@@ -54,7 +80,18 @@ public static class LoggerExtensions
 		logger.Log(logLevel, eventId, formattedLogValues, exception, _messageFormatter);
 	}
 
-	public static IDisposable BeginScopeInterpolated(this ILogger logger, [InterpolatedStringHandlerArgument("logger")] ref ScopeLogInterpolatedStringHandler handler)
+	/// <summary>
+	/// Formats the message and creates a logical operation scope.
+	/// </summary>
+	/// <returns>
+	/// An <see cref="T:System.IDisposable" /> that ends the logical operation scope on dispose.
+	/// </returns>
+    /// <example>
+    /// using(logger.BeginScopeInterpolated($"Processing request from {Address}"))
+    /// {
+    /// }
+    /// </example>
+    public static IDisposable BeginScopeInterpolated(this ILogger logger, [InterpolatedStringHandlerArgument("logger")] ref ScopeLogInterpolatedStringHandler handler)
 	{
 		return logger.BeginScope(handler.GetFormattedLogValuesAndReset());
 	}
