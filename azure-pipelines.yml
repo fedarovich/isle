@@ -39,7 +39,7 @@ steps:
   inputs:
     command: build    
     projects: 'src/Isle/Isle.sln'
-    arguments: '-c $(BuildConfiguration) -p:FileVersion=$(Build.BuildNumber)'
+    arguments: '-c $(BuildConfiguration) -p:FileVersion=$(Build.BuildNumber) -p:InformationalVersion="$(Build.BuildNumber)-$(Build.SourceVersion)"'
 
 - task: DotNetCoreCLI@2
   displayName: 'dotnet test'
@@ -69,7 +69,16 @@ steps:
 
 - task: NuGetCommand@2
   displayName: 'MyGet push'
+  condition: ${{ eq(parameters.IsRelease, false) }}
   inputs:
     command: push
     nuGetFeedType: external
     publishFeedCredentials: MyGet
+
+- task: NuGetCommand@2
+  displayName: 'NuGet push'
+  condition: ${{ eq(parameters.IsRelease, true) }}
+  inputs:
+    command: push
+    nuGetFeedType: external
+    publishFeedCredentials: NuGet
