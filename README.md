@@ -76,13 +76,10 @@ IsleConfiguration.Configure(builder => builder.WithValueRepresentationPolicy(new
 ## Custom Argument Names
 ISLE automatically captures argument names by using C# 10 CallerArgumentExpressionAttribute. Thus, it is recommended that you always use simple variable or property name as the arguments.
 
-You can also set a custom name for the argument using the `Named` method:
+You can also set a custom name for the argument using the `Named` extension method:
 ```
 int width = 5;
 int height = 6;
-// Named can be used as a regular static method:
-logger.LogInformation($"The area of rectangle with the width = {width} and the height = {height} is {Named(width * height, "area")}");
-// Or as an extension method:
 logger.LogInformation($"The area of rectangle with the width = {width} and the height = {height} is {(width * height).Named("area")}");
 ```
 
