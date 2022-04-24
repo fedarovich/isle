@@ -357,6 +357,44 @@ public class LoggerExtensionsTests : BaseFixture
         }
     }
 
+    [Test]
+    public void LogTrace_Named()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Trace;
+        var value = new TestObject(3, 5);
+
+        
+        
+        Logger.LogTrace(            $"Default: {value.Named("default")}, Stringified: {value.Named("$str")}, Destructured: {value.Named("@destructured")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = default(Exception),
+                Message = string.Format(CultureInfo.InvariantCulture, "Default: {0}, Stringified: {0}, Destructured: {0}", value)
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("@default", value),
+                new KeyValuePair<string, object>("$str", value),
+                new KeyValuePair<string, object>("@destructured", value),
+                new KeyValuePair<string, object>("{OriginalFormat}", "Default: {@default}, Stringified: {$str}, Destructured: {@destructured}")
+            });
+            logItem.Scopes.Should().BeEmpty();            
+        }
+    }
+
 
     [Test]
     public void LogTrace_Literal_WithException()
@@ -689,6 +727,44 @@ public class LoggerExtensionsTests : BaseFixture
                 new KeyValuePair<string, object>("{OriginalFormat}", "ABCD{arg1,7}EFGH{arg2:N}IJKL{arg3,10:F3}MNOP{@arg4}QRST{@arg5}UVWX{veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg}YZ")
             });
             logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogTrace_Named_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Trace;
+        var value = new TestObject(3, 5);
+
+        
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogTrace(exception,             $"Default: {value.Named("default")}, Stringified: {value.Named("$str")}, Destructured: {value.Named("@destructured")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = exception,
+                Message = string.Format(CultureInfo.InvariantCulture, "Default: {0}, Stringified: {0}, Destructured: {0}", value)
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("@default", value),
+                new KeyValuePair<string, object>("$str", value),
+                new KeyValuePair<string, object>("@destructured", value),
+                new KeyValuePair<string, object>("{OriginalFormat}", "Default: {@default}, Stringified: {$str}, Destructured: {@destructured}")
+            });
+            logItem.Scopes.Should().BeEmpty();            
         }
     }
 
@@ -1027,6 +1103,44 @@ public class LoggerExtensionsTests : BaseFixture
         }
     }
 
+    [Test]
+    public void LogTrace_Named_WithEventId()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Trace;
+        var value = new TestObject(3, 5);
+
+        EventId eventId = 5;
+        
+        Logger.LogTrace(eventId,             $"Default: {value.Named("default")}, Stringified: {value.Named("$str")}, Destructured: {value.Named("@destructured")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = eventId,
+                Exception = default(Exception),
+                Message = string.Format(CultureInfo.InvariantCulture, "Default: {0}, Stringified: {0}, Destructured: {0}", value)
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("@default", value),
+                new KeyValuePair<string, object>("$str", value),
+                new KeyValuePair<string, object>("@destructured", value),
+                new KeyValuePair<string, object>("{OriginalFormat}", "Default: {@default}, Stringified: {$str}, Destructured: {@destructured}")
+            });
+            logItem.Scopes.Should().BeEmpty();            
+        }
+    }
+
 
     [Test]
     public void LogTrace_Literal_WithEventId_WithException()
@@ -1359,6 +1473,44 @@ public class LoggerExtensionsTests : BaseFixture
                 new KeyValuePair<string, object>("{OriginalFormat}", "ABCD{arg1,7}EFGH{arg2:N}IJKL{arg3,10:F3}MNOP{@arg4}QRST{@arg5}UVWX{veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg}YZ")
             });
             logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogTrace_Named_WithEventId_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Trace;
+        var value = new TestObject(3, 5);
+
+        EventId eventId = 5;
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogTrace(eventId, exception,             $"Default: {value.Named("default")}, Stringified: {value.Named("$str")}, Destructured: {value.Named("@destructured")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = eventId,
+                Exception = exception,
+                Message = string.Format(CultureInfo.InvariantCulture, "Default: {0}, Stringified: {0}, Destructured: {0}", value)
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("@default", value),
+                new KeyValuePair<string, object>("$str", value),
+                new KeyValuePair<string, object>("@destructured", value),
+                new KeyValuePair<string, object>("{OriginalFormat}", "Default: {@default}, Stringified: {$str}, Destructured: {@destructured}")
+            });
+            logItem.Scopes.Should().BeEmpty();            
         }
     }
 
@@ -1757,6 +1909,44 @@ public class LoggerExtensionsTests : BaseFixture
         }
     }
 
+    [Test]
+    public void LogDebug_Named()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Debug;
+        var value = new TestObject(3, 5);
+
+        
+        
+        Logger.LogDebug(            $"Default: {value.Named("default")}, Stringified: {value.Named("$str")}, Destructured: {value.Named("@destructured")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = default(Exception),
+                Message = string.Format(CultureInfo.InvariantCulture, "Default: {0}, Stringified: {0}, Destructured: {0}", value)
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("@default", value),
+                new KeyValuePair<string, object>("$str", value),
+                new KeyValuePair<string, object>("@destructured", value),
+                new KeyValuePair<string, object>("{OriginalFormat}", "Default: {@default}, Stringified: {$str}, Destructured: {@destructured}")
+            });
+            logItem.Scopes.Should().BeEmpty();            
+        }
+    }
+
 
     [Test]
     public void LogDebug_Literal_WithException()
@@ -2089,6 +2279,44 @@ public class LoggerExtensionsTests : BaseFixture
                 new KeyValuePair<string, object>("{OriginalFormat}", "ABCD{arg1,7}EFGH{arg2:N}IJKL{arg3,10:F3}MNOP{@arg4}QRST{@arg5}UVWX{veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg}YZ")
             });
             logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogDebug_Named_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Debug;
+        var value = new TestObject(3, 5);
+
+        
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogDebug(exception,             $"Default: {value.Named("default")}, Stringified: {value.Named("$str")}, Destructured: {value.Named("@destructured")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = exception,
+                Message = string.Format(CultureInfo.InvariantCulture, "Default: {0}, Stringified: {0}, Destructured: {0}", value)
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("@default", value),
+                new KeyValuePair<string, object>("$str", value),
+                new KeyValuePair<string, object>("@destructured", value),
+                new KeyValuePair<string, object>("{OriginalFormat}", "Default: {@default}, Stringified: {$str}, Destructured: {@destructured}")
+            });
+            logItem.Scopes.Should().BeEmpty();            
         }
     }
 
@@ -2427,6 +2655,44 @@ public class LoggerExtensionsTests : BaseFixture
         }
     }
 
+    [Test]
+    public void LogDebug_Named_WithEventId()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Debug;
+        var value = new TestObject(3, 5);
+
+        EventId eventId = 5;
+        
+        Logger.LogDebug(eventId,             $"Default: {value.Named("default")}, Stringified: {value.Named("$str")}, Destructured: {value.Named("@destructured")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = eventId,
+                Exception = default(Exception),
+                Message = string.Format(CultureInfo.InvariantCulture, "Default: {0}, Stringified: {0}, Destructured: {0}", value)
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("@default", value),
+                new KeyValuePair<string, object>("$str", value),
+                new KeyValuePair<string, object>("@destructured", value),
+                new KeyValuePair<string, object>("{OriginalFormat}", "Default: {@default}, Stringified: {$str}, Destructured: {@destructured}")
+            });
+            logItem.Scopes.Should().BeEmpty();            
+        }
+    }
+
 
     [Test]
     public void LogDebug_Literal_WithEventId_WithException()
@@ -2759,6 +3025,44 @@ public class LoggerExtensionsTests : BaseFixture
                 new KeyValuePair<string, object>("{OriginalFormat}", "ABCD{arg1,7}EFGH{arg2:N}IJKL{arg3,10:F3}MNOP{@arg4}QRST{@arg5}UVWX{veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg}YZ")
             });
             logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogDebug_Named_WithEventId_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Debug;
+        var value = new TestObject(3, 5);
+
+        EventId eventId = 5;
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogDebug(eventId, exception,             $"Default: {value.Named("default")}, Stringified: {value.Named("$str")}, Destructured: {value.Named("@destructured")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = eventId,
+                Exception = exception,
+                Message = string.Format(CultureInfo.InvariantCulture, "Default: {0}, Stringified: {0}, Destructured: {0}", value)
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("@default", value),
+                new KeyValuePair<string, object>("$str", value),
+                new KeyValuePair<string, object>("@destructured", value),
+                new KeyValuePair<string, object>("{OriginalFormat}", "Default: {@default}, Stringified: {$str}, Destructured: {@destructured}")
+            });
+            logItem.Scopes.Should().BeEmpty();            
         }
     }
 
@@ -3157,6 +3461,44 @@ public class LoggerExtensionsTests : BaseFixture
         }
     }
 
+    [Test]
+    public void LogInformation_Named()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Information;
+        var value = new TestObject(3, 5);
+
+        
+        
+        Logger.LogInformation(            $"Default: {value.Named("default")}, Stringified: {value.Named("$str")}, Destructured: {value.Named("@destructured")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = default(Exception),
+                Message = string.Format(CultureInfo.InvariantCulture, "Default: {0}, Stringified: {0}, Destructured: {0}", value)
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("@default", value),
+                new KeyValuePair<string, object>("$str", value),
+                new KeyValuePair<string, object>("@destructured", value),
+                new KeyValuePair<string, object>("{OriginalFormat}", "Default: {@default}, Stringified: {$str}, Destructured: {@destructured}")
+            });
+            logItem.Scopes.Should().BeEmpty();            
+        }
+    }
+
 
     [Test]
     public void LogInformation_Literal_WithException()
@@ -3489,6 +3831,44 @@ public class LoggerExtensionsTests : BaseFixture
                 new KeyValuePair<string, object>("{OriginalFormat}", "ABCD{arg1,7}EFGH{arg2:N}IJKL{arg3,10:F3}MNOP{@arg4}QRST{@arg5}UVWX{veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg}YZ")
             });
             logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogInformation_Named_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Information;
+        var value = new TestObject(3, 5);
+
+        
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogInformation(exception,             $"Default: {value.Named("default")}, Stringified: {value.Named("$str")}, Destructured: {value.Named("@destructured")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = exception,
+                Message = string.Format(CultureInfo.InvariantCulture, "Default: {0}, Stringified: {0}, Destructured: {0}", value)
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("@default", value),
+                new KeyValuePair<string, object>("$str", value),
+                new KeyValuePair<string, object>("@destructured", value),
+                new KeyValuePair<string, object>("{OriginalFormat}", "Default: {@default}, Stringified: {$str}, Destructured: {@destructured}")
+            });
+            logItem.Scopes.Should().BeEmpty();            
         }
     }
 
@@ -3827,6 +4207,44 @@ public class LoggerExtensionsTests : BaseFixture
         }
     }
 
+    [Test]
+    public void LogInformation_Named_WithEventId()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Information;
+        var value = new TestObject(3, 5);
+
+        EventId eventId = 5;
+        
+        Logger.LogInformation(eventId,             $"Default: {value.Named("default")}, Stringified: {value.Named("$str")}, Destructured: {value.Named("@destructured")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = eventId,
+                Exception = default(Exception),
+                Message = string.Format(CultureInfo.InvariantCulture, "Default: {0}, Stringified: {0}, Destructured: {0}", value)
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("@default", value),
+                new KeyValuePair<string, object>("$str", value),
+                new KeyValuePair<string, object>("@destructured", value),
+                new KeyValuePair<string, object>("{OriginalFormat}", "Default: {@default}, Stringified: {$str}, Destructured: {@destructured}")
+            });
+            logItem.Scopes.Should().BeEmpty();            
+        }
+    }
+
 
     [Test]
     public void LogInformation_Literal_WithEventId_WithException()
@@ -4159,6 +4577,44 @@ public class LoggerExtensionsTests : BaseFixture
                 new KeyValuePair<string, object>("{OriginalFormat}", "ABCD{arg1,7}EFGH{arg2:N}IJKL{arg3,10:F3}MNOP{@arg4}QRST{@arg5}UVWX{veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg}YZ")
             });
             logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogInformation_Named_WithEventId_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Information;
+        var value = new TestObject(3, 5);
+
+        EventId eventId = 5;
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogInformation(eventId, exception,             $"Default: {value.Named("default")}, Stringified: {value.Named("$str")}, Destructured: {value.Named("@destructured")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = eventId,
+                Exception = exception,
+                Message = string.Format(CultureInfo.InvariantCulture, "Default: {0}, Stringified: {0}, Destructured: {0}", value)
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("@default", value),
+                new KeyValuePair<string, object>("$str", value),
+                new KeyValuePair<string, object>("@destructured", value),
+                new KeyValuePair<string, object>("{OriginalFormat}", "Default: {@default}, Stringified: {$str}, Destructured: {@destructured}")
+            });
+            logItem.Scopes.Should().BeEmpty();            
         }
     }
 
@@ -4557,6 +5013,44 @@ public class LoggerExtensionsTests : BaseFixture
         }
     }
 
+    [Test]
+    public void LogWarning_Named()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Warning;
+        var value = new TestObject(3, 5);
+
+        
+        
+        Logger.LogWarning(            $"Default: {value.Named("default")}, Stringified: {value.Named("$str")}, Destructured: {value.Named("@destructured")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = default(Exception),
+                Message = string.Format(CultureInfo.InvariantCulture, "Default: {0}, Stringified: {0}, Destructured: {0}", value)
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("@default", value),
+                new KeyValuePair<string, object>("$str", value),
+                new KeyValuePair<string, object>("@destructured", value),
+                new KeyValuePair<string, object>("{OriginalFormat}", "Default: {@default}, Stringified: {$str}, Destructured: {@destructured}")
+            });
+            logItem.Scopes.Should().BeEmpty();            
+        }
+    }
+
 
     [Test]
     public void LogWarning_Literal_WithException()
@@ -4889,6 +5383,44 @@ public class LoggerExtensionsTests : BaseFixture
                 new KeyValuePair<string, object>("{OriginalFormat}", "ABCD{arg1,7}EFGH{arg2:N}IJKL{arg3,10:F3}MNOP{@arg4}QRST{@arg5}UVWX{veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg}YZ")
             });
             logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogWarning_Named_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Warning;
+        var value = new TestObject(3, 5);
+
+        
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogWarning(exception,             $"Default: {value.Named("default")}, Stringified: {value.Named("$str")}, Destructured: {value.Named("@destructured")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = exception,
+                Message = string.Format(CultureInfo.InvariantCulture, "Default: {0}, Stringified: {0}, Destructured: {0}", value)
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("@default", value),
+                new KeyValuePair<string, object>("$str", value),
+                new KeyValuePair<string, object>("@destructured", value),
+                new KeyValuePair<string, object>("{OriginalFormat}", "Default: {@default}, Stringified: {$str}, Destructured: {@destructured}")
+            });
+            logItem.Scopes.Should().BeEmpty();            
         }
     }
 
@@ -5227,6 +5759,44 @@ public class LoggerExtensionsTests : BaseFixture
         }
     }
 
+    [Test]
+    public void LogWarning_Named_WithEventId()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Warning;
+        var value = new TestObject(3, 5);
+
+        EventId eventId = 5;
+        
+        Logger.LogWarning(eventId,             $"Default: {value.Named("default")}, Stringified: {value.Named("$str")}, Destructured: {value.Named("@destructured")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = eventId,
+                Exception = default(Exception),
+                Message = string.Format(CultureInfo.InvariantCulture, "Default: {0}, Stringified: {0}, Destructured: {0}", value)
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("@default", value),
+                new KeyValuePair<string, object>("$str", value),
+                new KeyValuePair<string, object>("@destructured", value),
+                new KeyValuePair<string, object>("{OriginalFormat}", "Default: {@default}, Stringified: {$str}, Destructured: {@destructured}")
+            });
+            logItem.Scopes.Should().BeEmpty();            
+        }
+    }
+
 
     [Test]
     public void LogWarning_Literal_WithEventId_WithException()
@@ -5559,6 +6129,44 @@ public class LoggerExtensionsTests : BaseFixture
                 new KeyValuePair<string, object>("{OriginalFormat}", "ABCD{arg1,7}EFGH{arg2:N}IJKL{arg3,10:F3}MNOP{@arg4}QRST{@arg5}UVWX{veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg}YZ")
             });
             logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogWarning_Named_WithEventId_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Warning;
+        var value = new TestObject(3, 5);
+
+        EventId eventId = 5;
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogWarning(eventId, exception,             $"Default: {value.Named("default")}, Stringified: {value.Named("$str")}, Destructured: {value.Named("@destructured")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = eventId,
+                Exception = exception,
+                Message = string.Format(CultureInfo.InvariantCulture, "Default: {0}, Stringified: {0}, Destructured: {0}", value)
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("@default", value),
+                new KeyValuePair<string, object>("$str", value),
+                new KeyValuePair<string, object>("@destructured", value),
+                new KeyValuePair<string, object>("{OriginalFormat}", "Default: {@default}, Stringified: {$str}, Destructured: {@destructured}")
+            });
+            logItem.Scopes.Should().BeEmpty();            
         }
     }
 
@@ -5957,6 +6565,44 @@ public class LoggerExtensionsTests : BaseFixture
         }
     }
 
+    [Test]
+    public void LogError_Named()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Error;
+        var value = new TestObject(3, 5);
+
+        
+        
+        Logger.LogError(            $"Default: {value.Named("default")}, Stringified: {value.Named("$str")}, Destructured: {value.Named("@destructured")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = default(Exception),
+                Message = string.Format(CultureInfo.InvariantCulture, "Default: {0}, Stringified: {0}, Destructured: {0}", value)
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("@default", value),
+                new KeyValuePair<string, object>("$str", value),
+                new KeyValuePair<string, object>("@destructured", value),
+                new KeyValuePair<string, object>("{OriginalFormat}", "Default: {@default}, Stringified: {$str}, Destructured: {@destructured}")
+            });
+            logItem.Scopes.Should().BeEmpty();            
+        }
+    }
+
 
     [Test]
     public void LogError_Literal_WithException()
@@ -6289,6 +6935,44 @@ public class LoggerExtensionsTests : BaseFixture
                 new KeyValuePair<string, object>("{OriginalFormat}", "ABCD{arg1,7}EFGH{arg2:N}IJKL{arg3,10:F3}MNOP{@arg4}QRST{@arg5}UVWX{veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg}YZ")
             });
             logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogError_Named_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Error;
+        var value = new TestObject(3, 5);
+
+        
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogError(exception,             $"Default: {value.Named("default")}, Stringified: {value.Named("$str")}, Destructured: {value.Named("@destructured")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = exception,
+                Message = string.Format(CultureInfo.InvariantCulture, "Default: {0}, Stringified: {0}, Destructured: {0}", value)
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("@default", value),
+                new KeyValuePair<string, object>("$str", value),
+                new KeyValuePair<string, object>("@destructured", value),
+                new KeyValuePair<string, object>("{OriginalFormat}", "Default: {@default}, Stringified: {$str}, Destructured: {@destructured}")
+            });
+            logItem.Scopes.Should().BeEmpty();            
         }
     }
 
@@ -6627,6 +7311,44 @@ public class LoggerExtensionsTests : BaseFixture
         }
     }
 
+    [Test]
+    public void LogError_Named_WithEventId()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Error;
+        var value = new TestObject(3, 5);
+
+        EventId eventId = 5;
+        
+        Logger.LogError(eventId,             $"Default: {value.Named("default")}, Stringified: {value.Named("$str")}, Destructured: {value.Named("@destructured")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = eventId,
+                Exception = default(Exception),
+                Message = string.Format(CultureInfo.InvariantCulture, "Default: {0}, Stringified: {0}, Destructured: {0}", value)
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("@default", value),
+                new KeyValuePair<string, object>("$str", value),
+                new KeyValuePair<string, object>("@destructured", value),
+                new KeyValuePair<string, object>("{OriginalFormat}", "Default: {@default}, Stringified: {$str}, Destructured: {@destructured}")
+            });
+            logItem.Scopes.Should().BeEmpty();            
+        }
+    }
+
 
     [Test]
     public void LogError_Literal_WithEventId_WithException()
@@ -6959,6 +7681,44 @@ public class LoggerExtensionsTests : BaseFixture
                 new KeyValuePair<string, object>("{OriginalFormat}", "ABCD{arg1,7}EFGH{arg2:N}IJKL{arg3,10:F3}MNOP{@arg4}QRST{@arg5}UVWX{veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg}YZ")
             });
             logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogError_Named_WithEventId_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Error;
+        var value = new TestObject(3, 5);
+
+        EventId eventId = 5;
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogError(eventId, exception,             $"Default: {value.Named("default")}, Stringified: {value.Named("$str")}, Destructured: {value.Named("@destructured")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = eventId,
+                Exception = exception,
+                Message = string.Format(CultureInfo.InvariantCulture, "Default: {0}, Stringified: {0}, Destructured: {0}", value)
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("@default", value),
+                new KeyValuePair<string, object>("$str", value),
+                new KeyValuePair<string, object>("@destructured", value),
+                new KeyValuePair<string, object>("{OriginalFormat}", "Default: {@default}, Stringified: {$str}, Destructured: {@destructured}")
+            });
+            logItem.Scopes.Should().BeEmpty();            
         }
     }
 
@@ -7357,6 +8117,44 @@ public class LoggerExtensionsTests : BaseFixture
         }
     }
 
+    [Test]
+    public void LogCritical_Named()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Critical;
+        var value = new TestObject(3, 5);
+
+        
+        
+        Logger.LogCritical(            $"Default: {value.Named("default")}, Stringified: {value.Named("$str")}, Destructured: {value.Named("@destructured")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = default(Exception),
+                Message = string.Format(CultureInfo.InvariantCulture, "Default: {0}, Stringified: {0}, Destructured: {0}", value)
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("@default", value),
+                new KeyValuePair<string, object>("$str", value),
+                new KeyValuePair<string, object>("@destructured", value),
+                new KeyValuePair<string, object>("{OriginalFormat}", "Default: {@default}, Stringified: {$str}, Destructured: {@destructured}")
+            });
+            logItem.Scopes.Should().BeEmpty();            
+        }
+    }
+
 
     [Test]
     public void LogCritical_Literal_WithException()
@@ -7689,6 +8487,44 @@ public class LoggerExtensionsTests : BaseFixture
                 new KeyValuePair<string, object>("{OriginalFormat}", "ABCD{arg1,7}EFGH{arg2:N}IJKL{arg3,10:F3}MNOP{@arg4}QRST{@arg5}UVWX{veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg}YZ")
             });
             logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogCritical_Named_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Critical;
+        var value = new TestObject(3, 5);
+
+        
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogCritical(exception,             $"Default: {value.Named("default")}, Stringified: {value.Named("$str")}, Destructured: {value.Named("@destructured")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = exception,
+                Message = string.Format(CultureInfo.InvariantCulture, "Default: {0}, Stringified: {0}, Destructured: {0}", value)
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("@default", value),
+                new KeyValuePair<string, object>("$str", value),
+                new KeyValuePair<string, object>("@destructured", value),
+                new KeyValuePair<string, object>("{OriginalFormat}", "Default: {@default}, Stringified: {$str}, Destructured: {@destructured}")
+            });
+            logItem.Scopes.Should().BeEmpty();            
         }
     }
 
@@ -8027,6 +8863,44 @@ public class LoggerExtensionsTests : BaseFixture
         }
     }
 
+    [Test]
+    public void LogCritical_Named_WithEventId()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Critical;
+        var value = new TestObject(3, 5);
+
+        EventId eventId = 5;
+        
+        Logger.LogCritical(eventId,             $"Default: {value.Named("default")}, Stringified: {value.Named("$str")}, Destructured: {value.Named("@destructured")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = eventId,
+                Exception = default(Exception),
+                Message = string.Format(CultureInfo.InvariantCulture, "Default: {0}, Stringified: {0}, Destructured: {0}", value)
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("@default", value),
+                new KeyValuePair<string, object>("$str", value),
+                new KeyValuePair<string, object>("@destructured", value),
+                new KeyValuePair<string, object>("{OriginalFormat}", "Default: {@default}, Stringified: {$str}, Destructured: {@destructured}")
+            });
+            logItem.Scopes.Should().BeEmpty();            
+        }
+    }
+
 
     [Test]
     public void LogCritical_Literal_WithEventId_WithException()
@@ -8359,6 +9233,44 @@ public class LoggerExtensionsTests : BaseFixture
                 new KeyValuePair<string, object>("{OriginalFormat}", "ABCD{arg1,7}EFGH{arg2:N}IJKL{arg3,10:F3}MNOP{@arg4}QRST{@arg5}UVWX{veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg}YZ")
             });
             logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogCritical_Named_WithEventId_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Critical;
+        var value = new TestObject(3, 5);
+
+        EventId eventId = 5;
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogCritical(eventId, exception,             $"Default: {value.Named("default")}, Stringified: {value.Named("$str")}, Destructured: {value.Named("@destructured")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = eventId,
+                Exception = exception,
+                Message = string.Format(CultureInfo.InvariantCulture, "Default: {0}, Stringified: {0}, Destructured: {0}", value)
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("@default", value),
+                new KeyValuePair<string, object>("$str", value),
+                new KeyValuePair<string, object>("@destructured", value),
+                new KeyValuePair<string, object>("{OriginalFormat}", "Default: {@default}, Stringified: {$str}, Destructured: {@destructured}")
+            });
+            logItem.Scopes.Should().BeEmpty();            
         }
     }
 
@@ -8739,6 +9651,42 @@ public class LoggerExtensionsTests : BaseFixture
         }
     }
 
+    [Test]
+    public void Log_Named([ValueSource(nameof(LogLevels))] LogLevel logLevel)
+    {
+        var value = new TestObject(3, 5);
+
+        
+        
+        Logger.Log(logLevel,             $"Default: {value.Named("default")}, Stringified: {value.Named("$str")}, Destructured: {value.Named("@destructured")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = default(Exception),
+                Message = string.Format(CultureInfo.InvariantCulture, "Default: {0}, Stringified: {0}, Destructured: {0}", value)
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("@default", value),
+                new KeyValuePair<string, object>("$str", value),
+                new KeyValuePair<string, object>("@destructured", value),
+                new KeyValuePair<string, object>("{OriginalFormat}", "Default: {@default}, Stringified: {$str}, Destructured: {@destructured}")
+            });
+            logItem.Scopes.Should().BeEmpty();            
+        }
+    }
+
 
     [Test]
     public void Log_Literal_WithException([ValueSource(nameof(LogLevels))] LogLevel logLevel)
@@ -9053,6 +10001,42 @@ public class LoggerExtensionsTests : BaseFixture
                 new KeyValuePair<string, object>("{OriginalFormat}", "ABCD{arg1,7}EFGH{arg2:N}IJKL{arg3,10:F3}MNOP{@arg4}QRST{@arg5}UVWX{veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg}YZ")
             });
             logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void Log_Named_WithException([ValueSource(nameof(LogLevels))] LogLevel logLevel)
+    {
+        var value = new TestObject(3, 5);
+
+        
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.Log(logLevel, exception,             $"Default: {value.Named("default")}, Stringified: {value.Named("$str")}, Destructured: {value.Named("@destructured")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = exception,
+                Message = string.Format(CultureInfo.InvariantCulture, "Default: {0}, Stringified: {0}, Destructured: {0}", value)
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("@default", value),
+                new KeyValuePair<string, object>("$str", value),
+                new KeyValuePair<string, object>("@destructured", value),
+                new KeyValuePair<string, object>("{OriginalFormat}", "Default: {@default}, Stringified: {$str}, Destructured: {@destructured}")
+            });
+            logItem.Scopes.Should().BeEmpty();            
         }
     }
 
@@ -9373,6 +10357,42 @@ public class LoggerExtensionsTests : BaseFixture
         }
     }
 
+    [Test]
+    public void Log_Named_WithEventId([ValueSource(nameof(LogLevels))] LogLevel logLevel)
+    {
+        var value = new TestObject(3, 5);
+
+        EventId eventId = 5;
+        
+        Logger.Log(logLevel, eventId,             $"Default: {value.Named("default")}, Stringified: {value.Named("$str")}, Destructured: {value.Named("@destructured")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = eventId,
+                Exception = default(Exception),
+                Message = string.Format(CultureInfo.InvariantCulture, "Default: {0}, Stringified: {0}, Destructured: {0}", value)
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("@default", value),
+                new KeyValuePair<string, object>("$str", value),
+                new KeyValuePair<string, object>("@destructured", value),
+                new KeyValuePair<string, object>("{OriginalFormat}", "Default: {@default}, Stringified: {$str}, Destructured: {@destructured}")
+            });
+            logItem.Scopes.Should().BeEmpty();            
+        }
+    }
+
 
     [Test]
     public void Log_Literal_WithEventId_WithException([ValueSource(nameof(LogLevels))] LogLevel logLevel)
@@ -9687,6 +10707,42 @@ public class LoggerExtensionsTests : BaseFixture
                 new KeyValuePair<string, object>("{OriginalFormat}", "ABCD{arg1,7}EFGH{arg2:N}IJKL{arg3,10:F3}MNOP{@arg4}QRST{@arg5}UVWX{veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg}YZ")
             });
             logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void Log_Named_WithEventId_WithException([ValueSource(nameof(LogLevels))] LogLevel logLevel)
+    {
+        var value = new TestObject(3, 5);
+
+        EventId eventId = 5;
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.Log(logLevel, eventId, exception,             $"Default: {value.Named("default")}, Stringified: {value.Named("$str")}, Destructured: {value.Named("@destructured")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = eventId,
+                Exception = exception,
+                Message = string.Format(CultureInfo.InvariantCulture, "Default: {0}, Stringified: {0}, Destructured: {0}", value)
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("@default", value),
+                new KeyValuePair<string, object>("$str", value),
+                new KeyValuePair<string, object>("@destructured", value),
+                new KeyValuePair<string, object>("{OriginalFormat}", "Default: {@default}, Stringified: {$str}, Destructured: {@destructured}")
+            });
+            logItem.Scopes.Should().BeEmpty();            
         }
     }
 

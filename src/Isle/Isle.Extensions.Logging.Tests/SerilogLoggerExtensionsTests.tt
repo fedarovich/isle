@@ -407,6 +407,49 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
         }
     }
 
+    [Test]
+    public void <#= GetTestName("Named", logLevel, withEventId, withException) #>(<#if (logLevel == "") { #>[ValueSource(nameof(LogLevels))] LogLevel logLevel<# } #>)
+    {
+<#if (logLevel != "") { #> 
+        const LogLevel logLevel = LogLevel.<#= (logLevel) #>;
+<# } #>
+        var value = new TestObject(3, 5);
+
+        <#if (withEventId) { #>EventId eventId = 5;<# } #>
+
+        <#if (withException) { #>Exception exception = new InvalidOperationException("Test exception."); <# } #>
+
+        Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>
+            $"Default: {value.Named("default")}, Stringified: {value.Named("$str")}, Destructured: {value.Named("@destructured")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(1);
+            var logEvent = LogEvents.Single();
+            logEvent.Should().BeEquivalentTo(new 
+            {
+                Exception = <#= withException ? "exception" : "default(Exception)" #>,
+                Level = ToSerilogLevel(logLevel),
+                MessageTemplate = Parser.Parse("Default: {@default}, Stringified: {$str}, Destructured: {@destructured}"),
+                Properties = new Dictionary<string, LogEventPropertyValue>
+                {
+                    ["default"] = new ScalarValue(value),
+                    ["str"] = new ScalarValue(value),
+                    ["destructured"] = new ScalarValue(value),
+                    ["SourceContext"] = new ScalarValue(GetType().FullName),
+                    <#if (withEventId) { #>["EventId"] = new ScalarValue(eventId)<# } #>
+
+                }
+            });
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(string.Format(CultureInfo.InvariantCulture, 
+                "Default: TestObject {{ X: {0}, Y: {1} }}, Stringified: \"{2}\", Destructured: TestObject {{ X: {0}, Y: {1} }}", value.X, value.Y, value));          
+        }
+    }
+
 <# } #>
 <# } #>
 
