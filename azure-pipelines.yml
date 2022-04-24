@@ -67,6 +67,11 @@ steps:
 
 - task: PublishBuildArtifacts@1
 
+- task: NuGetToolInstaller@1
+  displayName: 'Install NuGet 6.x'
+  inputs:
+    versionSpec: 6.x
+
 - task: NuGetCommand@2
   displayName: 'MyGet push'
   condition: ${{ eq(parameters.IsRelease, false) }}
@@ -74,6 +79,7 @@ steps:
     command: push
     nuGetFeedType: external
     publishFeedCredentials: MyGet
+    includeSymbols: true
 
 - task: NuGetCommand@2
   displayName: 'NuGet push'
@@ -82,3 +88,4 @@ steps:
     command: push
     nuGetFeedType: external
     publishFeedCredentials: NuGet
+    includeSymbols: true
