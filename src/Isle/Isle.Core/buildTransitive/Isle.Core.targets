@@ -3,7 +3,4 @@
 	<ItemGroup Condition=" '$(UsingIsleExtensions)' != 'False' ">
 		<Using Include="Isle.Extensions" />
 	</ItemGroup>
-	<ItemGroup Condition=" '$(UsingStaticIsleExtensions)' != 'False' ">
-		<Using Include="Isle.Extensions.LoggingExtensions" Static="True" />
-	</ItemGroup>
 </Project>
