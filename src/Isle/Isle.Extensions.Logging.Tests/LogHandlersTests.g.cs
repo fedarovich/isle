@@ -42,6 +42,38 @@ public class TraceLogInterpolatedStringHandlerTests : BaseFixture
         values.ToString().Should().Be(literal ?? "");
     }
 
+    [Test]
+    public void AppendLiteralWithBraces()
+    {
+        Assume.That(logLevel >= MinLogLevel);
+
+        var handler = new TraceLogInterpolatedStringHandler(3, 0, Logger,  out _);
+        handler.AppendLiteral("A{B}C");
+        var values = handler.GetFormattedLogValuesAndReset();
+        values.Count.Should().Be(1);
+        values[0].Should().Be(new KeyValuePair<string, object>("{OriginalFormat}", "A{{B}}C"));
+        values.ToString().Should().Be("A{B}C");
+    }
+
+    [Test]
+    public void AppendLiterals()
+    {
+        Assume.That(logLevel >= MinLogLevel);
+
+        var handler = new TraceLogInterpolatedStringHandler(5, 0, Logger,  out _);
+        handler.AppendLiteral("A");
+        handler.AppendLiteral("B");
+        handler.AppendLiteral("C");
+        handler.AppendLiteral(null);
+        handler.AppendLiteral("D");
+        handler.AppendLiteral("");
+        handler.AppendLiteral("E");
+        var values = handler.GetFormattedLogValuesAndReset();
+        values.Count.Should().Be(1);
+        values[0].Should().Be(new KeyValuePair<string, object>("{OriginalFormat}", "ABCDE"));
+        values.ToString().Should().Be("ABCDE");
+    }
+
     #region AppendFormatted with Scalar
 
     [Test]
@@ -321,6 +353,38 @@ public class DebugLogInterpolatedStringHandlerTests : BaseFixture
         values.Count.Should().Be(1);
         values[0].Should().Be(new KeyValuePair<string, object>("{OriginalFormat}", literal ?? ""));
         values.ToString().Should().Be(literal ?? "");
+    }
+
+    [Test]
+    public void AppendLiteralWithBraces()
+    {
+        Assume.That(logLevel >= MinLogLevel);
+
+        var handler = new DebugLogInterpolatedStringHandler(3, 0, Logger,  out _);
+        handler.AppendLiteral("A{B}C");
+        var values = handler.GetFormattedLogValuesAndReset();
+        values.Count.Should().Be(1);
+        values[0].Should().Be(new KeyValuePair<string, object>("{OriginalFormat}", "A{{B}}C"));
+        values.ToString().Should().Be("A{B}C");
+    }
+
+    [Test]
+    public void AppendLiterals()
+    {
+        Assume.That(logLevel >= MinLogLevel);
+
+        var handler = new DebugLogInterpolatedStringHandler(5, 0, Logger,  out _);
+        handler.AppendLiteral("A");
+        handler.AppendLiteral("B");
+        handler.AppendLiteral("C");
+        handler.AppendLiteral(null);
+        handler.AppendLiteral("D");
+        handler.AppendLiteral("");
+        handler.AppendLiteral("E");
+        var values = handler.GetFormattedLogValuesAndReset();
+        values.Count.Should().Be(1);
+        values[0].Should().Be(new KeyValuePair<string, object>("{OriginalFormat}", "ABCDE"));
+        values.ToString().Should().Be("ABCDE");
     }
 
     #region AppendFormatted with Scalar
@@ -604,6 +668,38 @@ public class InformationLogInterpolatedStringHandlerTests : BaseFixture
         values.ToString().Should().Be(literal ?? "");
     }
 
+    [Test]
+    public void AppendLiteralWithBraces()
+    {
+        Assume.That(logLevel >= MinLogLevel);
+
+        var handler = new InformationLogInterpolatedStringHandler(3, 0, Logger,  out _);
+        handler.AppendLiteral("A{B}C");
+        var values = handler.GetFormattedLogValuesAndReset();
+        values.Count.Should().Be(1);
+        values[0].Should().Be(new KeyValuePair<string, object>("{OriginalFormat}", "A{{B}}C"));
+        values.ToString().Should().Be("A{B}C");
+    }
+
+    [Test]
+    public void AppendLiterals()
+    {
+        Assume.That(logLevel >= MinLogLevel);
+
+        var handler = new InformationLogInterpolatedStringHandler(5, 0, Logger,  out _);
+        handler.AppendLiteral("A");
+        handler.AppendLiteral("B");
+        handler.AppendLiteral("C");
+        handler.AppendLiteral(null);
+        handler.AppendLiteral("D");
+        handler.AppendLiteral("");
+        handler.AppendLiteral("E");
+        var values = handler.GetFormattedLogValuesAndReset();
+        values.Count.Should().Be(1);
+        values[0].Should().Be(new KeyValuePair<string, object>("{OriginalFormat}", "ABCDE"));
+        values.ToString().Should().Be("ABCDE");
+    }
+
     #region AppendFormatted with Scalar
 
     [Test]
@@ -883,6 +979,38 @@ public class WarningLogInterpolatedStringHandlerTests : BaseFixture
         values.Count.Should().Be(1);
         values[0].Should().Be(new KeyValuePair<string, object>("{OriginalFormat}", literal ?? ""));
         values.ToString().Should().Be(literal ?? "");
+    }
+
+    [Test]
+    public void AppendLiteralWithBraces()
+    {
+        Assume.That(logLevel >= MinLogLevel);
+
+        var handler = new WarningLogInterpolatedStringHandler(3, 0, Logger,  out _);
+        handler.AppendLiteral("A{B}C");
+        var values = handler.GetFormattedLogValuesAndReset();
+        values.Count.Should().Be(1);
+        values[0].Should().Be(new KeyValuePair<string, object>("{OriginalFormat}", "A{{B}}C"));
+        values.ToString().Should().Be("A{B}C");
+    }
+
+    [Test]
+    public void AppendLiterals()
+    {
+        Assume.That(logLevel >= MinLogLevel);
+
+        var handler = new WarningLogInterpolatedStringHandler(5, 0, Logger,  out _);
+        handler.AppendLiteral("A");
+        handler.AppendLiteral("B");
+        handler.AppendLiteral("C");
+        handler.AppendLiteral(null);
+        handler.AppendLiteral("D");
+        handler.AppendLiteral("");
+        handler.AppendLiteral("E");
+        var values = handler.GetFormattedLogValuesAndReset();
+        values.Count.Should().Be(1);
+        values[0].Should().Be(new KeyValuePair<string, object>("{OriginalFormat}", "ABCDE"));
+        values.ToString().Should().Be("ABCDE");
     }
 
     #region AppendFormatted with Scalar
@@ -1166,6 +1294,38 @@ public class ErrorLogInterpolatedStringHandlerTests : BaseFixture
         values.ToString().Should().Be(literal ?? "");
     }
 
+    [Test]
+    public void AppendLiteralWithBraces()
+    {
+        Assume.That(logLevel >= MinLogLevel);
+
+        var handler = new ErrorLogInterpolatedStringHandler(3, 0, Logger,  out _);
+        handler.AppendLiteral("A{B}C");
+        var values = handler.GetFormattedLogValuesAndReset();
+        values.Count.Should().Be(1);
+        values[0].Should().Be(new KeyValuePair<string, object>("{OriginalFormat}", "A{{B}}C"));
+        values.ToString().Should().Be("A{B}C");
+    }
+
+    [Test]
+    public void AppendLiterals()
+    {
+        Assume.That(logLevel >= MinLogLevel);
+
+        var handler = new ErrorLogInterpolatedStringHandler(5, 0, Logger,  out _);
+        handler.AppendLiteral("A");
+        handler.AppendLiteral("B");
+        handler.AppendLiteral("C");
+        handler.AppendLiteral(null);
+        handler.AppendLiteral("D");
+        handler.AppendLiteral("");
+        handler.AppendLiteral("E");
+        var values = handler.GetFormattedLogValuesAndReset();
+        values.Count.Should().Be(1);
+        values[0].Should().Be(new KeyValuePair<string, object>("{OriginalFormat}", "ABCDE"));
+        values.ToString().Should().Be("ABCDE");
+    }
+
     #region AppendFormatted with Scalar
 
     [Test]
@@ -1447,6 +1607,38 @@ public class CriticalLogInterpolatedStringHandlerTests : BaseFixture
         values.ToString().Should().Be(literal ?? "");
     }
 
+    [Test]
+    public void AppendLiteralWithBraces()
+    {
+        Assume.That(logLevel >= MinLogLevel);
+
+        var handler = new CriticalLogInterpolatedStringHandler(3, 0, Logger,  out _);
+        handler.AppendLiteral("A{B}C");
+        var values = handler.GetFormattedLogValuesAndReset();
+        values.Count.Should().Be(1);
+        values[0].Should().Be(new KeyValuePair<string, object>("{OriginalFormat}", "A{{B}}C"));
+        values.ToString().Should().Be("A{B}C");
+    }
+
+    [Test]
+    public void AppendLiterals()
+    {
+        Assume.That(logLevel >= MinLogLevel);
+
+        var handler = new CriticalLogInterpolatedStringHandler(5, 0, Logger,  out _);
+        handler.AppendLiteral("A");
+        handler.AppendLiteral("B");
+        handler.AppendLiteral("C");
+        handler.AppendLiteral(null);
+        handler.AppendLiteral("D");
+        handler.AppendLiteral("");
+        handler.AppendLiteral("E");
+        var values = handler.GetFormattedLogValuesAndReset();
+        values.Count.Should().Be(1);
+        values[0].Should().Be(new KeyValuePair<string, object>("{OriginalFormat}", "ABCDE"));
+        values.ToString().Should().Be("ABCDE");
+    }
+
     #region AppendFormatted with Scalar
 
     [Test]
@@ -1725,6 +1917,38 @@ public class LogInterpolatedStringHandlerTests : BaseFixture
         values.Count.Should().Be(1);
         values[0].Should().Be(new KeyValuePair<string, object>("{OriginalFormat}", literal ?? ""));
         values.ToString().Should().Be(literal ?? "");
+    }
+
+    [Test]
+    public void AppendLiteralWithBraces( [ValueSource(nameof(LogLevels))] LogLevel logLevel )
+    {
+        Assume.That(logLevel >= MinLogLevel);
+
+        var handler = new LogInterpolatedStringHandler(3, 0, Logger,  logLevel,  out _);
+        handler.AppendLiteral("A{B}C");
+        var values = handler.GetFormattedLogValuesAndReset();
+        values.Count.Should().Be(1);
+        values[0].Should().Be(new KeyValuePair<string, object>("{OriginalFormat}", "A{{B}}C"));
+        values.ToString().Should().Be("A{B}C");
+    }
+
+    [Test]
+    public void AppendLiterals( [ValueSource(nameof(LogLevels))] LogLevel logLevel )
+    {
+        Assume.That(logLevel >= MinLogLevel);
+
+        var handler = new LogInterpolatedStringHandler(5, 0, Logger,  logLevel,  out _);
+        handler.AppendLiteral("A");
+        handler.AppendLiteral("B");
+        handler.AppendLiteral("C");
+        handler.AppendLiteral(null);
+        handler.AppendLiteral("D");
+        handler.AppendLiteral("");
+        handler.AppendLiteral("E");
+        var values = handler.GetFormattedLogValuesAndReset();
+        values.Count.Should().Be(1);
+        values[0].Should().Be(new KeyValuePair<string, object>("{OriginalFormat}", "ABCDE"));
+        values.ToString().Should().Be("ABCDE");
     }
 
     #region AppendFormatted with Scalar

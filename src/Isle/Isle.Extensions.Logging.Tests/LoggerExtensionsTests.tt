@@ -46,13 +46,11 @@ public class LoggerExtensionsTests : BaseFixture
 <#if (logLevel != "") { #> 
         const LogLevel logLevel = LogLevel.<#= (logLevel) #>;
 <# } #>
-        const string message = "Test";
-
         <#if (withEventId) { #>EventId eventId = 5;<# } #>
 
         <#if (withException) { #>Exception exception = new InvalidOperationException("Test exception."); <# } #>
 
-        Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>message);
+        Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>$"Test");
 
         if (logLevel < MinLogLevel)
         {
@@ -68,11 +66,47 @@ public class LoggerExtensionsTests : BaseFixture
                 LogLevel = logLevel,
                 EventId = <#= withEventId ? "eventId" : "default(EventId)" #>,
                 Exception = <#= withException ? "exception" : "default(Exception)" #>,
-                Message = message
+                Message = "Test"
             });
             logItem.State.Should().BeEquivalentTo(new[]
             {
-                new KeyValuePair<string, object>("{OriginalFormat}", message)
+                new KeyValuePair<string, object>("{OriginalFormat}", "Test")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void <#= GetTestName("LiteralWithBraces", logLevel, withEventId, withException) #>(<#if (logLevel == "") { #>[ValueSource(nameof(LogLevels))] LogLevel logLevel<# } #>)
+    {
+<#if (logLevel != "") { #> 
+        const LogLevel logLevel = LogLevel.<#= (logLevel) #>;
+<# } #>
+        <#if (withEventId) { #>EventId eventId = 5;<# } #>
+
+        <#if (withException) { #>Exception exception = new InvalidOperationException("Test exception."); <# } #>
+
+        Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>$"T{{es}}t");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = <#= withEventId ? "eventId" : "default(EventId)" #>,
+                Exception = <#= withException ? "exception" : "default(Exception)" #>,
+                Message = "T{es}t"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "T{{es}}t")
             });
             logItem.Scopes.Should().BeEmpty();
         }
@@ -397,6 +431,48 @@ public class LoggerExtensionsTests : BaseFixture
                 new KeyValuePair<string, object>("@arg5", arg5),
                 new KeyValuePair<string, object>("veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg", veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg),
                 new KeyValuePair<string, object>("{OriginalFormat}", "ABCD{arg1,7}EFGH{arg2:N}IJKL{arg3,10:F3}MNOP{@arg4}QRST{@arg5}UVWX{veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg}YZ")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void <#= GetTestName("MixedWithLiteralLists", logLevel, withEventId, withException) #>(<#if (logLevel == "") { #>[ValueSource(nameof(LogLevels))] LogLevel logLevel<# } #>)
+    {
+<#if (logLevel != "") { #> 
+        const LogLevel logLevel = LogLevel.<#= (logLevel) #>;
+<# } #>
+        var arg1 = 5;
+        var arg2 = new TestObject(7, 11);
+
+        <#if (withEventId) { #>EventId eventId = 5;<# } #>
+
+        <#if (withException) { #>Exception exception = new InvalidOperationException("Test exception."); <# } #>
+
+        Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>
+            $"A" + $"B" + $"C" + $"{arg1}" + $"D" + $"E" + $"F{arg2}G" + $"H" + $"" + $"I{{J}}" + $"K");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = <#= withEventId ? "eventId" : "default(EventId)" #>,
+                Exception = <#= withException ? "exception" : "default(Exception)" #>,
+                Message = string.Format("ABC{0}DEF{1}GHI{{J}}K", arg1, arg2)
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("arg1", arg1),
+                new KeyValuePair<string, object>("@arg2", arg2),
+                new KeyValuePair<string, object>("{OriginalFormat}", "ABC{arg1}DEF{@arg2}GHI{{J}}K")
             });
             logItem.Scopes.Should().BeEmpty();
         }

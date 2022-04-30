@@ -21,8 +21,9 @@ public ref partial struct TraceLogInterpolatedStringHandler
     private const char StringifyOperator = '$';
 
     private StringBuilder _originalFormatBuilder = null!;
-    private FormattedLogValue[] _formattedLogValues = null!;
+    private KeyValuePair<string, object?>[] _formattedLogValues = null!;
     private Segment[] _segments = null!;
+    private List<string> _literalList = null!;
     private int _valueIndex = 0;
     private int _segmentIndex = 0;
 
@@ -40,7 +41,7 @@ public ref partial struct TraceLogInterpolatedStringHandler
         if (isEnabled)
         {
             _originalFormatBuilder = StringBuilderCache.Acquire(Math.Max(literalLength + formattedCount * 16, StringBuilderCache.MaxBuilderSize));
-            _formattedLogValues = new FormattedLogValue[formattedCount + 1];
+            _formattedLogValues = new KeyValuePair<string, object?>[formattedCount + 1];
             _segments = GC.AllocateUninitializedArray<Segment>(formattedCount * 2 + 1);
         }
     }
@@ -61,14 +62,25 @@ public ref partial struct TraceLogInterpolatedStringHandler
         var length = end - start;
         if (length > 0)
         {
-            if (_segmentIndex > 0 && _segments[_segmentIndex - 1].IsLiteral)
+            if (_segmentIndex > 0)
             {
-                Segment.Grow(ref _segments[_segmentIndex - 1], length);
+                ref var prevSegment = ref _segments[_segmentIndex - 1];
+                switch (prevSegment.Type)
+                {
+                    case Segment.SegmentType.Literal:
+                    {
+                        prevSegment = new Segment(prevSegment, str!, _literalList ??= new List<string>());
+                        return;
+                    }
+                    case Segment.SegmentType.LiteralList:
+                    {
+                        prevSegment = new Segment(prevSegment, str!);
+                        return;
+                    }
+                }
             }
-            else
-            {
-                _segments[_segmentIndex++] = new Segment(start, length);
-            }
+            
+            _segments[_segmentIndex++] = new Segment(str!);
         }
     }
 
@@ -125,13 +137,13 @@ public ref partial struct TraceLogInterpolatedStringHandler
         }
 
         _originalFormatBuilder.Append('}');
-        _segments[_segmentIndex++] = new Segment(alignment);
-        _formattedLogValues[_valueIndex++] = new (name, namedLogValue.Value, format);
+        _segments[_segmentIndex++] = new Segment(format, alignment);
+        _formattedLogValues[_valueIndex++] = new (name, namedLogValue.Value);
     }
 
     internal FormattedLogValues GetFormattedLogValuesAndReset()
     {
-        _formattedLogValues[_valueIndex] = new FormattedLogValue(OriginalFormatName, StringBuilderCache.GetStringAndRelease(_originalFormatBuilder));
+        _formattedLogValues[_valueIndex] = new KeyValuePair<string, object?>(OriginalFormatName, StringBuilderCache.GetStringAndRelease(_originalFormatBuilder));
         var result = new FormattedLogValues(_formattedLogValues, _segments, _segmentIndex);
         _formattedLogValues = null!;
         _originalFormatBuilder = null!;
@@ -155,8 +167,9 @@ public ref partial struct DebugLogInterpolatedStringHandler
     private const char StringifyOperator = '$';
 
     private StringBuilder _originalFormatBuilder = null!;
-    private FormattedLogValue[] _formattedLogValues = null!;
+    private KeyValuePair<string, object?>[] _formattedLogValues = null!;
     private Segment[] _segments = null!;
+    private List<string> _literalList = null!;
     private int _valueIndex = 0;
     private int _segmentIndex = 0;
 
@@ -174,7 +187,7 @@ public ref partial struct DebugLogInterpolatedStringHandler
         if (isEnabled)
         {
             _originalFormatBuilder = StringBuilderCache.Acquire(Math.Max(literalLength + formattedCount * 16, StringBuilderCache.MaxBuilderSize));
-            _formattedLogValues = new FormattedLogValue[formattedCount + 1];
+            _formattedLogValues = new KeyValuePair<string, object?>[formattedCount + 1];
             _segments = GC.AllocateUninitializedArray<Segment>(formattedCount * 2 + 1);
         }
     }
@@ -195,14 +208,25 @@ public ref partial struct DebugLogInterpolatedStringHandler
         var length = end - start;
         if (length > 0)
         {
-            if (_segmentIndex > 0 && _segments[_segmentIndex - 1].IsLiteral)
+            if (_segmentIndex > 0)
             {
-                Segment.Grow(ref _segments[_segmentIndex - 1], length);
+                ref var prevSegment = ref _segments[_segmentIndex - 1];
+                switch (prevSegment.Type)
+                {
+                    case Segment.SegmentType.Literal:
+                    {
+                        prevSegment = new Segment(prevSegment, str!, _literalList ??= new List<string>());
+                        return;
+                    }
+                    case Segment.SegmentType.LiteralList:
+                    {
+                        prevSegment = new Segment(prevSegment, str!);
+                        return;
+                    }
+                }
             }
-            else
-            {
-                _segments[_segmentIndex++] = new Segment(start, length);
-            }
+            
+            _segments[_segmentIndex++] = new Segment(str!);
         }
     }
 
@@ -259,13 +283,13 @@ public ref partial struct DebugLogInterpolatedStringHandler
         }
 
         _originalFormatBuilder.Append('}');
-        _segments[_segmentIndex++] = new Segment(alignment);
-        _formattedLogValues[_valueIndex++] = new (name, namedLogValue.Value, format);
+        _segments[_segmentIndex++] = new Segment(format, alignment);
+        _formattedLogValues[_valueIndex++] = new (name, namedLogValue.Value);
     }
 
     internal FormattedLogValues GetFormattedLogValuesAndReset()
     {
-        _formattedLogValues[_valueIndex] = new FormattedLogValue(OriginalFormatName, StringBuilderCache.GetStringAndRelease(_originalFormatBuilder));
+        _formattedLogValues[_valueIndex] = new KeyValuePair<string, object?>(OriginalFormatName, StringBuilderCache.GetStringAndRelease(_originalFormatBuilder));
         var result = new FormattedLogValues(_formattedLogValues, _segments, _segmentIndex);
         _formattedLogValues = null!;
         _originalFormatBuilder = null!;
@@ -289,8 +313,9 @@ public ref partial struct InformationLogInterpolatedStringHandler
     private const char StringifyOperator = '$';
 
     private StringBuilder _originalFormatBuilder = null!;
-    private FormattedLogValue[] _formattedLogValues = null!;
+    private KeyValuePair<string, object?>[] _formattedLogValues = null!;
     private Segment[] _segments = null!;
+    private List<string> _literalList = null!;
     private int _valueIndex = 0;
     private int _segmentIndex = 0;
 
@@ -308,7 +333,7 @@ public ref partial struct InformationLogInterpolatedStringHandler
         if (isEnabled)
         {
             _originalFormatBuilder = StringBuilderCache.Acquire(Math.Max(literalLength + formattedCount * 16, StringBuilderCache.MaxBuilderSize));
-            _formattedLogValues = new FormattedLogValue[formattedCount + 1];
+            _formattedLogValues = new KeyValuePair<string, object?>[formattedCount + 1];
             _segments = GC.AllocateUninitializedArray<Segment>(formattedCount * 2 + 1);
         }
     }
@@ -329,14 +354,25 @@ public ref partial struct InformationLogInterpolatedStringHandler
         var length = end - start;
         if (length > 0)
         {
-            if (_segmentIndex > 0 && _segments[_segmentIndex - 1].IsLiteral)
+            if (_segmentIndex > 0)
             {
-                Segment.Grow(ref _segments[_segmentIndex - 1], length);
+                ref var prevSegment = ref _segments[_segmentIndex - 1];
+                switch (prevSegment.Type)
+                {
+                    case Segment.SegmentType.Literal:
+                    {
+                        prevSegment = new Segment(prevSegment, str!, _literalList ??= new List<string>());
+                        return;
+                    }
+                    case Segment.SegmentType.LiteralList:
+                    {
+                        prevSegment = new Segment(prevSegment, str!);
+                        return;
+                    }
+                }
             }
-            else
-            {
-                _segments[_segmentIndex++] = new Segment(start, length);
-            }
+            
+            _segments[_segmentIndex++] = new Segment(str!);
         }
     }
 
@@ -393,13 +429,13 @@ public ref partial struct InformationLogInterpolatedStringHandler
         }
 
         _originalFormatBuilder.Append('}');
-        _segments[_segmentIndex++] = new Segment(alignment);
-        _formattedLogValues[_valueIndex++] = new (name, namedLogValue.Value, format);
+        _segments[_segmentIndex++] = new Segment(format, alignment);
+        _formattedLogValues[_valueIndex++] = new (name, namedLogValue.Value);
     }
 
     internal FormattedLogValues GetFormattedLogValuesAndReset()
     {
-        _formattedLogValues[_valueIndex] = new FormattedLogValue(OriginalFormatName, StringBuilderCache.GetStringAndRelease(_originalFormatBuilder));
+        _formattedLogValues[_valueIndex] = new KeyValuePair<string, object?>(OriginalFormatName, StringBuilderCache.GetStringAndRelease(_originalFormatBuilder));
         var result = new FormattedLogValues(_formattedLogValues, _segments, _segmentIndex);
         _formattedLogValues = null!;
         _originalFormatBuilder = null!;
@@ -423,8 +459,9 @@ public ref partial struct WarningLogInterpolatedStringHandler
     private const char StringifyOperator = '$';
 
     private StringBuilder _originalFormatBuilder = null!;
-    private FormattedLogValue[] _formattedLogValues = null!;
+    private KeyValuePair<string, object?>[] _formattedLogValues = null!;
     private Segment[] _segments = null!;
+    private List<string> _literalList = null!;
     private int _valueIndex = 0;
     private int _segmentIndex = 0;
 
@@ -442,7 +479,7 @@ public ref partial struct WarningLogInterpolatedStringHandler
         if (isEnabled)
         {
             _originalFormatBuilder = StringBuilderCache.Acquire(Math.Max(literalLength + formattedCount * 16, StringBuilderCache.MaxBuilderSize));
-            _formattedLogValues = new FormattedLogValue[formattedCount + 1];
+            _formattedLogValues = new KeyValuePair<string, object?>[formattedCount + 1];
             _segments = GC.AllocateUninitializedArray<Segment>(formattedCount * 2 + 1);
         }
     }
@@ -463,14 +500,25 @@ public ref partial struct WarningLogInterpolatedStringHandler
         var length = end - start;
         if (length > 0)
         {
-            if (_segmentIndex > 0 && _segments[_segmentIndex - 1].IsLiteral)
+            if (_segmentIndex > 0)
             {
-                Segment.Grow(ref _segments[_segmentIndex - 1], length);
+                ref var prevSegment = ref _segments[_segmentIndex - 1];
+                switch (prevSegment.Type)
+                {
+                    case Segment.SegmentType.Literal:
+                    {
+                        prevSegment = new Segment(prevSegment, str!, _literalList ??= new List<string>());
+                        return;
+                    }
+                    case Segment.SegmentType.LiteralList:
+                    {
+                        prevSegment = new Segment(prevSegment, str!);
+                        return;
+                    }
+                }
             }
-            else
-            {
-                _segments[_segmentIndex++] = new Segment(start, length);
-            }
+            
+            _segments[_segmentIndex++] = new Segment(str!);
         }
     }
 
@@ -527,13 +575,13 @@ public ref partial struct WarningLogInterpolatedStringHandler
         }
 
         _originalFormatBuilder.Append('}');
-        _segments[_segmentIndex++] = new Segment(alignment);
-        _formattedLogValues[_valueIndex++] = new (name, namedLogValue.Value, format);
+        _segments[_segmentIndex++] = new Segment(format, alignment);
+        _formattedLogValues[_valueIndex++] = new (name, namedLogValue.Value);
     }
 
     internal FormattedLogValues GetFormattedLogValuesAndReset()
     {
-        _formattedLogValues[_valueIndex] = new FormattedLogValue(OriginalFormatName, StringBuilderCache.GetStringAndRelease(_originalFormatBuilder));
+        _formattedLogValues[_valueIndex] = new KeyValuePair<string, object?>(OriginalFormatName, StringBuilderCache.GetStringAndRelease(_originalFormatBuilder));
         var result = new FormattedLogValues(_formattedLogValues, _segments, _segmentIndex);
         _formattedLogValues = null!;
         _originalFormatBuilder = null!;
@@ -557,8 +605,9 @@ public ref partial struct ErrorLogInterpolatedStringHandler
     private const char StringifyOperator = '$';
 
     private StringBuilder _originalFormatBuilder = null!;
-    private FormattedLogValue[] _formattedLogValues = null!;
+    private KeyValuePair<string, object?>[] _formattedLogValues = null!;
     private Segment[] _segments = null!;
+    private List<string> _literalList = null!;
     private int _valueIndex = 0;
     private int _segmentIndex = 0;
 
@@ -576,7 +625,7 @@ public ref partial struct ErrorLogInterpolatedStringHandler
         if (isEnabled)
         {
             _originalFormatBuilder = StringBuilderCache.Acquire(Math.Max(literalLength + formattedCount * 16, StringBuilderCache.MaxBuilderSize));
-            _formattedLogValues = new FormattedLogValue[formattedCount + 1];
+            _formattedLogValues = new KeyValuePair<string, object?>[formattedCount + 1];
             _segments = GC.AllocateUninitializedArray<Segment>(formattedCount * 2 + 1);
         }
     }
@@ -597,14 +646,25 @@ public ref partial struct ErrorLogInterpolatedStringHandler
         var length = end - start;
         if (length > 0)
         {
-            if (_segmentIndex > 0 && _segments[_segmentIndex - 1].IsLiteral)
+            if (_segmentIndex > 0)
             {
-                Segment.Grow(ref _segments[_segmentIndex - 1], length);
+                ref var prevSegment = ref _segments[_segmentIndex - 1];
+                switch (prevSegment.Type)
+                {
+                    case Segment.SegmentType.Literal:
+                    {
+                        prevSegment = new Segment(prevSegment, str!, _literalList ??= new List<string>());
+                        return;
+                    }
+                    case Segment.SegmentType.LiteralList:
+                    {
+                        prevSegment = new Segment(prevSegment, str!);
+                        return;
+                    }
+                }
             }
-            else
-            {
-                _segments[_segmentIndex++] = new Segment(start, length);
-            }
+            
+            _segments[_segmentIndex++] = new Segment(str!);
         }
     }
 
@@ -661,13 +721,13 @@ public ref partial struct ErrorLogInterpolatedStringHandler
         }
 
         _originalFormatBuilder.Append('}');
-        _segments[_segmentIndex++] = new Segment(alignment);
-        _formattedLogValues[_valueIndex++] = new (name, namedLogValue.Value, format);
+        _segments[_segmentIndex++] = new Segment(format, alignment);
+        _formattedLogValues[_valueIndex++] = new (name, namedLogValue.Value);
     }
 
     internal FormattedLogValues GetFormattedLogValuesAndReset()
     {
-        _formattedLogValues[_valueIndex] = new FormattedLogValue(OriginalFormatName, StringBuilderCache.GetStringAndRelease(_originalFormatBuilder));
+        _formattedLogValues[_valueIndex] = new KeyValuePair<string, object?>(OriginalFormatName, StringBuilderCache.GetStringAndRelease(_originalFormatBuilder));
         var result = new FormattedLogValues(_formattedLogValues, _segments, _segmentIndex);
         _formattedLogValues = null!;
         _originalFormatBuilder = null!;
@@ -691,8 +751,9 @@ public ref partial struct CriticalLogInterpolatedStringHandler
     private const char StringifyOperator = '$';
 
     private StringBuilder _originalFormatBuilder = null!;
-    private FormattedLogValue[] _formattedLogValues = null!;
+    private KeyValuePair<string, object?>[] _formattedLogValues = null!;
     private Segment[] _segments = null!;
+    private List<string> _literalList = null!;
     private int _valueIndex = 0;
     private int _segmentIndex = 0;
 
@@ -710,7 +771,7 @@ public ref partial struct CriticalLogInterpolatedStringHandler
         if (isEnabled)
         {
             _originalFormatBuilder = StringBuilderCache.Acquire(Math.Max(literalLength + formattedCount * 16, StringBuilderCache.MaxBuilderSize));
-            _formattedLogValues = new FormattedLogValue[formattedCount + 1];
+            _formattedLogValues = new KeyValuePair<string, object?>[formattedCount + 1];
             _segments = GC.AllocateUninitializedArray<Segment>(formattedCount * 2 + 1);
         }
     }
@@ -731,14 +792,25 @@ public ref partial struct CriticalLogInterpolatedStringHandler
         var length = end - start;
         if (length > 0)
         {
-            if (_segmentIndex > 0 && _segments[_segmentIndex - 1].IsLiteral)
+            if (_segmentIndex > 0)
             {
-                Segment.Grow(ref _segments[_segmentIndex - 1], length);
+                ref var prevSegment = ref _segments[_segmentIndex - 1];
+                switch (prevSegment.Type)
+                {
+                    case Segment.SegmentType.Literal:
+                    {
+                        prevSegment = new Segment(prevSegment, str!, _literalList ??= new List<string>());
+                        return;
+                    }
+                    case Segment.SegmentType.LiteralList:
+                    {
+                        prevSegment = new Segment(prevSegment, str!);
+                        return;
+                    }
+                }
             }
-            else
-            {
-                _segments[_segmentIndex++] = new Segment(start, length);
-            }
+            
+            _segments[_segmentIndex++] = new Segment(str!);
         }
     }
 
@@ -795,13 +867,13 @@ public ref partial struct CriticalLogInterpolatedStringHandler
         }
 
         _originalFormatBuilder.Append('}');
-        _segments[_segmentIndex++] = new Segment(alignment);
-        _formattedLogValues[_valueIndex++] = new (name, namedLogValue.Value, format);
+        _segments[_segmentIndex++] = new Segment(format, alignment);
+        _formattedLogValues[_valueIndex++] = new (name, namedLogValue.Value);
     }
 
     internal FormattedLogValues GetFormattedLogValuesAndReset()
     {
-        _formattedLogValues[_valueIndex] = new FormattedLogValue(OriginalFormatName, StringBuilderCache.GetStringAndRelease(_originalFormatBuilder));
+        _formattedLogValues[_valueIndex] = new KeyValuePair<string, object?>(OriginalFormatName, StringBuilderCache.GetStringAndRelease(_originalFormatBuilder));
         var result = new FormattedLogValues(_formattedLogValues, _segments, _segmentIndex);
         _formattedLogValues = null!;
         _originalFormatBuilder = null!;
@@ -825,8 +897,9 @@ public ref partial struct LogInterpolatedStringHandler
     private const char StringifyOperator = '$';
 
     private StringBuilder _originalFormatBuilder = null!;
-    private FormattedLogValue[] _formattedLogValues = null!;
+    private KeyValuePair<string, object?>[] _formattedLogValues = null!;
     private Segment[] _segments = null!;
+    private List<string> _literalList = null!;
     private int _valueIndex = 0;
     private int _segmentIndex = 0;
 
@@ -845,7 +918,7 @@ public ref partial struct LogInterpolatedStringHandler
         if (isEnabled)
         {
             _originalFormatBuilder = StringBuilderCache.Acquire(Math.Max(literalLength + formattedCount * 16, StringBuilderCache.MaxBuilderSize));
-            _formattedLogValues = new FormattedLogValue[formattedCount + 1];
+            _formattedLogValues = new KeyValuePair<string, object?>[formattedCount + 1];
             _segments = GC.AllocateUninitializedArray<Segment>(formattedCount * 2 + 1);
         }
     }
@@ -866,14 +939,25 @@ public ref partial struct LogInterpolatedStringHandler
         var length = end - start;
         if (length > 0)
         {
-            if (_segmentIndex > 0 && _segments[_segmentIndex - 1].IsLiteral)
+            if (_segmentIndex > 0)
             {
-                Segment.Grow(ref _segments[_segmentIndex - 1], length);
+                ref var prevSegment = ref _segments[_segmentIndex - 1];
+                switch (prevSegment.Type)
+                {
+                    case Segment.SegmentType.Literal:
+                    {
+                        prevSegment = new Segment(prevSegment, str!, _literalList ??= new List<string>());
+                        return;
+                    }
+                    case Segment.SegmentType.LiteralList:
+                    {
+                        prevSegment = new Segment(prevSegment, str!);
+                        return;
+                    }
+                }
             }
-            else
-            {
-                _segments[_segmentIndex++] = new Segment(start, length);
-            }
+            
+            _segments[_segmentIndex++] = new Segment(str!);
         }
     }
 
@@ -930,13 +1014,13 @@ public ref partial struct LogInterpolatedStringHandler
         }
 
         _originalFormatBuilder.Append('}');
-        _segments[_segmentIndex++] = new Segment(alignment);
-        _formattedLogValues[_valueIndex++] = new (name, namedLogValue.Value, format);
+        _segments[_segmentIndex++] = new Segment(format, alignment);
+        _formattedLogValues[_valueIndex++] = new (name, namedLogValue.Value);
     }
 
     internal FormattedLogValues GetFormattedLogValuesAndReset()
     {
-        _formattedLogValues[_valueIndex] = new FormattedLogValue(OriginalFormatName, StringBuilderCache.GetStringAndRelease(_originalFormatBuilder));
+        _formattedLogValues[_valueIndex] = new KeyValuePair<string, object?>(OriginalFormatName, StringBuilderCache.GetStringAndRelease(_originalFormatBuilder));
         var result = new FormattedLogValues(_formattedLogValues, _segments, _segmentIndex);
         _formattedLogValues = null!;
         _originalFormatBuilder = null!;
@@ -960,8 +1044,9 @@ public ref partial struct ScopeLogInterpolatedStringHandler
     private const char StringifyOperator = '$';
 
     private StringBuilder _originalFormatBuilder = null!;
-    private FormattedLogValue[] _formattedLogValues = null!;
+    private KeyValuePair<string, object?>[] _formattedLogValues = null!;
     private Segment[] _segments = null!;
+    private List<string> _literalList = null!;
     private int _valueIndex = 0;
     private int _segmentIndex = 0;
 
@@ -974,7 +1059,7 @@ public ref partial struct ScopeLogInterpolatedStringHandler
         ILogger logger    )
     {
             _originalFormatBuilder = StringBuilderCache.Acquire(Math.Max(literalLength + formattedCount * 16, StringBuilderCache.MaxBuilderSize));
-            _formattedLogValues = new FormattedLogValue[formattedCount + 1];
+            _formattedLogValues = new KeyValuePair<string, object?>[formattedCount + 1];
             _segments = GC.AllocateUninitializedArray<Segment>(formattedCount * 2 + 1);
     }
 
@@ -990,14 +1075,25 @@ public ref partial struct ScopeLogInterpolatedStringHandler
         var length = end - start;
         if (length > 0)
         {
-            if (_segmentIndex > 0 && _segments[_segmentIndex - 1].IsLiteral)
+            if (_segmentIndex > 0)
             {
-                Segment.Grow(ref _segments[_segmentIndex - 1], length);
+                ref var prevSegment = ref _segments[_segmentIndex - 1];
+                switch (prevSegment.Type)
+                {
+                    case Segment.SegmentType.Literal:
+                    {
+                        prevSegment = new Segment(prevSegment, str!, _literalList ??= new List<string>());
+                        return;
+                    }
+                    case Segment.SegmentType.LiteralList:
+                    {
+                        prevSegment = new Segment(prevSegment, str!);
+                        return;
+                    }
+                }
             }
-            else
-            {
-                _segments[_segmentIndex++] = new Segment(start, length);
-            }
+            
+            _segments[_segmentIndex++] = new Segment(str!);
         }
     }
 
@@ -1054,13 +1150,13 @@ public ref partial struct ScopeLogInterpolatedStringHandler
         }
 
         _originalFormatBuilder.Append('}');
-        _segments[_segmentIndex++] = new Segment(alignment);
-        _formattedLogValues[_valueIndex++] = new (name, namedLogValue.Value, format);
+        _segments[_segmentIndex++] = new Segment(format, alignment);
+        _formattedLogValues[_valueIndex++] = new (name, namedLogValue.Value);
     }
 
     internal FormattedLogValues GetFormattedLogValuesAndReset()
     {
-        _formattedLogValues[_valueIndex] = new FormattedLogValue(OriginalFormatName, StringBuilderCache.GetStringAndRelease(_originalFormatBuilder));
+        _formattedLogValues[_valueIndex] = new KeyValuePair<string, object?>(OriginalFormatName, StringBuilderCache.GetStringAndRelease(_originalFormatBuilder));
         var result = new FormattedLogValues(_formattedLogValues, _segments, _segmentIndex);
         _formattedLogValues = null!;
         _originalFormatBuilder = null!;

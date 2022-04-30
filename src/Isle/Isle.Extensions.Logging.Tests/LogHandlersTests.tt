@@ -59,6 +59,38 @@ public class <#= GetTestName(logLevel) #> : BaseFixture
         values.ToString().Should().Be(literal ?? "");
     }
 
+    [Test]
+    public void AppendLiteralWithBraces(<#if (logLevel == null) { #> [ValueSource(nameof(LogLevels))] LogLevel logLevel <# } #>)
+    {
+        Assume.That(logLevel >= MinLogLevel);
+
+        var handler = new <#= GetTypeName(logLevel) #>(3, 0, Logger, <#if (logLevel == null) { #> logLevel, <# } #> out _);
+        handler.AppendLiteral("A{B}C");
+        var values = handler.GetFormattedLogValuesAndReset();
+        values.Count.Should().Be(1);
+        values[0].Should().Be(new KeyValuePair<string, object>("{OriginalFormat}", "A{{B}}C"));
+        values.ToString().Should().Be("A{B}C");
+    }
+
+    [Test]
+    public void AppendLiterals(<#if (logLevel == null) { #> [ValueSource(nameof(LogLevels))] LogLevel logLevel <# } #>)
+    {
+        Assume.That(logLevel >= MinLogLevel);
+
+        var handler = new <#= GetTypeName(logLevel) #>(5, 0, Logger, <#if (logLevel == null) { #> logLevel, <# } #> out _);
+        handler.AppendLiteral("A");
+        handler.AppendLiteral("B");
+        handler.AppendLiteral("C");
+        handler.AppendLiteral(null);
+        handler.AppendLiteral("D");
+        handler.AppendLiteral("");
+        handler.AppendLiteral("E");
+        var values = handler.GetFormattedLogValuesAndReset();
+        values.Count.Should().Be(1);
+        values[0].Should().Be(new KeyValuePair<string, object>("{OriginalFormat}", "ABCDE"));
+        values.ToString().Should().Be("ABCDE");
+    }
+
     #region AppendFormatted with Scalar
 
     [Test]

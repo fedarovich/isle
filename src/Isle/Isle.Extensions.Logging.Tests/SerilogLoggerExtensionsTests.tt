@@ -50,6 +50,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
 
         <#if (withException) { #>Exception exception = new InvalidOperationException("Test exception."); <# } #>
 
+        Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>$"Test");
         Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>message);
 
         if (logLevel < MinLogLevel)
@@ -58,8 +59,10 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
         }
         else
         {
-            LogEvents.Should().HaveCount(1);
-            var logEvent = LogEvents.Single();
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, config => config.Excluding(e => e.Timestamp));
             logEvent.Should().BeEquivalentTo(new 
             {
                 Exception = <#= withException ? "exception" : "default(Exception)" #>,
@@ -77,6 +80,47 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
+    public void <#= GetTestName("LiteralWithBraces", logLevel, withEventId, withException) #>(<#if (logLevel == "") { #>[ValueSource(nameof(LogLevels))] LogLevel logLevel<# } #>)
+    {
+<#if (logLevel != "") { #> 
+        const LogLevel logLevel = LogLevel.<#= (logLevel) #>;
+<# } #>
+        const string message = "T{{es}}t";
+
+        <#if (withEventId) { #>EventId eventId = 5;<# } #>
+
+        <#if (withException) { #>Exception exception = new InvalidOperationException("Test exception."); <# } #>
+
+        Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>$"T{{es}}t");
+        Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, config => config.Excluding(e => e.Timestamp));
+            logEvent.Should().BeEquivalentTo(new 
+            {
+                Exception = <#= withException ? "exception" : "default(Exception)" #>,
+                Level = ToSerilogLevel(logLevel),
+                MessageTemplate = Parser.Parse(message),
+                Properties = new Dictionary<string, LogEventPropertyValue>
+                {
+                    ["SourceContext"] = new ScalarValue(GetType().FullName),
+                    <#if (withEventId) { #>["EventId"] = new ScalarValue(eventId)<# } #>
+
+                }
+            });
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
+    [Test]
     public void <#= GetTestName("Scalar", logLevel, withEventId, withException) #>(<#if (logLevel == "") { #>[ValueSource(nameof(LogLevels))] LogLevel logLevel<# } #>)
     {
 <#if (logLevel != "") { #> 
@@ -89,6 +133,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
         <#if (withException) { #>Exception exception = new InvalidOperationException("Test exception."); <# } #>
 
         Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>$"{value}");
+        Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>"{value}", value);
 
         if (logLevel < MinLogLevel)
         {
@@ -96,8 +141,10 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
         }
         else
         {
-            LogEvents.Should().HaveCount(1);
-            var logEvent = LogEvents.Single();
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, config => config.Excluding(e => e.Timestamp));
             logEvent.Should().BeEquivalentTo(new 
             {
                 Exception = <#= withException ? "exception" : "default(Exception)" #>,
@@ -128,6 +175,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
         <#if (withException) { #>Exception exception = new InvalidOperationException("Test exception."); <# } #>
 
         Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>$"{value,3}");
+        Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>"{value,3}", value);
 
         if (logLevel < MinLogLevel)
         {
@@ -135,8 +183,10 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
         }
         else
         {
-            LogEvents.Should().HaveCount(1);
-            var logEvent = LogEvents.Single();
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, config => config.Excluding(e => e.Timestamp));
             logEvent.Should().BeEquivalentTo(new 
             {
                 Exception = <#= withException ? "exception" : "default(Exception)" #>,
@@ -167,6 +217,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
         <#if (withException) { #>Exception exception = new InvalidOperationException("Test exception."); <# } #>
 
         Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>$"{value:N}");
+        Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>"{value:N}", value);
 
         if (logLevel < MinLogLevel)
         {
@@ -174,8 +225,10 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
         }
         else
         {
-            LogEvents.Should().HaveCount(1);
-            var logEvent = LogEvents.Single();
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, config => config.Excluding(e => e.Timestamp));
             logEvent.Should().BeEquivalentTo(new 
             {
                 Exception = <#= withException ? "exception" : "default(Exception)" #>,
@@ -206,6 +259,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
         <#if (withException) { #>Exception exception = new InvalidOperationException("Test exception."); <# } #>
 
         Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>$"{value,8:N}");
+        Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>"{value,8:N}", value);
 
         if (logLevel < MinLogLevel)
         {
@@ -213,8 +267,10 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
         }
         else
         {
-            LogEvents.Should().HaveCount(1);
-            var logEvent = LogEvents.Single();
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, config => config.Excluding(e => e.Timestamp));
             logEvent.Should().BeEquivalentTo(new 
             {
                 Exception = <#= withException ? "exception" : "default(Exception)" #>,
@@ -245,6 +301,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
         <#if (withException) { #>Exception exception = new InvalidOperationException("Test exception."); <# } #>
 
         Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>$"{value}");
+        Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>"{@value}", value);
 
         if (logLevel < MinLogLevel)
         {
@@ -252,8 +309,10 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
         }
         else
         {
-            LogEvents.Should().HaveCount(1);
-            var logEvent = LogEvents.Single();
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, config => config.Excluding(e => e.Timestamp));
             logEvent.Should().BeEquivalentTo(new 
             {
                 Exception = <#= withException ? "exception" : "default(Exception)" #>,
@@ -285,6 +344,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
         <#if (withException) { #>Exception exception = new InvalidOperationException("Test exception."); <# } #>
 
         Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>$"{value}");
+        Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>"{@value}", value);
 
         if (logLevel < MinLogLevel)
         {
@@ -292,8 +352,10 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
         }
         else
         {
-            LogEvents.Should().HaveCount(1);
-            var logEvent = LogEvents.Single();
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, config => config.Excluding(e => e.Timestamp));
             logEvent.Should().BeEquivalentTo(new 
             {
                 Exception = <#= withException ? "exception" : "default(Exception)" #>,
@@ -324,6 +386,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
         <#if (withException) { #>Exception exception = new InvalidOperationException("Test exception."); <# } #>
 
         Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>$"{value}");
+        Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>"{value}", value);
 
         if (logLevel < MinLogLevel)
         {
@@ -331,8 +394,10 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
         }
         else
         {
-            LogEvents.Should().HaveCount(1);
-            var logEvent = LogEvents.Single();
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, config => config.Excluding(e => e.Timestamp));
             logEvent.Should().BeEquivalentTo(new 
             {
                 Exception = <#= withException ? "exception" : "default(Exception)" #>,
@@ -369,6 +434,14 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
 
         Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>
             $"ABCD{arg1,7}EFGH{arg2:N}IJKL{arg3,10:F3}MNOP{arg4}QRST{arg5}UVWX{veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg}YZ");
+        Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>
+            "ABCD{arg1,7}EFGH{arg2:N}IJKL{arg3,10:F3}MNOP{@arg4}QRST{@arg5}UVWX{veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg}YZ",
+            arg1,
+            arg2,
+            arg3,
+            arg4,
+            arg5,
+            veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg);
 
         if (logLevel < MinLogLevel)
         {
@@ -376,8 +449,10 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
         }
         else
         {
-            LogEvents.Should().HaveCount(1);
-            var logEvent = LogEvents.Single();
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, config => config.Excluding(e => e.Timestamp));
             logEvent.Should().BeEquivalentTo(new 
             {
                 Exception = <#= withException ? "exception" : "default(Exception)" #>,
@@ -421,6 +496,9 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
 
         Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>
             $"Default: {value.Named("default")}, Stringified: {value.Named("$str")}, Destructured: {value.Named("@destructured")}");
+        Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>
+            "Default: {@default}, Stringified: {$str}, Destructured: {@destructured}", value, value, value);
+
 
         if (logLevel < MinLogLevel)
         {
@@ -428,8 +506,10 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
         }
         else
         {
-            LogEvents.Should().HaveCount(1);
-            var logEvent = LogEvents.Single();
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, config => config.Excluding(e => e.Timestamp));
             logEvent.Should().BeEquivalentTo(new 
             {
                 Exception = <#= withException ? "exception" : "default(Exception)" #>,

@@ -3,23 +3,17 @@ using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text;
 
-namespace Isle;
-
-internal readonly record struct FormattedLogValue(string Name, object? Value, string? Format = null)
-{
-    public static implicit operator KeyValuePair<string, object?>(in FormattedLogValue formattedLogValue) =>
-        new(formattedLogValue.Name, formattedLogValue.Value);
-}
+namespace Isle.Extensions.Logging;
 
 internal readonly struct FormattedLogValues : IReadOnlyList<KeyValuePair<string, object?>>
 {
     private const string NullValue = "(null)";
 
-    private readonly FormattedLogValue[] _values;
+    private readonly KeyValuePair<string, object?>[] _values;
     private readonly Segment[] _segments;
     private readonly int _segmentCount;
 
-    public FormattedLogValues(FormattedLogValue[] values, Segment[] segments, int segmentCount)
+    public FormattedLogValues(KeyValuePair<string, object?>[] values, Segment[] segments, int segmentCount)
     {
         _values = values;
         _segments = segments;
@@ -56,19 +50,26 @@ internal readonly struct FormattedLogValues : IReadOnlyList<KeyValuePair<string,
 
         var handler = new DefaultInterpolatedStringHandler(0, _segmentCount, CultureInfo.InvariantCulture, stackalloc char[256]);
 
-        // ReSharper disable once UseIndexFromEndExpression
-        var originalFormatSpan = ((string) _values[_values.Length - 1].Value!).AsSpan();
         for (var i = 0; i < _segments.Length && i < _segmentCount; i++)
         {
             var segment = _segments[i];
-            if (segment.IsLiteral)
+            switch (segment.Type)
             {
-                handler.AppendFormatted(originalFormatSpan.Slice(segment.Start, segment.Length));
-            }
-            else
-            {
-                var formattedValue = _values[index++];
-                handler.AppendFormatted(FormatArgument(formattedValue.Value), segment.Alignment, formattedValue.Format);
+                case Segment.SegmentType.FormattedValue:
+                    var formattedValue = _values[index++];
+                    handler.AppendFormatted(FormatArgument(formattedValue.Value), segment.Alignment, segment.Format);
+                    break;
+                case Segment.SegmentType.Literal:
+                    handler.AppendFormatted(segment.Literal);
+                    break;
+                case Segment.SegmentType.LiteralList:
+                    foreach (var literal in segment.LiteralList)
+                    {
+                        handler.AppendFormatted(literal);
+                    }
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
         }
 
