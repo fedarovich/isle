@@ -42,7 +42,7 @@ public ref partial struct TraceLogInterpolatedStringHandler
         {
             _originalFormatBuilder = StringBuilderCache.Acquire(Math.Max(literalLength + formattedCount * 16, StringBuilderCache.MaxBuilderSize));
             _formattedLogValues = new KeyValuePair<string, object?>[formattedCount + 1];
-            _segments = GC.AllocateUninitializedArray<Segment>(formattedCount * 2 + 1);
+            _segments = new Segment[formattedCount * 2 + 1];
         }
     }
 
@@ -188,7 +188,7 @@ public ref partial struct DebugLogInterpolatedStringHandler
         {
             _originalFormatBuilder = StringBuilderCache.Acquire(Math.Max(literalLength + formattedCount * 16, StringBuilderCache.MaxBuilderSize));
             _formattedLogValues = new KeyValuePair<string, object?>[formattedCount + 1];
-            _segments = GC.AllocateUninitializedArray<Segment>(formattedCount * 2 + 1);
+            _segments = new Segment[formattedCount * 2 + 1];
         }
     }
 
@@ -334,7 +334,7 @@ public ref partial struct InformationLogInterpolatedStringHandler
         {
             _originalFormatBuilder = StringBuilderCache.Acquire(Math.Max(literalLength + formattedCount * 16, StringBuilderCache.MaxBuilderSize));
             _formattedLogValues = new KeyValuePair<string, object?>[formattedCount + 1];
-            _segments = GC.AllocateUninitializedArray<Segment>(formattedCount * 2 + 1);
+            _segments = new Segment[formattedCount * 2 + 1];
         }
     }
 
@@ -480,7 +480,7 @@ public ref partial struct WarningLogInterpolatedStringHandler
         {
             _originalFormatBuilder = StringBuilderCache.Acquire(Math.Max(literalLength + formattedCount * 16, StringBuilderCache.MaxBuilderSize));
             _formattedLogValues = new KeyValuePair<string, object?>[formattedCount + 1];
-            _segments = GC.AllocateUninitializedArray<Segment>(formattedCount * 2 + 1);
+            _segments = new Segment[formattedCount * 2 + 1];
         }
     }
 
@@ -626,7 +626,7 @@ public ref partial struct ErrorLogInterpolatedStringHandler
         {
             _originalFormatBuilder = StringBuilderCache.Acquire(Math.Max(literalLength + formattedCount * 16, StringBuilderCache.MaxBuilderSize));
             _formattedLogValues = new KeyValuePair<string, object?>[formattedCount + 1];
-            _segments = GC.AllocateUninitializedArray<Segment>(formattedCount * 2 + 1);
+            _segments = new Segment[formattedCount * 2 + 1];
         }
     }
 
@@ -772,7 +772,7 @@ public ref partial struct CriticalLogInterpolatedStringHandler
         {
             _originalFormatBuilder = StringBuilderCache.Acquire(Math.Max(literalLength + formattedCount * 16, StringBuilderCache.MaxBuilderSize));
             _formattedLogValues = new KeyValuePair<string, object?>[formattedCount + 1];
-            _segments = GC.AllocateUninitializedArray<Segment>(formattedCount * 2 + 1);
+            _segments = new Segment[formattedCount * 2 + 1];
         }
     }
 
@@ -919,7 +919,7 @@ public ref partial struct LogInterpolatedStringHandler
         {
             _originalFormatBuilder = StringBuilderCache.Acquire(Math.Max(literalLength + formattedCount * 16, StringBuilderCache.MaxBuilderSize));
             _formattedLogValues = new KeyValuePair<string, object?>[formattedCount + 1];
-            _segments = GC.AllocateUninitializedArray<Segment>(formattedCount * 2 + 1);
+            _segments = new Segment[formattedCount * 2 + 1];
         }
     }
 
@@ -1060,7 +1060,7 @@ public ref partial struct ScopeLogInterpolatedStringHandler
     {
             _originalFormatBuilder = StringBuilderCache.Acquire(Math.Max(literalLength + formattedCount * 16, StringBuilderCache.MaxBuilderSize));
             _formattedLogValues = new KeyValuePair<string, object?>[formattedCount + 1];
-            _segments = GC.AllocateUninitializedArray<Segment>(formattedCount * 2 + 1);
+            _segments = new Segment[formattedCount * 2 + 1];
     }
 
 

@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Globalization;
 using System.Runtime.CompilerServices;
-using System.Text;
 
 namespace Isle.Extensions.Logging;
 
@@ -22,10 +21,7 @@ internal readonly struct FormattedLogValues : IReadOnlyList<KeyValuePair<string,
 
     public IEnumerator<KeyValuePair<string, object?>> GetEnumerator()
     {
-        foreach (var formattedLogValue in _values)
-        {
-            yield return formattedLogValue;
-        }
+        return ((IEnumerable<KeyValuePair<string, object?>>)_values).GetEnumerator();
     }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
@@ -92,7 +88,7 @@ internal readonly struct FormattedLogValues : IReadOnlyList<KeyValuePair<string,
         // if the value implements IEnumerable, build a comma separated string.
         if (value is IEnumerable enumerable)
         {
-            var vsb = new StringBuilder(256);
+            var vsb = StringBuilderCache.Acquire(StringBuilderCache.MaxBuilderSize);
             bool first = true;
             foreach (object? e in enumerable)
             {
@@ -104,7 +100,7 @@ internal readonly struct FormattedLogValues : IReadOnlyList<KeyValuePair<string,
                 vsb.Append(e != null ? e.ToString() : NullValue);
                 first = false;
             }
-            return vsb.ToString();
+            return StringBuilderCache.GetStringAndRelease(vsb);
         }
 
         return value;

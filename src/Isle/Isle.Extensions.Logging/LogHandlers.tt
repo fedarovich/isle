@@ -64,7 +64,7 @@ public ref partial struct <#= GetTypeName(logLevel) #>
 <# } #>
             _originalFormatBuilder = StringBuilderCache.Acquire(Math.Max(literalLength + formattedCount * 16, StringBuilderCache.MaxBuilderSize));
             _formattedLogValues = new KeyValuePair<string, object?>[formattedCount + 1];
-            _segments = GC.AllocateUninitializedArray<Segment>(formattedCount * 2 + 1);
+            _segments = new Segment[formattedCount * 2 + 1];
 <# if (logLevel != Scope) { #>
         }
 <# } #>
