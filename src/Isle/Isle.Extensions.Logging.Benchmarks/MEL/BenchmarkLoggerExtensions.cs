@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Configuration;
 
-namespace Isle.Extensions.Logging.Benchmarks.Logging;
+namespace Isle.Extensions.Logging.Benchmarks.MEL;
 
 public static class BenchmarkLoggerExtensions
 {

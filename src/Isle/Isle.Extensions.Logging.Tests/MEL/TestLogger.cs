@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Isle.Extensions.Logging.Tests.Logging;
+namespace Isle.Extensions.Logging.Tests.MEL;
 
 public class TestLogger : ILogger
 {

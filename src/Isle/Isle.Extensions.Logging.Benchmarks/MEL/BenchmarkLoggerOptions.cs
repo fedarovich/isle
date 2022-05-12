@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 
-namespace Isle.Extensions.Logging.Benchmarks.Logging;
+namespace Isle.Extensions.Logging.Benchmarks.MEL;
 
 public class BenchmarkLoggerOptions
 {

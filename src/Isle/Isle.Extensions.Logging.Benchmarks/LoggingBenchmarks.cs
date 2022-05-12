@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using BenchmarkDotNet.Attributes;
 using Isle.Configuration;
-using Isle.Extensions.Logging.Benchmarks.Logging;
+using Isle.Extensions.Logging.Benchmarks.MEL;
 using Microsoft.Extensions.Logging;
 
 namespace Isle.Extensions.Logging.Benchmarks;

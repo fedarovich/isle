@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Isle.Extensions.Logging.Benchmarks.Logging;
+namespace Isle.Extensions.Logging.Benchmarks.MEL;
 
 [ProviderAlias("Benchmark")]
 internal class BenchmarkLoggerProvider : ILoggerProvider
