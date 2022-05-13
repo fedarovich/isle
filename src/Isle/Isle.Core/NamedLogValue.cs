@@ -1,16 +1,18 @@
-﻿using Isle.Configuration;
+﻿using System.Reflection;
+using Isle.Configuration;
 
 namespace Isle;
 
 /// <summary>
 /// Wrapper struct that allows to set a custom name for the logged value.
 /// </summary>
-public readonly ref struct NamedLogValue
+public readonly struct NamedLogValue
 {
-    internal NamedLogValue(object? value, string name, ValueRepresentation representation, Flags flags)
+    internal NamedLogValue(object? value, string name, Type type, ValueRepresentation representation, Flags flags)
     {
         Value = value;
         Name = name;
+        Type = type;
         Representation = representation;
         _flags = flags;
     }
@@ -24,6 +26,8 @@ public readonly ref struct NamedLogValue
     /// Gets the value name.
     /// </summary>
     public string Name { get; }
+
+    internal Type Type { get; }
 
     internal ValueRepresentation Representation { get; }
 

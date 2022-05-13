@@ -19,6 +19,7 @@ public static class LoggingExtensions
         return new NamedLogValue(
             value,
             name,
+            typeof(T),
             IsleConfiguration.Current.ValueRepresentationPolicy.GetRepresentationOfType<T>(),
             NamedLogValue.Flags.ExplicitName);
     }
