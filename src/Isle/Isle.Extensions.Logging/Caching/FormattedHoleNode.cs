@@ -1,8 +1,8 @@
 ﻿namespace Isle.Extensions.Logging.Caching;
 
-internal sealed class FormatNode : Node
+internal sealed class FormattedHoleNode : Node
 {
-    public FormatNode(Node parent, string name, string? format, int alignment) : base(parent)
+    public FormattedHoleNode(Node parent, string name, string? format, int alignment) : base(parent)
     {
         Name = name;
         Format = format;
