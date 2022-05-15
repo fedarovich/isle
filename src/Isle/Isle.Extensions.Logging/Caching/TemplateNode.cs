@@ -1,9 +1,12 @@
 ﻿using System.Buffers;
+using System.Globalization;
+using System.Runtime.CompilerServices;
 
 namespace Isle.Extensions.Logging.Caching;
 
 internal sealed class TemplateNode
 {
+    [SkipLocalsInit]
     public TemplateNode(Node parent)
     {
         if (parent.Depth == 0)
@@ -21,7 +24,7 @@ internal sealed class TemplateNode
             node = node.Parent!;
         }
 
-        var builder = StringBuilderCache.Acquire(StringBuilderCache.MaxBuilderSize);
+        var builder = new ValueStringBuilder(stackalloc char[1024]);
         var segments = new Segment[parent.Depth];
         for (int i = 0; i < parent.Depth; i++)
         {
@@ -35,7 +38,7 @@ internal sealed class TemplateNode
                     if (formatNode.Alignment != 0)
                     {
                         builder.Append(',');
-                        builder.Append(formatNode.Alignment);
+                        builder.AppendSpanFormattable(formatNode.Alignment, provider: CultureInfo.InvariantCulture);
                     }
                     if (!string.IsNullOrEmpty(formatNode.Format))
                     {
@@ -52,7 +55,7 @@ internal sealed class TemplateNode
         }
 
         Segments = segments;
-        MessageTemplate = StringBuilderCache.GetStringAndRelease(builder);
+        MessageTemplate = builder.ToString();
         ArrayPool<Node>.Shared.Return(nodes);
     }
 

@@ -2,9 +2,9 @@
 
 internal sealed class FormatNode : Node
 {
-    public FormatNode(Node parent, in NamedLogValue name, string? format, int alignment) : base(parent)
+    public FormatNode(Node parent, string name, string? format, int alignment) : base(parent)
     {
-        Name = FormattedLogValuesBuilder.TransformName(name);
+        Name = name;
         Format = format;
         Alignment = alignment;
     }

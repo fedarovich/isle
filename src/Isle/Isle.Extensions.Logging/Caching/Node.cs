@@ -29,11 +29,11 @@ internal abstract class Node
         return LiteralNodes.GetOrAdd(rawLiteral, static (rl, parent) => new LiteralNode(parent, rl), this);
     }
 
-    public FormatNode GetOrAddFormatNode(in NamedLogValue namedLogValue, int alignment, string? format)
+    public FormatNode GetOrAddFormatNode(string name, int alignment, string? format)
     {
-        var formatKey = new FormatKey(namedLogValue.Type, namedLogValue.Name, format, alignment, namedLogValue.HasExplicitName);
+        var formatKey = new FormatKey(name, format, alignment);
         return FormatNodes.GetOrAdd(formatKey, static (key, arg) => 
-            new FormatNode(arg.parent, arg.namedLogValue, key.Format, key.Alignment), (parent: this, namedLogValue));
+            new FormatNode(arg.parent, key.Name, key.Format, key.Alignment), (parent: this, formatKey));
     }
 
     public TemplateNode GetTemplateNode()

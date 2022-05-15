@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 
 namespace Isle.Extensions.Logging;
 
-internal readonly struct FormattedLogValues : IReadOnlyList<KeyValuePair<string, object?>>
+internal class FormattedLogValues : IReadOnlyList<KeyValuePair<string, object?>>
 {
     private const string NullValue = "(null)";
 
@@ -44,7 +44,7 @@ internal readonly struct FormattedLogValues : IReadOnlyList<KeyValuePair<string,
     {
         int index = 0;
 
-        var handler = new DefaultInterpolatedStringHandler(0, _segmentCount, CultureInfo.InvariantCulture, stackalloc char[256]);
+        var handler = new DefaultInterpolatedStringHandler(0, _segmentCount, CultureInfo.InvariantCulture, stackalloc char[512]);
 
         for (var i = 0; i < _segments.Length && i < _segmentCount; i++)
         {
@@ -72,6 +72,7 @@ internal readonly struct FormattedLogValues : IReadOnlyList<KeyValuePair<string,
         return handler.ToStringAndClear();
     }
 
+    [SkipLocalsInit]
     private static object FormatArgument(object? value)
     {
         if (value == null)
@@ -88,7 +89,7 @@ internal readonly struct FormattedLogValues : IReadOnlyList<KeyValuePair<string,
         // if the value implements IEnumerable, build a comma separated string.
         if (value is IEnumerable enumerable)
         {
-            var vsb = StringBuilderCache.Acquire(StringBuilderCache.MaxBuilderSize);
+            var vsb = new ValueStringBuilder(stackalloc char[256]);
             bool first = true;
             foreach (object? e in enumerable)
             {
@@ -100,7 +101,7 @@ internal readonly struct FormattedLogValues : IReadOnlyList<KeyValuePair<string,
                 vsb.Append(e != null ? e.ToString() : NullValue);
                 first = false;
             }
-            return StringBuilderCache.GetStringAndRelease(vsb);
+            return vsb.ToString();
         }
 
         return value;

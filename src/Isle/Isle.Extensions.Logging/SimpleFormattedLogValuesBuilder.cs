@@ -66,10 +66,9 @@ internal sealed class SimpleFormattedLogValuesBuilder : FormattedLogValuesBuilde
     }
 
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-    public override void AppendFormatted(in NamedLogValue namedLogValue, int alignment = 0, string? format = null)
+    public override void AppendFormatted(string name, object? value, int alignment = 0, string? format = null)
     {
         _originalFormatBuilder.Append('{');
-        var name = TransformName(namedLogValue);
 
         _originalFormatBuilder.Append(name);
 
@@ -88,6 +87,6 @@ internal sealed class SimpleFormattedLogValuesBuilder : FormattedLogValuesBuilde
 
         _originalFormatBuilder.Append('}');
         _segments[_segmentIndex++] = new Segment(format, alignment);
-        _formattedLogValues[_valueIndex++] = new(name, namedLogValue.Value);
+        _formattedLogValues[_valueIndex++] = new(name, value);
     }
 }

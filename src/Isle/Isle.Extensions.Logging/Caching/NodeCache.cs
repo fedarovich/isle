@@ -12,5 +12,5 @@ internal sealed class NodeCache : Node
     {
     }
 
-    internal new void Reset() => base.Reset();
+    public new void Reset() => base.Reset();
 }

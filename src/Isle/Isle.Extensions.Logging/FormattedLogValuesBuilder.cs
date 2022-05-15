@@ -1,12 +1,8 @@
-﻿using Isle.Configuration;
-
-namespace Isle.Extensions.Logging;
+﻿namespace Isle.Extensions.Logging;
 
 internal abstract class FormattedLogValuesBuilder
 {
     protected const string OriginalFormatName = "{OriginalFormat}";
-    protected const char DestructureOperator = '@';
-    protected const char StringifyOperator = '$';
 
     [ThreadStatic]
     private static FormattedLogValuesBuilder? _cachedInstance;
@@ -40,26 +36,5 @@ internal abstract class FormattedLogValuesBuilder
 
     public abstract void AppendLiteral(string? str);
 
-    public abstract void AppendFormatted(in NamedLogValue namedLogValue, int alignment = 0, string? format = null);
-
-    internal static string TransformName(in NamedLogValue namedLogValue)
-    {
-        var name = namedLogValue.HasExplicitName
-            ? namedLogValue.Name
-            : IsleConfiguration.Current.ValueNameConverter(namedLogValue.Name);
-        if (!name.StartsWith(DestructureOperator) && !name.StartsWith(StringifyOperator))
-        {
-            switch (namedLogValue.Representation)
-            {
-                case ValueRepresentation.Destructure:
-                    name = DestructureOperator + name;
-                    break;
-                case ValueRepresentation.Stringify:
-                    name = StringifyOperator + name;
-                    break;
-            }
-        }
-
-        return name;
-    }
+    public abstract void AppendFormatted(string name, object? value, int alignment = 0, string? format = null);
 }

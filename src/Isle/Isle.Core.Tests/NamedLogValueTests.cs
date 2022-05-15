@@ -7,13 +7,10 @@ namespace Isle.Core.Tests;
 internal class NamedLogValueTests
 {
     [Test]
-    public void Create([Values] ValueRepresentation representation, [Values] NamedLogValue.Flags flags)
+    public void Create()
     {
-        var namedLogValue = new NamedLogValue("TestValue", "TestName", typeof(string), representation, flags);
+        var namedLogValue = new NamedLogValue("TestValue", "TestName");
         namedLogValue.Value.Should().Be("TestValue");
         namedLogValue.Name.Should().Be("TestName");
-        namedLogValue.Type.Should().Be(typeof(string));
-        namedLogValue.Representation.Should().Be(representation);
-        namedLogValue.HasExplicitName.Should().Be(flags.HasFlag(NamedLogValue.Flags.ExplicitName));
     }
 }

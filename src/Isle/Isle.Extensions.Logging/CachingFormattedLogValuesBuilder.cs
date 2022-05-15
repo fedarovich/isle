@@ -35,10 +35,10 @@ internal class CachingFormattedLogValuesBuilder : FormattedLogValuesBuilder
         }
     }
 
-    public override void AppendFormatted(in NamedLogValue namedLogValue, int alignment = 0, string? format = null)
+    public override void AppendFormatted(string name, object? value, int alignment = 0, string? format = null)
     {
-        var formatNode = _lastNode.GetOrAddFormatNode(namedLogValue, alignment, format);
+        var formatNode = _lastNode.GetOrAddFormatNode(name, alignment, format);
         _lastNode = formatNode;
-        _formattedLogValues[_valueIndex++] = new(formatNode.Name, namedLogValue.Value);
+        _formattedLogValues[_valueIndex++] = new(formatNode.Name, value);
     }
 }
