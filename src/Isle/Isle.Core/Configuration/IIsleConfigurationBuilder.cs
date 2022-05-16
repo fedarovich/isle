@@ -20,4 +20,10 @@ public interface IIsleConfigurationBuilder
     /// If <see langword="null"/>, a function returning original value will be used.
     /// </remarks>
     Func<string, string>? ValueNameConverter { get; set; }
+
+    /// <summary>
+    /// Registers an extension configuration hook.
+    /// </summary>
+    /// <param name="hook">The hook to register.</param>
+    void RegisterExtensionConfigurationHook(IIsleExtensionConfigurationHook hook);
 }

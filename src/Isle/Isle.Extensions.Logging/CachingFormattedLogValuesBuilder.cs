@@ -2,11 +2,13 @@
 
 namespace Isle.Extensions.Logging;
 
-internal class CachingFormattedLogValuesBuilder : FormattedLogValuesBuilder
+internal sealed class CachingFormattedLogValuesBuilder : FormattedLogValuesBuilder
 {
     private Node _lastNode = null!;
     private FormattedLogValuesBase _formattedLogValues = null!;
     private int _valueIndex = 0;
+
+    public override bool IsCaching => true;
 
     protected override void Initialize(int literalLength, int formattedCount)
     {

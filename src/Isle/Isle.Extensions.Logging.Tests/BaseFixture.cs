@@ -10,7 +10,10 @@ namespace Isle.Extensions.Logging.Tests;
 
 public abstract class BaseFixture
 {
-    protected static readonly IReadOnlyList<object> FixtureArgs = Enum.GetValues<LogLevel>().Select(x => new object[] { x }).ToArray();
+    protected static readonly IReadOnlyList<object> FixtureArgs = (
+        from logLevel in Enum.GetValues<LogLevel>()
+        from enableCaching in new[] { false, true }
+        select new object[] { logLevel, enableCaching }).ToArray();
 
     protected static readonly IReadOnlyList<LogLevel> LogLevels = Enum.GetValues<LogLevel>().Where(x => x != LogLevel.None).ToArray();
 
@@ -20,15 +23,18 @@ public abstract class BaseFixture
 
     private readonly List<TestLogItem> _logItems = new ();
 
-    protected BaseFixture(LogLevel minLogLevel)
+    protected BaseFixture(LogLevel minLogLevel, bool enableCaching)
     {
         MinLogLevel = minLogLevel;
+        EnableCaching = enableCaching;
     }
 
     [OneTimeSetUp]
     protected virtual void OneTimeSetUp()
     {
-        IsleConfiguration.Configure(builder => builder.WithAutomaticDestructuring());
+        IsleConfiguration.Configure(builder => builder
+            .WithAutomaticDestructuring()
+            .ConfigureExtensionsLogging(cfg => cfg.EnableMessageTemplateCaching = EnableCaching));
         LoggerFactory = Microsoft.Extensions.Logging.LoggerFactory.Create(builder =>
         {
             builder
@@ -62,6 +68,8 @@ public abstract class BaseFixture
     }
 
     protected LogLevel MinLogLevel { get; }
+
+    protected bool EnableCaching { get; }
 
     protected ILoggerFactory LoggerFactory { get; private set; } = null!;
 

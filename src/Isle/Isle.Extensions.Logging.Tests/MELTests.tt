@@ -30,7 +30,7 @@ public class <#= GetTestName(logLevel) #> : BaseFixture
     private const LogLevel logLevel = LogLevel.<#= logLevel #>;
 <# } #>
 
-    public <#= GetTestName(logLevel) #>(LogLevel minLogLevel) : base(minLogLevel)
+    public <#= GetTestName(logLevel) #>(LogLevel minLogLevel, bool enableCaching) : base(minLogLevel, enableCaching)
     {
     }
 

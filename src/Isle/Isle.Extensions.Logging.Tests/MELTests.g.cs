@@ -13,7 +13,7 @@ public class TraceLogInterpolatedStringHandlerTests : BaseFixture
 {
     private const LogLevel logLevel = LogLevel.Trace;
 
-    public TraceLogInterpolatedStringHandlerTests(LogLevel minLogLevel) : base(minLogLevel)
+    public TraceLogInterpolatedStringHandlerTests(LogLevel minLogLevel, bool enableCaching) : base(minLogLevel, enableCaching)
     {
     }
 
@@ -326,7 +326,7 @@ public class DebugLogInterpolatedStringHandlerTests : BaseFixture
 {
     private const LogLevel logLevel = LogLevel.Debug;
 
-    public DebugLogInterpolatedStringHandlerTests(LogLevel minLogLevel) : base(minLogLevel)
+    public DebugLogInterpolatedStringHandlerTests(LogLevel minLogLevel, bool enableCaching) : base(minLogLevel, enableCaching)
     {
     }
 
@@ -639,7 +639,7 @@ public class InformationLogInterpolatedStringHandlerTests : BaseFixture
 {
     private const LogLevel logLevel = LogLevel.Information;
 
-    public InformationLogInterpolatedStringHandlerTests(LogLevel minLogLevel) : base(minLogLevel)
+    public InformationLogInterpolatedStringHandlerTests(LogLevel minLogLevel, bool enableCaching) : base(minLogLevel, enableCaching)
     {
     }
 
@@ -952,7 +952,7 @@ public class WarningLogInterpolatedStringHandlerTests : BaseFixture
 {
     private const LogLevel logLevel = LogLevel.Warning;
 
-    public WarningLogInterpolatedStringHandlerTests(LogLevel minLogLevel) : base(minLogLevel)
+    public WarningLogInterpolatedStringHandlerTests(LogLevel minLogLevel, bool enableCaching) : base(minLogLevel, enableCaching)
     {
     }
 
@@ -1265,7 +1265,7 @@ public class ErrorLogInterpolatedStringHandlerTests : BaseFixture
 {
     private const LogLevel logLevel = LogLevel.Error;
 
-    public ErrorLogInterpolatedStringHandlerTests(LogLevel minLogLevel) : base(minLogLevel)
+    public ErrorLogInterpolatedStringHandlerTests(LogLevel minLogLevel, bool enableCaching) : base(minLogLevel, enableCaching)
     {
     }
 
@@ -1578,7 +1578,7 @@ public class CriticalLogInterpolatedStringHandlerTests : BaseFixture
 {
     private const LogLevel logLevel = LogLevel.Critical;
 
-    public CriticalLogInterpolatedStringHandlerTests(LogLevel minLogLevel) : base(minLogLevel)
+    public CriticalLogInterpolatedStringHandlerTests(LogLevel minLogLevel, bool enableCaching) : base(minLogLevel, enableCaching)
     {
     }
 
@@ -1890,7 +1890,7 @@ public class CriticalLogInterpolatedStringHandlerTests : BaseFixture
 public class LogInterpolatedStringHandlerTests : BaseFixture
 {
 
-    public LogInterpolatedStringHandlerTests(LogLevel minLogLevel) : base(minLogLevel)
+    public LogInterpolatedStringHandlerTests(LogLevel minLogLevel, bool enableCaching) : base(minLogLevel, enableCaching)
     {
     }
 

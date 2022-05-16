@@ -12,6 +12,8 @@ internal sealed class SimpleFormattedLogValuesBuilder : FormattedLogValuesBuilde
     private int _valueIndex = 0;
     private int _segmentIndex = 0;
 
+    public override bool IsCaching => false;
+
     protected override void Initialize(int literalLength, int formattedCount)
     {
         _originalFormatBuilder = StringBuilderCache.Acquire(Math.Max(literalLength + formattedCount * 16, StringBuilderCache.MaxBuilderSize));

@@ -13,7 +13,7 @@ namespace Isle.Extensions.Logging.Tests;
 [TestFixtureSource(nameof(FixtureArgs))]
 public class SerilogLoggerExtensionsTests : SerilogBaseFixture
 {
-    public SerilogLoggerExtensionsTests(LogLevel minLogLevel) : base(minLogLevel)
+    public SerilogLoggerExtensionsTests(LogLevel minLogLevel, bool enableCaching) : base(minLogLevel, enableCaching)
     {
     }
 

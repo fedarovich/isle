@@ -21,6 +21,9 @@ public class SerilogBenchmark
     [ParamsAllValues]
     public bool IsEnabled { get; set; } = true;
 
+    [ParamsAllValues]
+    public bool EnableCaching { get; set; }
+
     [GlobalSetup(Target = nameof(Standard))]
     public void GlobalSetupStandard()
     {
@@ -31,14 +34,16 @@ public class SerilogBenchmark
     public void GlobalSetupWithManualDestructuring()
     {
         GlobalSetup();
-        IsleConfiguration.Configure(_ => { });
+        IsleConfiguration.Configure(builder => builder
+            .ConfigureExtensionsLogging(cfg => cfg.EnableMessageTemplateCaching = EnableCaching));
     }
 
     [GlobalSetup(Targets = new[] { nameof(InterpolatedWithExplicitAutomaticDestructuring), nameof(InterpolatedWithImplicitAutomaticDestructuring) })]
     public void GlobalSetupWithAutoDestructuring()
     {
         GlobalSetup();
-        IsleConfiguration.Configure(builder => builder.WithAutomaticDestructuring());
+        IsleConfiguration.Configure(builder => builder.WithAutomaticDestructuring()
+            .ConfigureExtensionsLogging(cfg => cfg.EnableMessageTemplateCaching = EnableCaching));
     }
 
     private void GlobalSetup()

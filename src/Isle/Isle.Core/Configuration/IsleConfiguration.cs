@@ -7,6 +7,8 @@ public sealed class IsleConfiguration
 {
     private static volatile IsleConfiguration? _current;
 
+    private readonly IList<IIsleExtensionConfigurationHook> _extensionHooks;
+
     /// <summary>
     /// Gets the current ISLE configuration or throws <see cref="InvalidOperationException"/> if ISLE has not been configured yet.
     /// </summary>
@@ -20,6 +22,7 @@ public sealed class IsleConfiguration
     {
         ValueRepresentationPolicy = builder.ValueRepresentationPolicy ?? DefaultValueRepresentationPolicy.Instance;
         ValueNameConverter = builder.ValueNameConverter ?? (name => name);
+        _extensionHooks = builder.ExtensionHooks;
     }
 
     /// <summary>
@@ -57,12 +60,25 @@ public sealed class IsleConfiguration
         {
             throw new InvalidOperationException("Isle has already been configured.");
         }
+
+        foreach (var hook in configuration._extensionHooks)
+        {
+            hook.ApplyExtensionConfiguration();
+        }
     }
 
     // For unit testing.
     internal static void Reset()
     {
-        _current = null;
+        var configuration = Interlocked.Exchange(ref _current, null);
+        if (configuration != null)
+        {
+            foreach (var hook in configuration._extensionHooks.Reverse())
+            {
+                hook.ResetExtensionConfiguration();
+            }
+            configuration._extensionHooks.Clear();
+        }
     }
 
     private class IsleConfigurationBuilder : IIsleConfigurationBuilder
@@ -70,5 +86,9 @@ public sealed class IsleConfiguration
         public IValueRepresentationPolicy? ValueRepresentationPolicy { get; set; }
         
         public Func<string, string>? ValueNameConverter { get; set; }
+
+        public IList<IIsleExtensionConfigurationHook> ExtensionHooks { get; } = new List<IIsleExtensionConfigurationHook>();
+
+        public void RegisterExtensionConfigurationHook(IIsleExtensionConfigurationHook hook) => ExtensionHooks.Add(hook);
     }
 }
