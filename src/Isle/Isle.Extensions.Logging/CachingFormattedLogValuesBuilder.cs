@@ -5,26 +5,27 @@ namespace Isle.Extensions.Logging;
 internal class CachingFormattedLogValuesBuilder : FormattedLogValuesBuilder
 {
     private Node _lastNode = null!;
-    private KeyValuePair<string, object?>[] _formattedLogValues = null!;
+    private FormattedLogValuesBase _formattedLogValues = null!;
     private int _valueIndex = 0;
 
     protected override void Initialize(int literalLength, int formattedCount)
     {
         _lastNode = NodeCache.Instance;
-        _formattedLogValues = new KeyValuePair<string, object?>[formattedCount + 1];
+        _formattedLogValues = FormattedLogValuesBase.Create(formattedCount);
     }
 
-    protected override FormattedLogValues BuildAndReset()
+    protected override FormattedLogValuesBase BuildAndReset()
     {
         var templateNode = _lastNode.GetTemplateNode();
-        _formattedLogValues[_valueIndex] = new(OriginalFormatName, templateNode.MessageTemplate);
-        var formattedLogValues = new FormattedLogValues(_formattedLogValues, templateNode.Segments, templateNode.Segments.Length);
-
+        var result = _formattedLogValues;
+        result.Values[_valueIndex] = new(OriginalFormatName, templateNode.MessageTemplate);
+        result.SetSegments(templateNode.Segments);
+        
         _lastNode = null!;
         _formattedLogValues = null!;
         _valueIndex = 0;
 
-        return formattedLogValues;
+        return result;
     }
 
     public override void AppendLiteral(string? str)
@@ -40,6 +41,6 @@ internal class CachingFormattedLogValuesBuilder : FormattedLogValuesBuilder
         _lastNode = (alignment == 0 && string.IsNullOrEmpty(format))
             ? _lastNode.GetOrAddHoleNode(name)
             : _lastNode.GetOrAddFormattedHoleNode(name, alignment, format);
-        _formattedLogValues[_valueIndex++] = new(name, value);
+        _formattedLogValues.Values[_valueIndex++] = new(name, value);
     }
 }

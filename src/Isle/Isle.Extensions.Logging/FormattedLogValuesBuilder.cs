@@ -23,7 +23,7 @@ internal abstract class FormattedLogValuesBuilder
         return builder;
     }
 
-    public static FormattedLogValues BuildAndRelease(FormattedLogValuesBuilder builder)
+    public static FormattedLogValuesBase BuildAndRelease(FormattedLogValuesBuilder builder)
     {
         var result = builder.BuildAndReset();
         _cachedInstance = builder;
@@ -32,7 +32,7 @@ internal abstract class FormattedLogValuesBuilder
 
     protected abstract void Initialize(int literalLength, int formattedCount);
 
-    protected abstract FormattedLogValues BuildAndReset();
+    protected abstract FormattedLogValuesBase BuildAndReset();
 
     public abstract void AppendLiteral(string? str);
 

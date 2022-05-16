@@ -30,6 +30,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<None Update="FormattedLogValues.tt">
+		  <Generator>TextTemplatingFileGenerator</Generator>
+		  <LastGenOutput>FormattedLogValues.g.cs</LastGenOutput>
+		</None>
 		<None Update="LoggerExtensions.tt">
 			<Generator>TextTemplatingFileGenerator</Generator>
 			<LastGenOutput>LoggerExtensions.g.cs</LastGenOutput>
@@ -45,6 +49,16 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Compile Update="FormattedLogValues.g.cs">
+		  <DesignTime>True</DesignTime>
+		  <AutoGen>True</AutoGen>
+		  <DependentUpon>FormattedLogValues.tt</DependentUpon>
+		</Compile>
+		<Compile Update="FormattedLogValuesN.g.cs">
+		  <DesignTime>True</DesignTime>
+		  <AutoGen>True</AutoGen>
+		  <DependentUpon>FormattedLogValuesN.tt</DependentUpon>
+		</Compile>
 		<Compile Update="LoggerExtensions.g.cs">
 			<DesignTime>True</DesignTime>
 			<AutoGen>True</AutoGen>

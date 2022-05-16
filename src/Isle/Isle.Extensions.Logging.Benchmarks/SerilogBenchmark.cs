@@ -12,7 +12,7 @@ namespace Isle.Extensions.Logging.Benchmarks;
 public class SerilogBenchmark
 {
     private ILoggerFactory _loggerFactory = null!;
-    private ILogger<LoggingBenchmarks> _logger = null!;
+    private ILogger<MELBenchmarks> _logger = null!;
 
     private static readonly Rect Rect = new(0, 0, 3, 4);
     private static readonly int Area = Rect.Width * Rect.Height;
@@ -53,7 +53,7 @@ public class SerilogBenchmark
                     .WriteTo.BenchmarkSink()
                     .CreateLogger(), true);
         });
-        _logger = _loggerFactory.CreateLogger<LoggingBenchmarks>();
+        _logger = _loggerFactory.CreateLogger<MELBenchmarks>();
     }
 
     [GlobalCleanup]

@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using BenchmarkDotNet.Attributes;
 using Isle.Configuration;
 using Isle.Extensions.Logging.Benchmarks.MEL;
@@ -7,10 +8,11 @@ using Microsoft.Extensions.Logging;
 namespace Isle.Extensions.Logging.Benchmarks;
 
 [MemoryDiagnoser]
-public class LoggingBenchmarks
+[SuppressMessage("ReSharper", "InconsistentNaming")]
+public class MELBenchmarks
 {
     private ILoggerFactory _loggerFactory = null!;
-    private ILogger<LoggingBenchmarks> _logger = null!;
+    private ILogger<MELBenchmarks> _logger = null!;
 
     private static readonly Rect Rect = new (0, 0, 3, 4);
     private static readonly int Area = Rect.Width * Rect.Height;
@@ -55,7 +57,7 @@ public class LoggingBenchmarks
                     opt.RenderMessage = RenderMessage;
                 });
         });
-        _logger = _loggerFactory.CreateLogger<LoggingBenchmarks>();
+        _logger = _loggerFactory.CreateLogger<MELBenchmarks>();
     }
 
     [GlobalCleanup]
