@@ -5,7 +5,7 @@ namespace Isle.Extensions.Logging;
 
 internal abstract class FormattedLogValuesBuilder
 {
-    protected const string OriginalFormatName = "{OriginalFormat}";
+    protected internal const string OriginalFormatName = "{OriginalFormat}";
 
     [ThreadStatic]
     private static FormattedLogValuesBuilder? _cachedInstance;

@@ -12,7 +12,7 @@ internal class ExtensionsLoggingConfiguration
 
     public bool EnableMessageTemplateCaching { get; init; } = true;
 
-    private static class DefaultConfiguration
+    internal static class DefaultConfiguration
     {
         public static readonly ExtensionsLoggingConfiguration Value = new();
 

@@ -1,5 +1,4 @@
 ﻿using FluentAssertions;
-using Isle.Configuration;
 using NUnit.Framework;
 
 namespace Isle.Core.Tests;
