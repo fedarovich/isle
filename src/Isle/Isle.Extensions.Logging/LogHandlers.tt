@@ -76,17 +76,7 @@ public ref partial struct <#= GetTypeName(logLevel) #>
     }
 
     /// <summary>
-    /// Appends a <paramref name="value" /> to the string log message.
-    /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void AppendFormatted(string? value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "") => _builder.AppendFormatted(
-        name.GetStringNameFromCallerArgumentExpression(), 
-        value,
-        alignment, 
-        format);
-
-    /// <summary>
-    /// Appends a <paramref name="value" /> to the string log message.
+    /// Appends a <paramref name="value" /> to the log message.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "") => _builder.AppendFormatted(
@@ -96,7 +86,7 @@ public ref partial struct <#= GetTypeName(logLevel) #>
         format);
 
     /// <summary>
-    /// Appends a <paramref name="namedLogValue" /> to the string log message.
+    /// Appends a <paramref name="namedLogValue" /> to the log message.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in NamedLogValue namedLogValue, int alignment = 0, string? format = null)
@@ -105,7 +95,7 @@ public ref partial struct <#= GetTypeName(logLevel) #>
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal FormattedLogValues GetFormattedLogValuesAndReset()
+    internal FormattedLogValuesBase GetFormattedLogValuesAndReset()
     {
         var result = FormattedLogValuesBuilder.BuildAndRelease(_builder);
         _builder = null!;

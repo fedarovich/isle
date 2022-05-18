@@ -39,10 +39,6 @@ public static class LoggingExtensions
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static string GetStringNameFromCallerArgumentExpression(this string expression) 
-        => IsleConfiguration.Current.ValueNameConverter(expression);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static string GetNameFromCallerArgumentExpression<T>(this string expression)
     {
         var name = IsleConfiguration.Current.ValueNameConverter(expression);

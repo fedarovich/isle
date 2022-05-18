@@ -50,17 +50,7 @@ public ref partial struct TraceLogInterpolatedStringHandler
     }
 
     /// <summary>
-    /// Appends a <paramref name="value" /> to the string log message.
-    /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void AppendFormatted(string? value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "") => _builder.AppendFormatted(
-        name.GetStringNameFromCallerArgumentExpression(), 
-        value,
-        alignment, 
-        format);
-
-    /// <summary>
-    /// Appends a <paramref name="value" /> to the string log message.
+    /// Appends a <paramref name="value" /> to the log message.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "") => _builder.AppendFormatted(
@@ -70,7 +60,7 @@ public ref partial struct TraceLogInterpolatedStringHandler
         format);
 
     /// <summary>
-    /// Appends a <paramref name="namedLogValue" /> to the string log message.
+    /// Appends a <paramref name="namedLogValue" /> to the log message.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in NamedLogValue namedLogValue, int alignment = 0, string? format = null)
@@ -131,17 +121,7 @@ public ref partial struct DebugLogInterpolatedStringHandler
     }
 
     /// <summary>
-    /// Appends a <paramref name="value" /> to the string log message.
-    /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void AppendFormatted(string? value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "") => _builder.AppendFormatted(
-        name.GetStringNameFromCallerArgumentExpression(), 
-        value,
-        alignment, 
-        format);
-
-    /// <summary>
-    /// Appends a <paramref name="value" /> to the string log message.
+    /// Appends a <paramref name="value" /> to the log message.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "") => _builder.AppendFormatted(
@@ -151,7 +131,7 @@ public ref partial struct DebugLogInterpolatedStringHandler
         format);
 
     /// <summary>
-    /// Appends a <paramref name="namedLogValue" /> to the string log message.
+    /// Appends a <paramref name="namedLogValue" /> to the log message.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in NamedLogValue namedLogValue, int alignment = 0, string? format = null)
@@ -212,17 +192,7 @@ public ref partial struct InformationLogInterpolatedStringHandler
     }
 
     /// <summary>
-    /// Appends a <paramref name="value" /> to the string log message.
-    /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void AppendFormatted(string? value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "") => _builder.AppendFormatted(
-        name.GetStringNameFromCallerArgumentExpression(), 
-        value,
-        alignment, 
-        format);
-
-    /// <summary>
-    /// Appends a <paramref name="value" /> to the string log message.
+    /// Appends a <paramref name="value" /> to the log message.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "") => _builder.AppendFormatted(
@@ -232,7 +202,7 @@ public ref partial struct InformationLogInterpolatedStringHandler
         format);
 
     /// <summary>
-    /// Appends a <paramref name="namedLogValue" /> to the string log message.
+    /// Appends a <paramref name="namedLogValue" /> to the log message.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in NamedLogValue namedLogValue, int alignment = 0, string? format = null)
@@ -293,17 +263,7 @@ public ref partial struct WarningLogInterpolatedStringHandler
     }
 
     /// <summary>
-    /// Appends a <paramref name="value" /> to the string log message.
-    /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void AppendFormatted(string? value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "") => _builder.AppendFormatted(
-        name.GetStringNameFromCallerArgumentExpression(), 
-        value,
-        alignment, 
-        format);
-
-    /// <summary>
-    /// Appends a <paramref name="value" /> to the string log message.
+    /// Appends a <paramref name="value" /> to the log message.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "") => _builder.AppendFormatted(
@@ -313,7 +273,7 @@ public ref partial struct WarningLogInterpolatedStringHandler
         format);
 
     /// <summary>
-    /// Appends a <paramref name="namedLogValue" /> to the string log message.
+    /// Appends a <paramref name="namedLogValue" /> to the log message.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in NamedLogValue namedLogValue, int alignment = 0, string? format = null)
@@ -374,17 +334,7 @@ public ref partial struct ErrorLogInterpolatedStringHandler
     }
 
     /// <summary>
-    /// Appends a <paramref name="value" /> to the string log message.
-    /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void AppendFormatted(string? value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "") => _builder.AppendFormatted(
-        name.GetStringNameFromCallerArgumentExpression(), 
-        value,
-        alignment, 
-        format);
-
-    /// <summary>
-    /// Appends a <paramref name="value" /> to the string log message.
+    /// Appends a <paramref name="value" /> to the log message.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "") => _builder.AppendFormatted(
@@ -394,7 +344,7 @@ public ref partial struct ErrorLogInterpolatedStringHandler
         format);
 
     /// <summary>
-    /// Appends a <paramref name="namedLogValue" /> to the string log message.
+    /// Appends a <paramref name="namedLogValue" /> to the log message.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in NamedLogValue namedLogValue, int alignment = 0, string? format = null)
@@ -455,17 +405,7 @@ public ref partial struct CriticalLogInterpolatedStringHandler
     }
 
     /// <summary>
-    /// Appends a <paramref name="value" /> to the string log message.
-    /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void AppendFormatted(string? value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "") => _builder.AppendFormatted(
-        name.GetStringNameFromCallerArgumentExpression(), 
-        value,
-        alignment, 
-        format);
-
-    /// <summary>
-    /// Appends a <paramref name="value" /> to the string log message.
+    /// Appends a <paramref name="value" /> to the log message.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "") => _builder.AppendFormatted(
@@ -475,7 +415,7 @@ public ref partial struct CriticalLogInterpolatedStringHandler
         format);
 
     /// <summary>
-    /// Appends a <paramref name="namedLogValue" /> to the string log message.
+    /// Appends a <paramref name="namedLogValue" /> to the log message.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in NamedLogValue namedLogValue, int alignment = 0, string? format = null)
@@ -537,17 +477,7 @@ public ref partial struct LogInterpolatedStringHandler
     }
 
     /// <summary>
-    /// Appends a <paramref name="value" /> to the string log message.
-    /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void AppendFormatted(string? value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "") => _builder.AppendFormatted(
-        name.GetStringNameFromCallerArgumentExpression(), 
-        value,
-        alignment, 
-        format);
-
-    /// <summary>
-    /// Appends a <paramref name="value" /> to the string log message.
+    /// Appends a <paramref name="value" /> to the log message.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "") => _builder.AppendFormatted(
@@ -557,7 +487,7 @@ public ref partial struct LogInterpolatedStringHandler
         format);
 
     /// <summary>
-    /// Appends a <paramref name="namedLogValue" /> to the string log message.
+    /// Appends a <paramref name="namedLogValue" /> to the log message.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in NamedLogValue namedLogValue, int alignment = 0, string? format = null)
@@ -608,17 +538,7 @@ public ref partial struct ScopeLogInterpolatedStringHandler
     }
 
     /// <summary>
-    /// Appends a <paramref name="value" /> to the string log message.
-    /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void AppendFormatted(string? value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "") => _builder.AppendFormatted(
-        name.GetStringNameFromCallerArgumentExpression(), 
-        value,
-        alignment, 
-        format);
-
-    /// <summary>
-    /// Appends a <paramref name="value" /> to the string log message.
+    /// Appends a <paramref name="value" /> to the log message.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "") => _builder.AppendFormatted(
@@ -628,7 +548,7 @@ public ref partial struct ScopeLogInterpolatedStringHandler
         format);
 
     /// <summary>
-    /// Appends a <paramref name="namedLogValue" /> to the string log message.
+    /// Appends a <paramref name="namedLogValue" /> to the log message.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in NamedLogValue namedLogValue, int alignment = 0, string? format = null)
