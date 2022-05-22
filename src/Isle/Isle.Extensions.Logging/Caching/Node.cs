@@ -22,11 +22,14 @@ internal abstract class Node
 
     public int Depth { get; }
 
-    private ConcurrentDictionary<string, LiteralNode> LiteralNodes => _literalNodes ??= new();
+    private ConcurrentDictionary<string, LiteralNode> LiteralNodes => 
+        LazyInitializer.EnsureInitialized(ref _literalNodes, static () => new ());
 
-    private ConcurrentDictionary<string, HoleNode> HoleNodes => _holeNodes ??= new();
+    private ConcurrentDictionary<string, HoleNode> HoleNodes => 
+        LazyInitializer.EnsureInitialized(ref _holeNodes, static () => new());
 
-    private ConcurrentDictionary<FormatKey, FormattedHoleNode> FormattedHoleNodes => _formattedHoleNodes ??= new();
+    private ConcurrentDictionary<FormatKey, FormattedHoleNode> FormattedHoleNodes => 
+        LazyInitializer.EnsureInitialized(ref _formattedHoleNodes, static () => new());
 
     public LiteralNode GetOrAddLiteralNode(string rawLiteral)
     {
@@ -47,18 +50,21 @@ internal abstract class Node
 
     public TemplateNode GetTemplateNode()
     {
-        if (_templateNode != null)
-            return _templateNode;
+        return Volatile.Read(ref _templateNode) ?? InitializeTemplateNode();
 
-        var templateNode = new TemplateNode(this);
-        return Interlocked.CompareExchange(ref _templateNode, templateNode, null) ?? templateNode;
+        TemplateNode InitializeTemplateNode()
+        {
+            var templateNode = new TemplateNode(this);
+            Interlocked.CompareExchange(ref _templateNode, templateNode, null);
+            return _templateNode;
+        }
     }
 
     protected void Reset()
     {
-        _literalNodes?.Clear();
-        _holeNodes?.Clear();
-        _formattedHoleNodes?.Clear();
-        _templateNode = null;
+        Volatile.Read(ref _literalNodes)?.Clear();
+        Volatile.Read(ref _holeNodes)?.Clear();
+        Volatile.Read(ref _formattedHoleNodes)?.Clear();
+        Volatile.Write(ref _templateNode, null);
     }
 }
