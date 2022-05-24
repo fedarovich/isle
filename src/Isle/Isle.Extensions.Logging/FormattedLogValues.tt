@@ -1,0 +1,39 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".g.cs" #>
+#nullable enable
+using System.Runtime.InteropServices;
+
+namespace Isle.Extensions.Logging;
+
+<# for (int n = 0; n <= 7; n++) { #>
+
+internal sealed class FormattedLogValues<#= n #> : FormattedLogValuesBase
+{
+    private ValuesPlaceholder _values;
+
+    internal override Span<KeyValuePair<string, object?>> Values => MemoryMarshal.CreateSpan(ref _values.<#= n > 0 ? "Value0" : "OriginalFormat" #>, <#= (n + 1) #>);
+    
+    public override IEnumerator<KeyValuePair<string, object?>> GetEnumerator()
+    {
+<# for (int i = 0; i < n; i++) { #>
+        yield return _values.Value<#= i #>;
+<# } #>
+        yield return _values.OriginalFormat;
+    }
+
+    private struct ValuesPlaceholder
+    {
+#pragma warning disable CS0649
+<# for (int i = 0; i < n; i++) { #>
+        public KeyValuePair<string, object?> Value<#= i #>;
+<# } #>
+        public KeyValuePair<string, object?> OriginalFormat;
+#pragma warning restore CS0649
+    }
+}
+
+<# } #>

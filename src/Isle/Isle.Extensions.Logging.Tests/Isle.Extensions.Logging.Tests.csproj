@@ -7,16 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="LoggerExtensionsTests.g.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>LoggerExtensionsTests.tt</DependentUpon>
-    </None>
-    <None Include="LogHandlersTests.g.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>LogHandlersTests.tt</DependentUpon>
-    </None>
     <None Include="SerilogLoggerExtensionsTests.g.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -45,13 +35,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="LoggerExtensionsTests.tt">
+    <None Update="MELTests.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>LoggerExtensionsTests.g.cs</LastGenOutput>
-    </None>
-    <None Update="LogHandlersTests.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>LogHandlersTests.g.cs</LastGenOutput>
+      <LastGenOutput>MELTests.g.cs</LastGenOutput>
     </None>
     <None Update="SerilogLoggerExtensionsTests.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
@@ -69,10 +55,10 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>LoggerExtensionsTests.tt</DependentUpon>
     </Compile>
-    <Compile Update="LogHandlersTests.g.cs">
+    <Compile Update="MELTests.g.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
-      <DependentUpon>LogHandlersTests.tt</DependentUpon>
+      <DependentUpon>MELTests.tt</DependentUpon>
     </Compile>
     <Compile Update="SerilogLoggerExtensionsTests.g.cs">
       <DesignTime>True</DesignTime>

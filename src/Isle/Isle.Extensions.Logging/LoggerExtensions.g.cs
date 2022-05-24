@@ -9,7 +9,7 @@ namespace Isle.Extensions.Logging;
 /// </summary>
 public static class LoggerExtensions
 {
-	private static readonly Func<FormattedLogValues, Exception?, string> _messageFormatter = MessageFormatter;
+	private static readonly Func<FormattedLogValuesBase, Exception?, string> _messageFormatter = MessageFormatter;
 
 	/// <summary>
 	/// Formats and writes a trace log message.
@@ -523,7 +523,7 @@ public static class LoggerExtensions
 		}
 	}
 
-	private static void Log(ILogger logger, LogLevel logLevel, EventId eventId, Exception? exception, in FormattedLogValues formattedLogValues)
+	private static void Log(ILogger logger, LogLevel logLevel, EventId eventId, Exception? exception, in FormattedLogValuesBase formattedLogValues)
 	{
 		logger.Log(logLevel, eventId, formattedLogValues, exception, _messageFormatter);
 	}
@@ -544,5 +544,5 @@ public static class LoggerExtensions
 		return logger.BeginScope(handler.GetFormattedLogValuesAndReset());
 	}
 
-	private static string MessageFormatter(FormattedLogValues state, Exception? error) => state.ToString();
+	private static string MessageFormatter(FormattedLogValuesBase state, Exception? error) => state.ToString();
 }

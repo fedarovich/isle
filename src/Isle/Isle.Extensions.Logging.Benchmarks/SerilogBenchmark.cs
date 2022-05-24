@@ -12,7 +12,7 @@ namespace Isle.Extensions.Logging.Benchmarks;
 public class SerilogBenchmark
 {
     private ILoggerFactory _loggerFactory = null!;
-    private ILogger<LoggingBenchmarks> _logger = null!;
+    private ILogger<MELBenchmarks> _logger = null!;
 
     private static readonly Rect Rect = new(0, 0, 3, 4);
     private static readonly int Area = Rect.Width * Rect.Height;
@@ -20,6 +20,9 @@ public class SerilogBenchmark
 
     [ParamsAllValues]
     public bool IsEnabled { get; set; } = true;
+
+    [ParamsAllValues]
+    public bool EnableCaching { get; set; }
 
     [GlobalSetup(Target = nameof(Standard))]
     public void GlobalSetupStandard()
@@ -31,14 +34,16 @@ public class SerilogBenchmark
     public void GlobalSetupWithManualDestructuring()
     {
         GlobalSetup();
-        IsleConfiguration.Configure(_ => { });
+        IsleConfiguration.Configure(builder => builder
+            .ConfigureExtensionsLogging(cfg => cfg.EnableMessageTemplateCaching = EnableCaching));
     }
 
     [GlobalSetup(Targets = new[] { nameof(InterpolatedWithExplicitAutomaticDestructuring), nameof(InterpolatedWithImplicitAutomaticDestructuring) })]
     public void GlobalSetupWithAutoDestructuring()
     {
         GlobalSetup();
-        IsleConfiguration.Configure(builder => builder.WithAutomaticDestructuring());
+        IsleConfiguration.Configure(builder => builder.WithAutomaticDestructuring()
+            .ConfigureExtensionsLogging(cfg => cfg.EnableMessageTemplateCaching = EnableCaching));
     }
 
     private void GlobalSetup()
@@ -53,7 +58,7 @@ public class SerilogBenchmark
                     .WriteTo.BenchmarkSink()
                     .CreateLogger(), true);
         });
-        _logger = _loggerFactory.CreateLogger<LoggingBenchmarks>();
+        _logger = _loggerFactory.CreateLogger<MELBenchmarks>();
     }
 
     [GlobalCleanup]

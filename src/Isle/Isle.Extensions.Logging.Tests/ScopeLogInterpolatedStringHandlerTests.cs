@@ -1,57 +1,29 @@
-﻿<#@ template debug="false" hostspecific="false" language="C#" #>
-<#@ assembly name="System.Core" #>
-<#@ import namespace="System.Linq" #>
-<#@ import namespace="System.Text" #>
-<#@ import namespace="System.Collections.Generic" #>
-<#@ output extension=".g.cs" #>
-<#
-    const string Scope = "Scope";
-
-	string[] logLevels = { "Trace", "Debug", "Information", "Warning", "Error", "Critical", null }; 
-
-    string GetTypeName(string logLevel) => logLevel + "LogInterpolatedStringHandler";
-    string GetTestName(string logLevel) => GetTypeName(logLevel) + "Tests";
-#>
-#nullable enable
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Globalization;
+using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
-using FluentAssertions;
 
 namespace Isle.Extensions.Logging.Tests;
 
-<# foreach (var logLevel in logLevels) { #>
-
 [TestFixtureSource(nameof(FixtureArgs))]
-public class <#= GetTestName(logLevel) #> : BaseFixture
+public class ScopeLogInterpolatedStringHandlerTests : BaseFixture
 {
-<#if (logLevel != null) { #>
-    private const LogLevel logLevel = LogLevel.<#= logLevel #>;
-<# } #>
-
-    public <#= GetTestName(logLevel) #>(LogLevel minLogLevel) : base(minLogLevel)
+    public ScopeLogInterpolatedStringHandlerTests(LogLevel minLogLevel, bool enableCaching) : base(minLogLevel, enableCaching)
     {
     }
 
     [Test]
-    public void CreateHandler(<#if (logLevel == null) { #> [ValueSource(nameof(LogLevels))] LogLevel logLevel <# } #>)
+    public void CreateHandler()
     {
-        var handler = new <#= GetTypeName(logLevel) #>(0, 0, Logger, <#if (logLevel == null) { #> logLevel, <# } #> out bool isEnabled);
-        handler.IsEnabled.Should().Be(logLevel >= MinLogLevel);
-        isEnabled.Should().Be(logLevel >= MinLogLevel);
-        if (logLevel >= MinLogLevel)
-        {
-            handler.GetFormattedLogValuesAndReset();
-        }
+        var handler = new ScopeLogInterpolatedStringHandler(0, 0, Logger);
+        handler.GetFormattedLogValuesAndReset();
     }
 
     [Test]
-    public void AppendLiteral(<#if (logLevel == null) { #> [ValueSource(nameof(LogLevels))] LogLevel logLevel, <# } #>[ValueSource(nameof(Literals))] string? literal)
+    public void AppendLiteral([ValueSource(nameof(Literals))] string? literal)
     {
-        Assume.That(logLevel >= MinLogLevel);
-
-        var handler = new <#= GetTypeName(logLevel) #>(3, 0, Logger, <#if (logLevel == null) { #> logLevel, <# } #> out _);
+        var handler = new ScopeLogInterpolatedStringHandler(3, 0, Logger);
         handler.AppendLiteral(literal);
         var values = handler.GetFormattedLogValuesAndReset();
         values.Count.Should().Be(1);
@@ -60,11 +32,9 @@ public class <#= GetTestName(logLevel) #> : BaseFixture
     }
 
     [Test]
-    public void AppendLiteralWithBraces(<#if (logLevel == null) { #> [ValueSource(nameof(LogLevels))] LogLevel logLevel <# } #>)
+    public void AppendLiteralWithBraces()
     {
-        Assume.That(logLevel >= MinLogLevel);
-
-        var handler = new <#= GetTypeName(logLevel) #>(3, 0, Logger, <#if (logLevel == null) { #> logLevel, <# } #> out _);
+        var handler = new ScopeLogInterpolatedStringHandler(3, 0, Logger);
         handler.AppendLiteral("A{B}C");
         var values = handler.GetFormattedLogValuesAndReset();
         values.Count.Should().Be(1);
@@ -73,11 +43,9 @@ public class <#= GetTestName(logLevel) #> : BaseFixture
     }
 
     [Test]
-    public void AppendLiterals(<#if (logLevel == null) { #> [ValueSource(nameof(LogLevels))] LogLevel logLevel <# } #>)
+    public void AppendLiterals()
     {
-        Assume.That(logLevel >= MinLogLevel);
-
-        var handler = new <#= GetTypeName(logLevel) #>(5, 0, Logger, <#if (logLevel == null) { #> logLevel, <# } #> out _);
+        var handler = new ScopeLogInterpolatedStringHandler(5, 0, Logger);
         handler.AppendLiteral("A");
         handler.AppendLiteral("B");
         handler.AppendLiteral("C");
@@ -94,16 +62,14 @@ public class <#= GetTestName(logLevel) #> : BaseFixture
     #region AppendFormatted with Scalar
 
     [Test]
-    public void AppendFormattedScalar<T>(<#if (logLevel == null) { #> [ValueSource(nameof(LogLevels))] LogLevel logLevel, <# } #>[ValueSource(nameof(Scalars))] T value)
+    public void AppendFormattedScalar<T>([ValueSource(nameof(Scalars))] T value)
     {
-        Assume.That(logLevel >= MinLogLevel);
-
-        var handler = new <#= GetTypeName(logLevel) #>(0, 1, Logger, <#if (logLevel == null) { #> logLevel, <# } #> out _);
+        var handler = new ScopeLogInterpolatedStringHandler(0, 1, Logger);
         handler.AppendFormatted(value);
         var values = handler.GetFormattedLogValuesAndReset();
         values.Count.Should().Be(2);
         values.Should().BeEquivalentTo(
-            new []
+            new[]
             {
                 new KeyValuePair<string, object?>(nameof(value), value),
                 new KeyValuePair<string, object?>("{OriginalFormat}", "{value}")
@@ -112,12 +78,9 @@ public class <#= GetTestName(logLevel) #> : BaseFixture
     }
 
     [Test]
-    public void AppendFormattedScalar<T>(<#if (logLevel == null) { #> [ValueSource(nameof(LogLevels))] LogLevel logLevel, <# } #>[ValueSource(nameof(Scalars))] T value, [Values(-6, 5)] int alignment)
+    public void AppendFormattedScalar<T>([ValueSource(nameof(Scalars))] T value, [Values(-6, 5)] int alignment)
     {
-        Assume.That(logLevel >= MinLogLevel);
-
-        var handler = new <#= GetTypeName(logLevel) #>(0, 1, Logger, <#if (logLevel == null) { #> logLevel, <# } #> out _);
-        handler.IsEnabled.Should().BeTrue();
+        var handler = new ScopeLogInterpolatedStringHandler(0, 1, Logger);
         handler.AppendFormatted(value, alignment);
         var values = handler.GetFormattedLogValuesAndReset();
         values.Count.Should().Be(2);
@@ -131,11 +94,9 @@ public class <#= GetTestName(logLevel) #> : BaseFixture
     }
 
     [Test]
-    public void AppendFormattedScalar<T>(<#if (logLevel == null) { #> [ValueSource(nameof(LogLevels))] LogLevel logLevel, <# } #>[ValueSource(nameof(Scalars))] T value, [Values("00000", "N")] string format)
+    public void AppendFormattedScalar<T>([ValueSource(nameof(Scalars))] T value, [Values("00000", "N")] string format)
     {
-        Assume.That(logLevel >= MinLogLevel);
-
-        var handler = new <#= GetTypeName(logLevel) #>(0, 1, Logger, <#if (logLevel == null) { #> logLevel, <# } #> out _);
+        var handler = new ScopeLogInterpolatedStringHandler(0, 1, Logger);
         handler.AppendFormatted(value, format: format);
         var values = handler.GetFormattedLogValuesAndReset();
         values.Count.Should().Be(2);
@@ -149,11 +110,9 @@ public class <#= GetTestName(logLevel) #> : BaseFixture
     }
 
     [Test]
-    public void AppendFormattedScalar<T>(<#if (logLevel == null) { #> [ValueSource(nameof(LogLevels))] LogLevel logLevel, <# } #>[ValueSource(nameof(Scalars))] T value, [Values(-3, 5)] int alignment, [Values("00000", "N")] string format)
+    public void AppendFormattedScalar<T>([ValueSource(nameof(Scalars))] T value, [Values(-3, 5)] int alignment, [Values("00000", "N")] string format)
     {
-        Assume.That(logLevel >= MinLogLevel);
-
-        var handler = new <#= GetTypeName(logLevel) #>(0, 1, Logger, <#if (logLevel == null) { #> logLevel, <# } #> out _);
+        var handler = new ScopeLogInterpolatedStringHandler(0, 1, Logger);
         handler.AppendFormatted(value, alignment, format);
         var values = handler.GetFormattedLogValuesAndReset();
         values.Count.Should().Be(2);
@@ -171,13 +130,11 @@ public class <#= GetTestName(logLevel) #> : BaseFixture
     #region AppendFormatted with Collection
 
     [Test]
-    public void AppendFormattedCollection(<#if (logLevel == null) { #> [ValueSource(nameof(LogLevels))] LogLevel logLevel <# } #>)
+    public void AppendFormattedCollection()
     {
-        Assume.That(logLevel >= MinLogLevel);
-
         var value = new[] { 1, 2, 3 };
 
-        var handler = new <#= GetTypeName(logLevel) #>(0, 1, Logger, <#if (logLevel == null) { #> logLevel, <# } #> out _);
+        var handler = new ScopeLogInterpolatedStringHandler(0, 1, Logger);
         handler.AppendFormatted(value);
         var values = handler.GetFormattedLogValuesAndReset();
         values.Count.Should().Be(2);
@@ -191,13 +148,11 @@ public class <#= GetTestName(logLevel) #> : BaseFixture
     }
 
     [Test]
-    public void AppendFormattedCollection(<#if (logLevel == null) { #> [ValueSource(nameof(LogLevels))] LogLevel logLevel, <# } #>[Values(-6, 5)] int alignment)
+    public void AppendFormattedCollection([Values(-6, 5)] int alignment)
     {
-        Assume.That(logLevel >= MinLogLevel);
-
         var value = new[] { 1, 2, 3 };
 
-        var handler = new <#= GetTypeName(logLevel) #>(0, 1, Logger, <#if (logLevel == null) { #> logLevel, <# } #> out _);
+        var handler = new ScopeLogInterpolatedStringHandler(0, 1, Logger);
         handler.AppendFormatted(value, alignment);
         var values = handler.GetFormattedLogValuesAndReset();
         values.Count.Should().Be(2);
@@ -211,13 +166,11 @@ public class <#= GetTestName(logLevel) #> : BaseFixture
     }
 
     [Test]
-    public void AppendFormattedCollection(<#if (logLevel == null) { #> [ValueSource(nameof(LogLevels))] LogLevel logLevel, <# } #>[Values("00000", "N")] string format)
+    public void AppendFormattedCollection([Values("00000", "N")] string format)
     {
-        Assume.That(logLevel >= MinLogLevel);
-
         var value = new[] { 1, 2, 3 };
 
-        var handler = new <#= GetTypeName(logLevel) #>(0, 1, Logger, <#if (logLevel == null) { #> logLevel, <# } #> out _);
+        var handler = new ScopeLogInterpolatedStringHandler(0, 1, Logger);
         handler.AppendFormatted(value, format: format);
         var values = handler.GetFormattedLogValuesAndReset();
         values.Count.Should().Be(2);
@@ -231,13 +184,11 @@ public class <#= GetTestName(logLevel) #> : BaseFixture
     }
 
     [Test]
-    public void AppendFormattedCollection(<#if (logLevel == null) { #> [ValueSource(nameof(LogLevels))] LogLevel logLevel, <# } #>[Values(-6, 5)] int alignment, [Values("00000", "N")] string format)
+    public void AppendFormattedCollection([Values(-6, 5)] int alignment, [Values("00000", "N")] string format)
     {
-        Assume.That(logLevel >= MinLogLevel);
-
         var value = new[] { 1, 2, 3 };
 
-        var handler = new <#= GetTypeName(logLevel) #>(0, 1, Logger, <#if (logLevel == null) { #> logLevel, <# } #> out _);
+        var handler = new ScopeLogInterpolatedStringHandler(0, 1, Logger);
         handler.AppendFormatted(value, alignment, format);
         var values = handler.GetFormattedLogValuesAndReset();
         values.Count.Should().Be(2);
@@ -255,13 +206,11 @@ public class <#= GetTestName(logLevel) #> : BaseFixture
     #region AppendFormat with Complex Object
 
     [Test]
-    public void AppendFormattedComplexType(<#if (logLevel == null) { #> [ValueSource(nameof(LogLevels))] LogLevel logLevel <# } #>)
+    public void AppendFormattedComplexType()
     {
-        Assume.That(logLevel >= MinLogLevel);
-
         var value = new TestObject(1, 2);
 
-        var handler = new <#= GetTypeName(logLevel) #>(0, 1, Logger, <#if (logLevel == null) { #> logLevel, <# } #> out _);
+        var handler = new ScopeLogInterpolatedStringHandler(0, 1, Logger);
         handler.AppendFormatted(value);
         var values = handler.GetFormattedLogValuesAndReset();
         values.Count.Should().Be(2);
@@ -275,13 +224,11 @@ public class <#= GetTestName(logLevel) #> : BaseFixture
     }
 
     [Test]
-    public void AppendFormattedComplexType(<#if (logLevel == null) { #> [ValueSource(nameof(LogLevels))] LogLevel logLevel, <# } #>[Values(-6, 5)] int alignment)
+    public void AppendFormattedComplexType([Values(-6, 5)] int alignment)
     {
-        Assume.That(logLevel >= MinLogLevel);
-
         var value = new TestObject(1, 2);
 
-        var handler = new <#= GetTypeName(logLevel) #>(0, 1, Logger, <#if (logLevel == null) { #> logLevel, <# } #> out _);
+        var handler = new ScopeLogInterpolatedStringHandler(0, 1, Logger);
         handler.AppendFormatted(value, alignment);
         var values = handler.GetFormattedLogValuesAndReset();
         values.Count.Should().Be(2);
@@ -295,13 +242,11 @@ public class <#= GetTestName(logLevel) #> : BaseFixture
     }
 
     [Test]
-    public void AppendFormattedComplexType(<#if (logLevel == null) { #> [ValueSource(nameof(LogLevels))] LogLevel logLevel, <# } #>[Values("00000", "N")] string format)
+    public void AppendFormattedComplexType([Values("00000", "N")] string format)
     {
-        Assume.That(logLevel >= MinLogLevel);
-
         var value = new TestObject(1, 2);
 
-        var handler = new <#= GetTypeName(logLevel) #>(0, 1, Logger, <#if (logLevel == null) { #> logLevel, <# } #> out _);
+        var handler = new ScopeLogInterpolatedStringHandler(0, 1, Logger);
         handler.AppendFormatted(value, format: format);
         var values = handler.GetFormattedLogValuesAndReset();
         values.Count.Should().Be(2);
@@ -315,13 +260,11 @@ public class <#= GetTestName(logLevel) #> : BaseFixture
     }
 
     [Test]
-    public void AppendFormattedComplexType(<#if (logLevel == null) { #> [ValueSource(nameof(LogLevels))] LogLevel logLevel, <# } #>[Values(-6, 5)] int alignment, [Values("00000", "N")] string format)
+    public void AppendFormattedComplexType([Values(-6, 5)] int alignment, [Values("00000", "N")] string format)
     {
-        Assume.That(logLevel >= MinLogLevel);
-
         var value = new TestObject(1, 2);
 
-        var handler = new <#= GetTypeName(logLevel) #>(0, 1, Logger, <#if (logLevel == null) { #> logLevel, <# } #> out _);
+        var handler = new ScopeLogInterpolatedStringHandler(0, 1, Logger);
         handler.AppendFormatted(value, alignment, format);
         var values = handler.GetFormattedLogValuesAndReset();
         values.Count.Should().Be(2);
@@ -334,7 +277,24 @@ public class <#= GetTestName(logLevel) #> : BaseFixture
         values.ToString().Should().Be(value.ToString());
     }
 
+    [Test]
+    public void AppendFormattedNamedComplexType([Values(-6, 5)] int alignment, [Values("00000", "N")] string format)
+    {
+        var value = new TestObject(1, 2);
+        var name = "NAME";
+
+        var handler = new ScopeLogInterpolatedStringHandler(0, 1, Logger);
+        handler.AppendFormatted(value.Named(name), alignment, format);
+        var values = handler.GetFormattedLogValuesAndReset();
+        values.Count.Should().Be(2);
+        values.Should().BeEquivalentTo(
+            new[]
+            {
+                new KeyValuePair<string, object>(name, value),
+                new KeyValuePair<string, object>("{OriginalFormat}", "{" + name + "," + alignment + ":" + format + "}")
+            });
+        values.ToString().Should().Be(value.ToString());
+    }
+
     #endregion
 }
-
-<# } #>

@@ -16,8 +16,11 @@ public abstract class SerilogBaseFixture
 {
     protected static readonly IReadOnlyList<LogLevel> LogLevels = Enum.GetValues<LogLevel>().Where(x => x != LogLevel.None).ToArray();
         
-    protected static readonly IReadOnlyList<object> FixtureArgs = LogLevels.Select(x => new object[] { x }).ToArray();
-        
+    protected static readonly IReadOnlyList<object> FixtureArgs = (
+        from logLevel in LogLevels
+        from enableCaching in new[] { false, true }
+        select new object[] { logLevel, enableCaching }).ToArray();
+
     protected static readonly IReadOnlyList<string?> Literals = new[] { null, "A", "ABC", "ABCDE", "ABCDEFGHIJKLMNOPQRSTUVWXYZ" };
 
     protected static readonly IReadOnlyList<object?> Scalars = new object[] { 1000, 3.5, 2.5m, "ABC" };
@@ -26,15 +29,17 @@ public abstract class SerilogBaseFixture
 
     private readonly List<LogEvent> _serilogLogEvents = new();
 
-    protected SerilogBaseFixture(LogLevel minLogLevel)
+    protected SerilogBaseFixture(LogLevel minLogLevel, bool enableCaching)
     {
         MinLogLevel = minLogLevel;
+        EnableCaching = enableCaching;
     }
 
     [OneTimeSetUp]
     protected virtual void OneTimeSetUp()
     {
-        IsleConfiguration.Configure(builder => builder.WithAutomaticDestructuring());
+        IsleConfiguration.Configure(builder => builder.WithAutomaticDestructuring()
+            .ConfigureExtensionsLogging(cfg => cfg.EnableMessageTemplateCaching = EnableCaching));
         LoggerFactory = Microsoft.Extensions.Logging.LoggerFactory.Create(builder =>
         {
             builder
@@ -67,6 +72,8 @@ public abstract class SerilogBaseFixture
     }
 
     protected LogLevel MinLogLevel { get; }
+
+    protected bool EnableCaching { get; }
 
     protected ILoggerFactory LoggerFactory { get; private set; } = null!;
 
