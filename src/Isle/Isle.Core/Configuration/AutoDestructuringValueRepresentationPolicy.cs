@@ -45,6 +45,12 @@ namespace Isle.Configuration;
 ///         <description><see cref="TimeSpan"/></description>
 ///     </item>
 ///     <item>
+///         <description><see cref="DateOnly"/></description>
+///     </item>
+///     <item>
+///         <description><see cref="TimeOnly"/></description>
+///     </item>
+///     <item>
 ///         <description><see cref="Guid"/></description>
 ///     </item>
 ///     <item>
@@ -96,6 +102,8 @@ public sealed class AutoDestructuringValueRepresentationPolicy : IValueRepresent
                     || type == typeof(DateTime)
                     || type == typeof(DateTimeOffset)
                     || type == typeof(TimeSpan)
+                    || type == typeof(DateOnly)
+                    || type == typeof(TimeOnly)
                     || type == typeof(Uri)
                     || type == typeof(Guid);
         }
