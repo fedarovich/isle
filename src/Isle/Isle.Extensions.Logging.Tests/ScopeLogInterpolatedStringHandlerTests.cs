@@ -290,8 +290,8 @@ public class ScopeLogInterpolatedStringHandlerTests : BaseFixture
         values.Should().BeEquivalentTo(
             new[]
             {
-                new KeyValuePair<string, object>(name, value),
-                new KeyValuePair<string, object>("{OriginalFormat}", "{" + name + "," + alignment + ":" + format + "}")
+                new KeyValuePair<string, object>("@" + name, value),
+                new KeyValuePair<string, object>("{OriginalFormat}", "{@" + name + "," + alignment + ":" + format + "}")
             });
         values.ToString().Should().Be(value.ToString());
     }
