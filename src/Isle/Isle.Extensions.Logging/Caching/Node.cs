@@ -45,7 +45,7 @@ internal abstract class Node
     {
         var formatKey = new FormatKey(name, format, alignment);
         return FormattedHoleNodes.GetOrAdd(formatKey, static (key, arg) => 
-            new FormattedHoleNode(arg.parent, key.Name, key.Format, key.Alignment), (parent: this, formatKey));
+            new FormattedHoleNode(arg.parent, key.Name, key.Alignment, key.Format), (parent: this, formatKey));
     }
 
     public TemplateNode GetTemplateNode()
@@ -60,7 +60,7 @@ internal abstract class Node
         }
     }
 
-    protected void Reset()
+    protected internal void Reset()
     {
         Volatile.Read(ref _literalNodes)?.Clear();
         Volatile.Read(ref _holeNodes)?.Clear();

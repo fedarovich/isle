@@ -2,7 +2,7 @@
 
 internal sealed class NodeCache : Node
 {
-    public static readonly NodeCache Instance = new NodeCache();
+    public static readonly NodeCache Instance = new ();
     
     private NodeCache()
     {
@@ -11,6 +11,4 @@ internal sealed class NodeCache : Node
     static NodeCache()
     {
     }
-
-    public new void Reset() => base.Reset();
 }

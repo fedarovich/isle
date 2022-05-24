@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using FluentAssertions;
 using NUnit.Framework;
@@ -77,5 +78,36 @@ public class FormattedLogValuesTests
         values.Values[2] = new(FormattedLogValuesBuilder.OriginalFormatName, "{x} {y}");
         values.SetSegments(new [] { new Segment(null, 0), new Segment(" "), new Segment(null, 0) });
         values.ToString().Should().Be("(null) a, (null), b");
+    }
+
+    [Test]
+    public void AllFixedCountFormattedLogValuesAreUsed()
+    {
+        var regex = new Regex(@"^FormattedLogValues(?<n>\d+)$");
+        var types = (
+            from type in typeof(FormattedLogValuesBase).Assembly.GetTypes()
+            let match = regex.Match(type.Name)
+            where match.Success
+            let n = int.Parse(match.Groups["n"].ValueSpan)
+            orderby n
+            select (type, n)
+        ).ToArray();
+        types.Should().HaveCountGreaterThan(0);
+        types[0].n.Should().Be(0);
+
+        // Check that n is sequential
+        for (int i = 1; i < types.Length; i++)
+        {
+            types[i].n.Should().Be(types[i - 1].n + 1);
+        }
+
+        foreach (var (type, n) in types)
+        {
+            var formattedLogValuesN = FormattedLogValuesBase.Create(n);
+            formattedLogValuesN.Should().BeOfType(type);
+        }
+
+        var formattedLogValues = FormattedLogValuesBase.Create(types[^1].n + 1);
+        formattedLogValues.Should().BeOfType(typeof(FormattedLogValues));
     }
 }
