@@ -1,4 +1,6 @@
-﻿namespace Isle.Configuration;
+﻿using Isle.Extensions;
+
+namespace Isle.Configuration;
 
 /// <summary>
 /// ISLE Configuration.
@@ -22,6 +24,7 @@ public sealed class IsleConfiguration
     {
         ValueRepresentationPolicy = builder.ValueRepresentationPolicy ?? DefaultValueRepresentationPolicy.Instance;
         ValueNameConverter = builder.ValueNameConverter ?? (name => name);
+        PreserveDefaultValueRepresentationForExplicitNames = builder.PreserveDefaultValueRepresentationForExplicitNames;
         _extensionHooks = builder.ExtensionHooks;
     }
 
@@ -40,6 +43,22 @@ public sealed class IsleConfiguration
     /// Identity transform is used by default.
     /// </remarks>
     public Func<string, string> ValueNameConverter { get; }
+
+    /// <summary>
+    /// Gets or sets the value indicating whether <see cref="LoggingExtensions.Named{T}(T,string)"/>
+    /// will preserve the default value representation.
+    /// </summary>
+    /// <value>
+    /// <para>
+    /// If <see langword="true"/>, the method <see cref="LoggingExtensions.Named{T}(T,string)"/> will use the name as it is;
+    /// otherwise, depending on the <see cref="ValueRepresentationPolicy"/>,
+    /// the name can be prepended with <c>@</c> for destructuring or with <c>$</c> for stringification.
+    /// </para>
+    /// <para>
+    /// The default value is <see langword="false" />.
+    /// </para>
+    /// </value>
+    public bool PreserveDefaultValueRepresentationForExplicitNames { get; set; }
 
     /// <summary>
     /// Configures ISLE.
@@ -90,5 +109,7 @@ public sealed class IsleConfiguration
         public IList<IIsleExtensionConfigurationHook> ExtensionHooks { get; } = new List<IIsleExtensionConfigurationHook>();
 
         public void RegisterExtensionConfigurationHook(IIsleExtensionConfigurationHook hook) => ExtensionHooks.Add(hook);
+        
+        public bool PreserveDefaultValueRepresentationForExplicitNames { get; set; }
     }
 }

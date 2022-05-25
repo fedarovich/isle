@@ -31,6 +31,14 @@ internal class IsleConfigurationTests
     }
 
     [Test]
+    public void DefaultConfiguration()
+    {
+        IsleConfiguration.Configure(_ => {});
+        IsleConfiguration.Current.ValueRepresentationPolicy.Should().Be(DefaultValueRepresentationPolicy.Instance);
+        IsleConfiguration.Current.PreserveDefaultValueRepresentationForExplicitNames.Should().BeFalse();
+    }
+
+    [Test]
     public void ConfigureAndReset()
     {
         var valueNameConverter = (string s) => s;
@@ -40,12 +48,14 @@ internal class IsleConfigurationTests
         {
             builder.ValueNameConverter = valueNameConverter;
             builder.ValueRepresentationPolicy = AutoDestructuringValueRepresentationPolicy.Instance;
+            builder.PreserveDefaultValueRepresentationForExplicitNames = true;
             builder.RegisterExtensionConfigurationHook(hook);
         });
         hook.Received(1).ApplyExtensionConfiguration();
         hook.DidNotReceive().ResetExtensionConfiguration();
         IsleConfiguration.Current.ValueNameConverter.Should().Be(valueNameConverter);
         IsleConfiguration.Current.ValueRepresentationPolicy.Should().Be(AutoDestructuringValueRepresentationPolicy.Instance);
+        IsleConfiguration.Current.PreserveDefaultValueRepresentationForExplicitNames.Should().BeTrue();
         hook.ClearReceivedCalls();
 
         IsleConfiguration.Reset();

@@ -14,14 +14,50 @@ public static class LoggingExtensions
     /// <summary>
     /// Wraps the <paramref name="value"/> with an instance of <see cref="NamedLogValue"/> with the corresponding <paramref name="name"/>.
     /// </summary>
+    /// <param name="value">The value to wrap.</param>
+    /// <param name="name">The name.</param>
     /// <exception cref="ArgumentException"><paramref name="name"/> is null or blank string.</exception>
+    /// <remarks>
+    /// <para>
+    /// This method is equivalent to:
+    /// <code>
+    /// Named(value, name, IsleConfiguration.Current.PreserveDefaultValueRepresentationForExplicitNames)
+    /// </code>
+    /// </para>
+    /// <para>
+    /// If <see cref="IsleConfiguration.PreserveDefaultValueRepresentationForExplicitNames"/> is <see langword="true" />
+    /// the <paramref name="name"/> will be preserved as is;
+    /// otherwise, depending on the <see cref="IsleConfiguration.ValueRepresentationPolicy"/>,
+    /// the name can be prepended with <c>@</c> for destructuring or with <c>$</c> for stringification.
+    /// </para>
+    /// <para>By default, <see cref="IsleConfiguration.PreserveDefaultValueRepresentationForExplicitNames"/> is <see langword="false" />.</para>
+    /// </remarks>
+    /// <seealso cref="Named{T}(T,string,bool)"/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static NamedLogValue Named<T>(this T value, string name)
+    {
+        return Named(value, name, IsleConfiguration.Current.PreserveDefaultValueRepresentationForExplicitNames);
+    }
+
+    /// <summary>
+    /// Wraps the <paramref name="value"/> with an instance of <see cref="NamedLogValue"/> with the corresponding <paramref name="name"/>.
+    /// </summary>
+    /// <param name="value">The value to wrap.</param>
+    /// <param name="name">The name.</param>
+    /// <param name="preserveDefaultValueRepresentation">
+    /// If <see langword="true" /> the <paramref name="name"/> will be preserved as is;
+    /// otherwise, depending on the <see cref="IsleConfiguration.ValueRepresentationPolicy"/>,
+    /// the name can be prepended with <c>@</c> for destructuring or with <c>$</c> for stringification.
+    /// </param>
+    /// <exception cref="ArgumentException"><paramref name="name"/> is null or blank string.</exception>
+    /// <seealso cref="Named{T}(T,string)"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static NamedLogValue Named<T>(this T value, string name, bool preserveDefaultValueRepresentation)
     {
         if (string.IsNullOrWhiteSpace(name))
             throw new ArgumentException("The name cannot be null or empty string.", nameof(name));
 
-        if (!name.StartsWith(DestructureOperator) && !name.StartsWith(StringifyOperator))
+        if (!preserveDefaultValueRepresentation && !name.StartsWith(DestructureOperator) && !name.StartsWith(StringifyOperator))
         {
             var representation = IsleConfiguration.Current.ValueRepresentationPolicy.GetRepresentationOfType<T>();
             switch (representation)
