@@ -13,9 +13,7 @@
 #>
 #nullable enable
 using System.Runtime.CompilerServices;
-using System.Text;
 using Microsoft.Extensions.Logging;
-using Isle.Configuration;
 
 namespace Isle.Extensions.Logging;
 

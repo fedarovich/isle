@@ -1,0 +1,67 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	<Copyright>© Pavel Fedarovich, 2022</Copyright>
+	<PackageProjectUrl>https://github.com/fedarovich/isle</PackageProjectUrl>
+	<RepositoryUrl>https://github.com/fedarovich/isle.git</RepositoryUrl>
+	<RepositoryType>git</RepositoryType>
+	<PackageTags>structured logging; semantic logging; interpolated strings</PackageTags>
+	<PackageLicenseExpression>MIT</PackageLicenseExpression>
+	<Description>Adds support of structured logging using interpolated strings in C# 10 to Serilog.</Description>
+	<GenerateDocumentationFile>True</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="LoggerExtensions.g.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>LoggerExtensions.tt</DependentUpon>
+    </None>
+    <None Include="LogHandlers.g.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>LogHandlers.tt</DependentUpon>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Serilog" Version="2.11.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Isle.Core\Isle.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="LoggerExtensions.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>LoggerExtensions.g.cs</LastGenOutput>
+    </None>
+    <None Update="LogHandlers.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>LogHandlers.g.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="LoggerExtensions.g.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>LoggerExtensions.tt</DependentUpon>
+    </Compile>
+    <Compile Update="LogHandlers.g.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>LogHandlers.tt</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+</Project>

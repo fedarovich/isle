@@ -58,7 +58,7 @@ public sealed class IsleConfiguration
     /// The default value is <see langword="false" />.
     /// </para>
     /// </value>
-    public bool PreserveDefaultValueRepresentationForExplicitNames { get; set; }
+    public bool PreserveDefaultValueRepresentationForExplicitNames { get; }
 
     /// <summary>
     /// Configures ISLE.

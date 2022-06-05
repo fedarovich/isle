@@ -11,12 +11,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Isle.Extensions.Logging", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Isle.Extensions.Logging.Tests", "Isle.Extensions.Logging.Tests\Isle.Extensions.Logging.Tests.csproj", "{0E6EFF25-07BD-455F-92B8-B384E9C4B5F1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Isle.Extensions.Logging.Benchmarks", "Isle.Extensions.Logging.Benchmarks\Isle.Extensions.Logging.Benchmarks.csproj", "{EC557BFA-BAB5-4F1A-80CA-296C3B5425B8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Isle.Extensions.Logging.Benchmarks", "Isle.Extensions.Logging.Benchmarks\Isle.Extensions.Logging.Benchmarks.csproj", "{EC557BFA-BAB5-4F1A-80CA-296C3B5425B8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{CDCBFCB5-4114-4FDD-BD4F-5CDD9ED71D2D}"
 	ProjectSection(SolutionItems) = preProject
 		Directory.Build.props = Directory.Build.props
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Isle.Serilog", "Isle.Serilog\Isle.Serilog.csproj", "{39D4865E-0127-4015-8AA2-04E99A2A9A16}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -44,6 +46,10 @@ Global
 		{EC557BFA-BAB5-4F1A-80CA-296C3B5425B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EC557BFA-BAB5-4F1A-80CA-296C3B5425B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EC557BFA-BAB5-4F1A-80CA-296C3B5425B8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{39D4865E-0127-4015-8AA2-04E99A2A9A16}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39D4865E-0127-4015-8AA2-04E99A2A9A16}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39D4865E-0127-4015-8AA2-04E99A2A9A16}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39D4865E-0127-4015-8AA2-04E99A2A9A16}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
