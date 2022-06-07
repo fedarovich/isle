@@ -10,6 +10,8 @@ public sealed class IsleConfiguration
     private static volatile IsleConfiguration? _current;
 
     private readonly IList<IIsleExtensionConfigurationHook> _extensionHooks;
+    private readonly bool _preserveDefaultValueRepresentationForExplicitNames;
+
 
     /// <summary>
     /// Gets the current ISLE configuration or throws <see cref="InvalidOperationException"/> if ISLE has not been configured yet.
@@ -24,7 +26,7 @@ public sealed class IsleConfiguration
     {
         ValueRepresentationPolicy = builder.ValueRepresentationPolicy ?? DefaultValueRepresentationPolicy.Instance;
         ValueNameConverter = builder.ValueNameConverter ?? (name => name);
-        PreserveDefaultValueRepresentationForExplicitNames = builder.PreserveDefaultValueRepresentationForExplicitNames;
+        _preserveDefaultValueRepresentationForExplicitNames = builder.PreserveDefaultValueRepresentationForExplicitNames;
         _extensionHooks = builder.ExtensionHooks;
     }
 
@@ -58,7 +60,11 @@ public sealed class IsleConfiguration
     /// The default value is <see langword="false" />.
     /// </para>
     /// </value>
-    public bool PreserveDefaultValueRepresentationForExplicitNames { get; set; }
+    public bool PreserveDefaultValueRepresentationForExplicitNames
+    {
+        get => _preserveDefaultValueRepresentationForExplicitNames;
+        [Obsolete("The setter will be removed in the next version", true)] set { }
+    }
 
     /// <summary>
     /// Configures ISLE.
