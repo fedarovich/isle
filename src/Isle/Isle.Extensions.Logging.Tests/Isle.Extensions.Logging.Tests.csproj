@@ -7,6 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="MELTests.g.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>MELTests.tt</DependentUpon>
+    </None>
     <None Include="SerilogLoggerExtensionsTests.g.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -39,6 +44,10 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>LogHandlerTests.g.cs</LastGenOutput>
     </None>
+    <None Update="MELTests.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>MELTests.g.cs</LastGenOutput>
+    </None>
     <None Update="SerilogLoggerExtensionsTests.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>SerilogLoggerExtensionsTests.g.cs</LastGenOutput>
@@ -59,6 +68,11 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>LogHandlerTests.tt</DependentUpon>
+    </Compile>
+    <Compile Update="MELTests.g.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>MELTests.tt</DependentUpon>
     </Compile>
     <Compile Update="SerilogLoggerExtensionsTests.g.cs">
       <DesignTime>True</DesignTime>

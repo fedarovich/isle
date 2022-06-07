@@ -1,0 +1,580 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".g.cs" #>
+<#
+	string[] logLevels = { "Trace", "Debug", "Information", "Warning", "Error", "Critical", "" }; 
+
+    string GetTestName(string name, string logLevel, bool withEventId, bool withException) => 
+        $"Log{logLevel}_{name}{(withEventId ? "_WithEventId" : "")}{(withException ? "_WithException" : "")}";
+#>
+#nullable enable
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using Microsoft.Extensions.Logging;
+using NUnit.Framework;
+using FluentAssertions;
+
+namespace Isle.Extensions.Logging.Tests;
+
+[TestFixtureSource(nameof(FixtureArgs))]
+public class LoggerExtensionsTests : BaseFixture
+{
+    public LoggerExtensionsTests(LogLevel minLogLevel, bool enableCaching) : base(minLogLevel, enableCaching)
+    {
+    }
+
+<# foreach (var logLevel in logLevels) { #>
+
+    #region Log<#= (logLevel) #>
+
+<# foreach (var withEventId in new[] { false, true }) { #>
+<# foreach (var withException in new[] { false, true }) { #>
+
+    [Test]
+    public void <#= GetTestName("Literal", logLevel, withEventId, withException) #>(<#if (logLevel == "") { #>[ValueSource(nameof(LogLevels))] LogLevel logLevel<# } #>)
+    {
+<#if (logLevel != "") { #> 
+        const LogLevel logLevel = LogLevel.<#= (logLevel) #>;
+<# } #>
+        <#if (withEventId) { #>EventId eventId = 5;<# } #>
+
+        <#if (withException) { #>Exception exception = new InvalidOperationException("Test exception."); <# } #>
+
+        Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>$"Test");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = <#= withEventId ? "eventId" : "default(EventId)" #>,
+                Exception = <#= withException ? "exception" : "default(Exception)" #>,
+                Message = "Test"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "Test")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void <#= GetTestName("LiteralWithBraces", logLevel, withEventId, withException) #>(<#if (logLevel == "") { #>[ValueSource(nameof(LogLevels))] LogLevel logLevel<# } #>)
+    {
+<#if (logLevel != "") { #> 
+        const LogLevel logLevel = LogLevel.<#= (logLevel) #>;
+<# } #>
+        <#if (withEventId) { #>EventId eventId = 5;<# } #>
+
+        <#if (withException) { #>Exception exception = new InvalidOperationException("Test exception."); <# } #>
+
+        Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>$"T{{es}}t");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = <#= withEventId ? "eventId" : "default(EventId)" #>,
+                Exception = <#= withException ? "exception" : "default(Exception)" #>,
+                Message = "T{es}t"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "T{{es}}t")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void <#= GetTestName("Scalar", logLevel, withEventId, withException) #>(<#if (logLevel == "") { #>[ValueSource(nameof(LogLevels))] LogLevel logLevel<# } #>)
+    {
+<#if (logLevel != "") { #> 
+        const LogLevel logLevel = LogLevel.<#= (logLevel) #>;
+<# } #>
+        int value = 7;
+
+        <#if (withEventId) { #>EventId eventId = 5;<# } #>
+
+        <#if (withException) { #>Exception exception = new InvalidOperationException("Test exception."); <# } #>
+
+        Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>$"{value}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = <#= withEventId ? "eventId" : "default(EventId)" #>,
+                Exception = <#= withException ? "exception" : "default(Exception)" #>,
+                Message = string.Format(CultureInfo.InvariantCulture, "{0}", value)
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("value", value),
+                new KeyValuePair<string, object>("{OriginalFormat}", "{value}")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void <#= GetTestName("ScalarWithAlignment", logLevel, withEventId, withException) #>(<#if (logLevel == "") { #>[ValueSource(nameof(LogLevels))] LogLevel logLevel<# } #>)
+    {
+<#if (logLevel != "") { #> 
+        const LogLevel logLevel = LogLevel.<#= (logLevel) #>;
+<# } #>
+        int value = 7;
+
+        <#if (withEventId) { #>EventId eventId = 5;<# } #>
+
+        <#if (withException) { #>Exception exception = new InvalidOperationException("Test exception."); <# } #>
+
+        Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>$"{value,3}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = <#= withEventId ? "eventId" : "default(EventId)" #>,
+                Exception = <#= withException ? "exception" : "default(Exception)" #>,
+                Message = string.Format(CultureInfo.InvariantCulture, "{0,3}", value)
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("value", value),
+                new KeyValuePair<string, object>("{OriginalFormat}", "{value,3}")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void <#= GetTestName("ScalarWithFormat", logLevel, withEventId, withException) #>(<#if (logLevel == "") { #>[ValueSource(nameof(LogLevels))] LogLevel logLevel<# } #>)
+    {
+<#if (logLevel != "") { #> 
+        const LogLevel logLevel = LogLevel.<#= (logLevel) #>;
+<# } #>
+        int value = 7000;
+
+        <#if (withEventId) { #>EventId eventId = 5;<# } #>
+
+        <#if (withException) { #>Exception exception = new InvalidOperationException("Test exception."); <# } #>
+
+        Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>$"{value:N}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = <#= withEventId ? "eventId" : "default(EventId)" #>,
+                Exception = <#= withException ? "exception" : "default(Exception)" #>,
+                Message = string.Format(CultureInfo.InvariantCulture, "{0:N}", value)
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("value", value),
+                new KeyValuePair<string, object>("{OriginalFormat}", "{value:N}")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void <#= GetTestName("ScalarWithAlignmentAndFormat", logLevel, withEventId, withException) #>(<#if (logLevel == "") { #>[ValueSource(nameof(LogLevels))] LogLevel logLevel<# } #>)
+    {
+<#if (logLevel != "") { #> 
+        const LogLevel logLevel = LogLevel.<#= (logLevel) #>;
+<# } #>
+        int value = 7000;
+
+        <#if (withEventId) { #>EventId eventId = 5;<# } #>
+
+        <#if (withException) { #>Exception exception = new InvalidOperationException("Test exception."); <# } #>
+
+        Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>$"{value,8:N}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = <#= withEventId ? "eventId" : "default(EventId)" #>,
+                Exception = <#= withException ? "exception" : "default(Exception)" #>,
+                Message = string.Format(CultureInfo.InvariantCulture, "{0,8:N}", value)
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("value", value),
+                new KeyValuePair<string, object>("{OriginalFormat}", "{value,8:N}")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void <#= GetTestName("Complex", logLevel, withEventId, withException) #>(<#if (logLevel == "") { #>[ValueSource(nameof(LogLevels))] LogLevel logLevel<# } #>)
+    {
+<#if (logLevel != "") { #> 
+        const LogLevel logLevel = LogLevel.<#= (logLevel) #>;
+<# } #>
+        var value = new TestObject(3, 5);
+
+        <#if (withEventId) { #>EventId eventId = 5;<# } #>
+
+        <#if (withException) { #>Exception exception = new InvalidOperationException("Test exception."); <# } #>
+
+        Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>$"{value}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = <#= withEventId ? "eventId" : "default(EventId)" #>,
+                Exception = <#= withException ? "exception" : "default(Exception)" #>,
+                Message = string.Format(CultureInfo.InvariantCulture, "{0}", value)
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("@value", value),
+                new KeyValuePair<string, object>("{OriginalFormat}", "{@value}")
+            });
+            logItem.Scopes.Should().BeEmpty();            
+        }
+    }
+
+    [Test]
+    public void <#= GetTestName("Collection", logLevel, withEventId, withException) #>(<#if (logLevel == "") { #>[ValueSource(nameof(LogLevels))] LogLevel logLevel<# } #>)
+    {
+<#if (logLevel != "") { #> 
+        const LogLevel logLevel = LogLevel.<#= (logLevel) #>;
+<# } #>
+        var value = new int[] {1, 2, 3};
+
+        <#if (withEventId) { #>EventId eventId = 5;<# } #>
+
+        <#if (withException) { #>Exception exception = new InvalidOperationException("Test exception."); <# } #>
+
+        Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>$"{value}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = <#= withEventId ? "eventId" : "default(EventId)" #>,
+                Exception = <#= withException ? "exception" : "default(Exception)" #>,
+                Message = "1, 2, 3"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("@value", value),
+                new KeyValuePair<string, object>("{OriginalFormat}", "{@value}")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void <#= GetTestName("String", logLevel, withEventId, withException) #>(<#if (logLevel == "") { #>[ValueSource(nameof(LogLevels))] LogLevel logLevel<# } #>)
+    {
+<#if (logLevel != "") { #> 
+        const LogLevel logLevel = LogLevel.<#= (logLevel) #>;
+<# } #>
+        var value = "Test";
+
+        <#if (withEventId) { #>EventId eventId = 5;<# } #>
+
+        <#if (withException) { #>Exception exception = new InvalidOperationException("Test exception."); <# } #>
+
+        Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>$"{value}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = <#= withEventId ? "eventId" : "default(EventId)" #>,
+                Exception = <#= withException ? "exception" : "default(Exception)" #>,
+                Message = value
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("value", value),
+                new KeyValuePair<string, object>("{OriginalFormat}", "{value}")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void <#= GetTestName("Mixed", logLevel, withEventId, withException) #>(<#if (logLevel == "") { #>[ValueSource(nameof(LogLevels))] LogLevel logLevel<# } #>)
+    {
+<#if (logLevel != "") { #> 
+        const LogLevel logLevel = LogLevel.<#= (logLevel) #>;
+<# } #>
+        var arg1 = "Test";
+        var arg2 = 5000;
+        var arg3 = 4.5;
+        var arg4 = new TestObject(7, 11);
+        var arg5 = new int[] {5, 4, 3};
+        var veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg = "veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongValue";
+
+        <#if (withEventId) { #>EventId eventId = 5;<# } #>
+
+        <#if (withException) { #>Exception exception = new InvalidOperationException("Test exception."); <# } #>
+
+        Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>
+            $"ABCD{arg1,7}EFGH{arg2:N}IJKL{arg3,10:F3}MNOP{arg4}QRST{arg5}UVWX{veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg}YZ");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = <#= withEventId ? "eventId" : "default(EventId)" #>,
+                Exception = <#= withException ? "exception" : "default(Exception)" #>,
+                Message = string.Format("ABCD{0,7}EFGH{1:N}IJKL{2,10:F3}MNOP{3}QRST{4}UVWX{5}YZ",
+                    arg1, arg2, arg3, arg4, "5, 4, 3", veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg)
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("arg1", arg1),
+                new KeyValuePair<string, object>("arg2", arg2),
+                new KeyValuePair<string, object>("arg3", arg3),
+                new KeyValuePair<string, object>("@arg4", arg4),
+                new KeyValuePair<string, object>("@arg5", arg5),
+                new KeyValuePair<string, object>("veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg", veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg),
+                new KeyValuePair<string, object>("{OriginalFormat}", "ABCD{arg1,7}EFGH{arg2:N}IJKL{arg3,10:F3}MNOP{@arg4}QRST{@arg5}UVWX{veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg}YZ")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void <#= GetTestName("MixedWithLiteralLists", logLevel, withEventId, withException) #>(<#if (logLevel == "") { #>[ValueSource(nameof(LogLevels))] LogLevel logLevel<# } #>)
+    {
+<#if (logLevel != "") { #> 
+        const LogLevel logLevel = LogLevel.<#= (logLevel) #>;
+<# } #>
+        var arg1 = 5;
+        var arg2 = new TestObject(7, 11);
+
+        <#if (withEventId) { #>EventId eventId = 5;<# } #>
+
+        <#if (withException) { #>Exception exception = new InvalidOperationException("Test exception."); <# } #>
+
+        Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>
+            $"A" + $"B" + $"C" + $"{arg1}" + $"D" + $"E" + $"F{arg2}G" + $"H" + $"" + $"I{{J}}" + $"K");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = <#= withEventId ? "eventId" : "default(EventId)" #>,
+                Exception = <#= withException ? "exception" : "default(Exception)" #>,
+                Message = string.Format("ABC{0}DEF{1}GHI{{J}}K", arg1, arg2)
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("arg1", arg1),
+                new KeyValuePair<string, object>("@arg2", arg2),
+                new KeyValuePair<string, object>("{OriginalFormat}", "ABC{arg1}DEF{@arg2}GHI{{J}}K")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void <#= GetTestName("Named", logLevel, withEventId, withException) #>(<#if (logLevel == "") { #>[ValueSource(nameof(LogLevels))] LogLevel logLevel<# } #>)
+    {
+<#if (logLevel != "") { #> 
+        const LogLevel logLevel = LogLevel.<#= (logLevel) #>;
+<# } #>
+        var value = new TestObject(3, 5);
+
+        <#if (withEventId) { #>EventId eventId = 5;<# } #>
+
+        <#if (withException) { #>Exception exception = new InvalidOperationException("Test exception."); <# } #>
+
+        Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>
+            $"Default: {value.Named("default")}, Stringified: {value.Named("$str")}, Destructured: {value.Named("@destructured")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = <#= withEventId ? "eventId" : "default(EventId)" #>,
+                Exception = <#= withException ? "exception" : "default(Exception)" #>,
+                Message = string.Format(CultureInfo.InvariantCulture, "Default: {0}, Stringified: {0}, Destructured: {0}", value)
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("@default", value),
+                new KeyValuePair<string, object>("$str", value),
+                new KeyValuePair<string, object>("@destructured", value),
+                new KeyValuePair<string, object>("{OriginalFormat}", "Default: {@default}, Stringified: {$str}, Destructured: {@destructured}")
+            });
+            logItem.Scopes.Should().BeEmpty();            
+        }
+    }
+
+<# } #>
+<# } #>
+
+    [Test]
+    public void <#= GetTestName("Scopes", logLevel, false, false) #>(<#if (logLevel == "") { #>[ValueSource(nameof(LogLevels))] LogLevel logLevel<# } #>)
+    {
+<#if (logLevel != "") { #> 
+        const LogLevel logLevel = LogLevel.<#= (logLevel) #>;
+<# } #>
+        int value = 7;
+        int scope1 = 3;
+        var scope2 = new TestObject(5, 11);
+
+        using (Logger.BeginScopeInterpolated($"Scope 1 value: {scope1}"))
+        {
+            using (Logger.BeginScopeInterpolated($"Scope 2 value: {scope2}"))
+            {
+                Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #>$"{value}");
+            }
+        }
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = default(Exception),
+                Message = string.Format(CultureInfo.InvariantCulture, "{0}", value)
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("value", value),
+                new KeyValuePair<string, object>("{OriginalFormat}", "{value}")
+            });
+            logItem.Scopes.Should().BeEquivalentTo(new[]
+            {
+                new[] 
+                {
+                    new KeyValuePair<string, object>("@scope2", scope2),
+                    new KeyValuePair<string, object>("{OriginalFormat}", "Scope 2 value: {@scope2}")
+                },
+                new[] 
+                {
+                    new KeyValuePair<string, object>("scope1", scope1),
+                    new KeyValuePair<string, object>("{OriginalFormat}", "Scope 1 value: {scope1}")
+                }
+            });
+        }
+    }
+
+    #endregion // Log<#= (logLevel) #>
+
+<# } #>
+
+}
