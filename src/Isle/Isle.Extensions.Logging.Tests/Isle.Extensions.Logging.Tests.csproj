@@ -35,9 +35,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="MELTests.tt">
+    <None Update="LogHandlerTests.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>MELTests.g.cs</LastGenOutput>
+      <LastGenOutput>LogHandlerTests.g.cs</LastGenOutput>
     </None>
     <None Update="SerilogLoggerExtensionsTests.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
@@ -55,10 +55,10 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>LoggerExtensionsTests.tt</DependentUpon>
     </Compile>
-    <Compile Update="MELTests.g.cs">
+    <Compile Update="LogHandlerTests.g.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
-      <DependentUpon>MELTests.tt</DependentUpon>
+      <DependentUpon>LogHandlerTests.tt</DependentUpon>
     </Compile>
     <Compile Update="SerilogLoggerExtensionsTests.g.cs">
       <DesignTime>True</DesignTime>
