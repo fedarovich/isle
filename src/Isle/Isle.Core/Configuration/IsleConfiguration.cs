@@ -27,7 +27,7 @@ public sealed class IsleConfiguration
         ValueRepresentationPolicy = builder.ValueRepresentationPolicy ?? DefaultValueRepresentationPolicy.Instance;
         ValueNameConverter = builder.ValueNameConverter ?? (name => name);
         _preserveDefaultValueRepresentationForExplicitNames = builder.PreserveDefaultValueRepresentationForExplicitNames;
-        _extensionHooks = builder.ExtensionHooks;
+        _extensionHooks = builder.ExtensionHooks.ToList();
     }
 
     /// <summary>
