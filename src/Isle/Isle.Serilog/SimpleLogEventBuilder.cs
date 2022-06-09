@@ -43,7 +43,8 @@ internal sealed class SimpleLogEventBuilder : LogEventBuilder
             return;
 
         string escapedLiteral = LiteralUtils.EscapeLiteral(literal);
-        _tokens.Add(new TextToken(escapedLiteral, _currentPosition));
+        _tokens.Add(new TextToken(literal, _currentPosition));
+#warning TODO: Check whether to add literal.Length or escapedLiteral.Length
         _currentPosition += escapedLiteral.Length;
     }
 

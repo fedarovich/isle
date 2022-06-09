@@ -18,7 +18,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Directory.Build.props = Directory.Build.props
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Isle.Serilog", "Isle.Serilog\Isle.Serilog.csproj", "{39D4865E-0127-4015-8AA2-04E99A2A9A16}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Isle.Serilog", "Isle.Serilog\Isle.Serilog.csproj", "{39D4865E-0127-4015-8AA2-04E99A2A9A16}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Isle.Serilog.Tests", "Isle.Serilog.Tests\Isle.Serilog.Tests.csproj", "{3519605E-123D-403C-8A12-49487E6919E4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -50,6 +52,10 @@ Global
 		{39D4865E-0127-4015-8AA2-04E99A2A9A16}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{39D4865E-0127-4015-8AA2-04E99A2A9A16}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{39D4865E-0127-4015-8AA2-04E99A2A9A16}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3519605E-123D-403C-8A12-49487E6919E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3519605E-123D-403C-8A12-49487E6919E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3519605E-123D-403C-8A12-49487E6919E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3519605E-123D-403C-8A12-49487E6919E4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

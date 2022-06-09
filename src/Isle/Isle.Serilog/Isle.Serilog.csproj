@@ -16,6 +16,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>Isle.Serilog.Tests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="LoggerExtensions.g.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
