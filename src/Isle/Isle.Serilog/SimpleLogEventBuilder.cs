@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using System.Runtime.CompilerServices;
+using System.Text;
 using Isle.Configuration;
 using Serilog;
 using Serilog.Events;
@@ -12,9 +13,12 @@ internal sealed class SimpleLogEventBuilder : LogEventBuilder
     private const char DestructureOperator = '@';
     private const char StringifyOperator = '$';
 
+    private readonly object?[] _pooledValueArray = new object?[1];
+    
     private List<MessageTemplateToken> _tokens = null!;
     private LogEventProperty[] _properties = null!;
     private ILogger _logger = null!;
+    private StringBuilder _messageTemplateBuilder = null!;
     private int _currentPosition;
     private int _propertyIndex;
 
@@ -24,12 +28,18 @@ internal sealed class SimpleLogEventBuilder : LogEventBuilder
     {
         _tokens = new List<MessageTemplateToken>(formattedCount * 2 + 1);
         _properties = new LogEventProperty[formattedCount];
+        _messageTemplateBuilder = StringBuilderCache.Acquire(Math.Max(literalLength + formattedCount * 16, StringBuilderCache.MaxBuilderSize));
         _logger = logger;
     }
 
     protected override LogEvent BuildAndReset(LogEventLevel level, Exception? exception = null)
     {
-        var logEvent = new LogEvent(DateTimeOffset.Now, level, exception, new MessageTemplate(_tokens), _properties);
+        var logEvent = new LogEvent(
+            DateTimeOffset.Now, 
+            level, 
+            exception, 
+            new MessageTemplate(StringBuilderCache.GetStringAndRelease(_messageTemplateBuilder), _tokens),
+            _properties);
         _tokens = null!;
         _properties = null!;
         _currentPosition = 0;
@@ -42,15 +52,16 @@ internal sealed class SimpleLogEventBuilder : LogEventBuilder
         if (string.IsNullOrEmpty(literal))
             return;
 
-        string escapedLiteral = LiteralUtils.EscapeLiteral(literal);
         _tokens.Add(new TextToken(literal, _currentPosition));
-#warning TODO: Check whether to add literal.Length or escapedLiteral.Length
-        _currentPosition += escapedLiteral.Length;
+        var start = _messageTemplateBuilder.Length;
+        _messageTemplateBuilder.EscapeAndAppend(literal);
+        var end = _messageTemplateBuilder.Length;
+        _currentPosition += end - start;
     }
 
     public override void AppendFormatted<T>(string name, T value, int alignment, string? format)
     {
-        string originalName = name = IsleConfiguration.Current.ValueNameConverter(name);
+        name = IsleConfiguration.Current.ValueNameConverter(name);
         Destructuring destructuring;
         if (name.StartsWith(DestructureOperator))
         {
@@ -71,7 +82,8 @@ internal sealed class SimpleLogEventBuilder : LogEventBuilder
         if (name == string.Empty)
             name = _propertyIndex.ToString(CultureInfo.InvariantCulture);
 
-        var rawText = GetRawText(originalName, alignment, format);
+        var rawText = GetRawText(name, alignment, format, destructuring);
+        _messageTemplateBuilder.Append(rawText);
         AppendProperty(name, value, alignment, format, rawText, destructuring);
     }
 
@@ -94,20 +106,29 @@ internal sealed class SimpleLogEventBuilder : LogEventBuilder
                 : namedLogValue.RawName;
         }
 
-        // Pass namedLogValue.Name as it may contain destructure or stringify operator.
-        var rawText = GetRawText(namedLogValue.Name, alignment, format);
+        var rawText = GetRawText(name, alignment, format, destructuring);
+        _messageTemplateBuilder.Append(rawText);
         AppendProperty(name, namedLogValue.Value, alignment, format, rawText, destructuring);
     }
 
     [SkipLocalsInit]
-    private static string GetRawText(string name, int alignment, string? format)
+    private static string GetRawText(string name, int alignment, string? format, Destructuring destructuring)
     {
-        int bufferLength = name.Length + (format?.Length ?? 0) + 15;
+        int bufferLength = name.Length + (format?.Length ?? 0) + 16;
         var vsb = bufferLength <= 256
             ? new ValueStringBuilder(stackalloc char[bufferLength])
             : new ValueStringBuilder(bufferLength);
 
         vsb.Append('{');
+        switch (destructuring)
+        {
+            case Destructuring.Destructure:
+                vsb.Append(DestructureOperator);
+                break;
+            case Destructuring.Stringify:
+                vsb.Append(StringifyOperator);
+                break;
+        }
         vsb.Append(name);
 
         if (alignment != 0)
@@ -155,15 +176,34 @@ internal sealed class SimpleLogEventBuilder : LogEventBuilder
 
         _currentPosition += rawText.Length;
 
-        if (_logger.BindProperty(name, value, destructuring == Destructuring.Destructure, out var property))
+        if (destructuring != Destructuring.Stringify)
         {
-            _properties[_propertyIndex++] = property;
+            if (_logger.BindProperty(name, value, destructuring == Destructuring.Destructure, out var property))
+            {
+                _properties[_propertyIndex++] = property;
+                return;
+            }
         }
+        // Unfortunately, BindProperty does not handle Stringify option correctly, so we have a separate, less efficient branch for it.
         else
         {
-            // We should actually never get here.
-            _properties[_propertyIndex++] = new LogEventProperty(name, new ScalarValue(property));
+            _pooledValueArray[0] = value;
+            try
+            {
+                if (_logger.BindMessageTemplate(rawText, _pooledValueArray, out _, out var properties))
+                {
+                    _properties[_propertyIndex++] = properties.First();
+                    return;
+                }
+            }
+            finally
+            {
+                _pooledValueArray[0] = null;
+            }
         }
+
+        // We should actually never get here, but if we suddenly do, we'll just log the string representation of the value. 
+        _properties[_propertyIndex++] = new LogEventProperty(name, new ScalarValue(value?.ToString()));
     }
 
 }

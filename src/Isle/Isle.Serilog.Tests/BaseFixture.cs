@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FluentAssertions;
+using FluentAssertions.Equivalency;
 using Isle.Configuration;
 using NUnit.Framework;
 using Serilog;
@@ -101,5 +103,37 @@ public abstract class BaseFixture
         return string.Format(formatString, value);
     }
 
-    protected record TestObject(int X, int Y);
+    protected static EquivalencyAssertionOptions<LogEvent> LogEventEquivalency(EquivalencyAssertionOptions<LogEvent> cfg)
+    {
+        return cfg.Excluding(e => e.Timestamp)
+            .ComparingByMembers<TextToken>()
+            .ComparingByMembers<PropertyToken>()
+            .Using<MessageTemplateToken>(ctx => ctx.Subject
+                .Should().BeEquivalentTo(
+                    ctx.Expectation,
+                    config => config.RespectingRuntimeTypes()))
+                .WhenTypeIs<MessageTemplateToken>()
+            .Using<LogEventPropertyValue>(ctx => ctx.Subject
+                .Should().BeEquivalentTo(
+                    ctx.Expectation, 
+                    config => config.RespectingRuntimeTypes()))
+                .WhenTypeIs<LogEventPropertyValue>()
+            .WithTracing();
+    }
+
+    protected static EquivalencyAssertionOptions<T> MessageTemplateTokenEquivalency<T>(EquivalencyAssertionOptions<T> cfg)
+        where T : MessageTemplateToken
+    {
+        return cfg.ComparingByMembers<TextToken>().ComparingByMembers<PropertyToken>().RespectingRuntimeTypes();
+    }
+
+    protected static EquivalencyAssertionOptions<KeyValuePair<string, LogEventPropertyValue>> PropertiesEquivalency(
+        EquivalencyAssertionOptions<KeyValuePair<string, LogEventPropertyValue>> cfg)
+    {
+        return cfg.Using<LogEventPropertyValue>(ctx => ctx.Subject
+            .Should().BeEquivalentTo(
+                ctx.Expectation, 
+                config => config.RespectingRuntimeTypes()))
+            .WhenTypeIs<LogEventPropertyValue>();
+    }
 }

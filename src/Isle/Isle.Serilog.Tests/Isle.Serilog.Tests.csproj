@@ -8,6 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="LoggerExtensionsTests.g.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>LoggerExtensionsTests.tt</DependentUpon>
+    </None>
     <None Include="LogHandlerTests.g.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -16,11 +21,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
-    <PackageReference Include="NUnit" Version="3.13.2" />
-    <PackageReference Include="NUnit3TestAdapter" Version="4.0.0" />
-    <PackageReference Include="coverlet.collector" Version="3.1.0" />
-    <PackageReference Include="FluentAssertions" Version="6.6.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
+    <PackageReference Include="NUnit" Version="3.13.3" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.2.1" />
+    <PackageReference Include="coverlet.collector" Version="3.1.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="FluentAssertions" Version="6.7.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -28,6 +36,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="LoggerExtensionsTests.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>LoggerExtensionsTests.g.cs</LastGenOutput>
+    </None>
     <None Update="LogHandlerTests.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>LogHandlerTests.g.cs</LastGenOutput>
@@ -39,6 +51,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="LoggerExtensionsTests.g.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>LoggerExtensionsTests.tt</DependentUpon>
+    </Compile>
     <Compile Update="LogHandlerTests.g.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>

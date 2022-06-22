@@ -11,13 +11,11 @@
     string GetTestName(string logEventLevel) => GetTypeName(logEventLevel) + "Tests";
 #>
 #nullable enable
-using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using NUnit.Framework;
 using FluentAssertions;
-using Serilog;
 using Serilog.Events;
+using Serilog.Parsing;
 
 namespace Isle.Serilog.Tests;
 
@@ -67,7 +65,8 @@ public class <#= GetTestName(logEventLevel) #> : BaseFixture
         var handler = new <#= GetTypeName(logEventLevel) #>(3, 0, Logger, <#if (logEventLevel == null) { #> logEventLevel, <# } #> out _);
         handler.AppendLiteral("A{B}C");
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("A{B}C");
+        logEvent.MessageTemplate.Text.Should().Be("A{{B}}C");
+        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C", 0));
         logEvent.Properties.Count.Should().Be(0);
         logEvent.RenderMessage().Should().Be("A{B}C");
     }
@@ -106,8 +105,9 @@ public class <#= GetTestName(logEventLevel) #> : BaseFixture
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new ScalarValue(value))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value));
     }
 
@@ -125,8 +125,9 @@ public class <#= GetTestName(logEventLevel) #> : BaseFixture
         logEvent.Properties.Should().BeEquivalentTo(
             new[]
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new ScalarValue(value))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment));
     }
 
@@ -143,8 +144,9 @@ public class <#= GetTestName(logEventLevel) #> : BaseFixture
         logEvent.Properties.Should().BeEquivalentTo(
             new[]
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new ScalarValue(value))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, format));
     }
 
@@ -161,8 +163,9 @@ public class <#= GetTestName(logEventLevel) #> : BaseFixture
         logEvent.Properties.Should().BeEquivalentTo(
             new[]
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new ScalarValue(value))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment, format));
     }
 
@@ -180,13 +183,14 @@ public class <#= GetTestName(logEventLevel) #> : BaseFixture
         var handler = new <#= GetTypeName(logEventLevel) #>(0, 1, Logger, <#if (logEventLevel == null) { #> logEventLevel, <# } #> out _);
         handler.AppendFormatted(value);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new SequenceValue(value.Select(v => new ScalarValue(v))))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value));
     }
 
@@ -200,13 +204,14 @@ public class <#= GetTestName(logEventLevel) #> : BaseFixture
         var handler = new <#= GetTypeName(logEventLevel) #>(0, 1, Logger, <#if (logEventLevel == null) { #> logEventLevel, <# } #> out _);
         handler.AppendFormatted(value, alignment);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value," + alignment + "}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value," + alignment + "}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new SequenceValue(value.Select(v => new ScalarValue(v))))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment));
     }
 
@@ -220,13 +225,14 @@ public class <#= GetTestName(logEventLevel) #> : BaseFixture
         var handler = new <#= GetTypeName(logEventLevel) #>(0, 1, Logger, <#if (logEventLevel == null) { #> logEventLevel, <# } #> out _);
         handler.AppendFormatted(value, format: format);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value:" + format + "}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value:" + format + "}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new SequenceValue(value.Select(v => new ScalarValue(v))))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, format));
     }
 
@@ -240,13 +246,14 @@ public class <#= GetTestName(logEventLevel) #> : BaseFixture
         var handler = new <#= GetTypeName(logEventLevel) #>(0, 1, Logger, <#if (logEventLevel == null) { #> logEventLevel, <# } #> out _);
         handler.AppendFormatted(value, alignment, format);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value," + alignment + ":" + format + "}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value," + alignment + ":" + format + "}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new SequenceValue(value.Select(v => new ScalarValue(v))))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment, format));
     }
 
@@ -264,17 +271,14 @@ public class <#= GetTestName(logEventLevel) #> : BaseFixture
         var handler = new <#= GetTypeName(logEventLevel) #>(0, 1, Logger, <#if (logEventLevel == null) { #> logEventLevel, <# } #> out _);
         handler.AppendFormatted(value);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new StructureValue(new []
-                {
-                    new LogEventProperty(nameof(value.X), new ScalarValue(value.X)),
-                    new LogEventProperty(nameof(value.Y), new ScalarValue(value.Y))
-                }))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value));
     }
 
@@ -288,17 +292,14 @@ public class <#= GetTestName(logEventLevel) #> : BaseFixture
         var handler = new <#= GetTypeName(logEventLevel) #>(0, 1, Logger, <#if (logEventLevel == null) { #> logEventLevel, <# } #> out _);
         handler.AppendFormatted(value, alignment);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value," + alignment + "}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value," + alignment + "}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new StructureValue(new []
-                {
-                    new LogEventProperty(nameof(value.X), new ScalarValue(value.X)),
-                    new LogEventProperty(nameof(value.Y), new ScalarValue(value.Y))
-                }))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment));
     }
 
@@ -312,17 +313,14 @@ public class <#= GetTestName(logEventLevel) #> : BaseFixture
         var handler = new <#= GetTypeName(logEventLevel) #>(0, 1, Logger, <#if (logEventLevel == null) { #> logEventLevel, <# } #> out _);
         handler.AppendFormatted(value, format: format);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value:" + format + "}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value:" + format + "}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new StructureValue(new []
-                {
-                    new LogEventProperty(nameof(value.X), new ScalarValue(value.X)),
-                    new LogEventProperty(nameof(value.Y), new ScalarValue(value.Y))
-                }))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, format));
     }
 
@@ -336,17 +334,14 @@ public class <#= GetTestName(logEventLevel) #> : BaseFixture
         var handler = new <#= GetTypeName(logEventLevel) #>(0, 1, Logger, <#if (logEventLevel == null) { #> logEventLevel, <# } #> out _);
         handler.AppendFormatted(value, alignment, format);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value," + alignment + ":" + format + "}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value," + alignment + ":" + format + "}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new StructureValue(new []
-                {
-                    new LogEventProperty(nameof(value.X), new ScalarValue(value.X)),
-                    new LogEventProperty(nameof(value.Y), new ScalarValue(value.Y))
-                }))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment, format));
     }
 

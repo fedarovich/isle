@@ -1,11 +1,9 @@
 ﻿#nullable enable
-using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using NUnit.Framework;
 using FluentAssertions;
-using Serilog;
 using Serilog.Events;
+using Serilog.Parsing;
 
 namespace Isle.Serilog.Tests;
 
@@ -52,7 +50,8 @@ public class VerboseLogInterpolatedStringHandlerTests : BaseFixture
         var handler = new VerboseLogInterpolatedStringHandler(3, 0, Logger,  out _);
         handler.AppendLiteral("A{B}C");
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("A{B}C");
+        logEvent.MessageTemplate.Text.Should().Be("A{{B}}C");
+        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C", 0));
         logEvent.Properties.Count.Should().Be(0);
         logEvent.RenderMessage().Should().Be("A{B}C");
     }
@@ -91,8 +90,9 @@ public class VerboseLogInterpolatedStringHandlerTests : BaseFixture
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new ScalarValue(value))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value));
     }
 
@@ -110,8 +110,9 @@ public class VerboseLogInterpolatedStringHandlerTests : BaseFixture
         logEvent.Properties.Should().BeEquivalentTo(
             new[]
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new ScalarValue(value))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment));
     }
 
@@ -128,8 +129,9 @@ public class VerboseLogInterpolatedStringHandlerTests : BaseFixture
         logEvent.Properties.Should().BeEquivalentTo(
             new[]
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new ScalarValue(value))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, format));
     }
 
@@ -146,8 +148,9 @@ public class VerboseLogInterpolatedStringHandlerTests : BaseFixture
         logEvent.Properties.Should().BeEquivalentTo(
             new[]
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new ScalarValue(value))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment, format));
     }
 
@@ -165,13 +168,14 @@ public class VerboseLogInterpolatedStringHandlerTests : BaseFixture
         var handler = new VerboseLogInterpolatedStringHandler(0, 1, Logger,  out _);
         handler.AppendFormatted(value);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new SequenceValue(value.Select(v => new ScalarValue(v))))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value));
     }
 
@@ -185,13 +189,14 @@ public class VerboseLogInterpolatedStringHandlerTests : BaseFixture
         var handler = new VerboseLogInterpolatedStringHandler(0, 1, Logger,  out _);
         handler.AppendFormatted(value, alignment);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value," + alignment + "}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value," + alignment + "}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new SequenceValue(value.Select(v => new ScalarValue(v))))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment));
     }
 
@@ -205,13 +210,14 @@ public class VerboseLogInterpolatedStringHandlerTests : BaseFixture
         var handler = new VerboseLogInterpolatedStringHandler(0, 1, Logger,  out _);
         handler.AppendFormatted(value, format: format);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value:" + format + "}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value:" + format + "}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new SequenceValue(value.Select(v => new ScalarValue(v))))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, format));
     }
 
@@ -225,13 +231,14 @@ public class VerboseLogInterpolatedStringHandlerTests : BaseFixture
         var handler = new VerboseLogInterpolatedStringHandler(0, 1, Logger,  out _);
         handler.AppendFormatted(value, alignment, format);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value," + alignment + ":" + format + "}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value," + alignment + ":" + format + "}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new SequenceValue(value.Select(v => new ScalarValue(v))))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment, format));
     }
 
@@ -249,17 +256,14 @@ public class VerboseLogInterpolatedStringHandlerTests : BaseFixture
         var handler = new VerboseLogInterpolatedStringHandler(0, 1, Logger,  out _);
         handler.AppendFormatted(value);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new StructureValue(new []
-                {
-                    new LogEventProperty(nameof(value.X), new ScalarValue(value.X)),
-                    new LogEventProperty(nameof(value.Y), new ScalarValue(value.Y))
-                }))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value));
     }
 
@@ -273,17 +277,14 @@ public class VerboseLogInterpolatedStringHandlerTests : BaseFixture
         var handler = new VerboseLogInterpolatedStringHandler(0, 1, Logger,  out _);
         handler.AppendFormatted(value, alignment);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value," + alignment + "}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value," + alignment + "}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new StructureValue(new []
-                {
-                    new LogEventProperty(nameof(value.X), new ScalarValue(value.X)),
-                    new LogEventProperty(nameof(value.Y), new ScalarValue(value.Y))
-                }))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment));
     }
 
@@ -297,17 +298,14 @@ public class VerboseLogInterpolatedStringHandlerTests : BaseFixture
         var handler = new VerboseLogInterpolatedStringHandler(0, 1, Logger,  out _);
         handler.AppendFormatted(value, format: format);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value:" + format + "}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value:" + format + "}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new StructureValue(new []
-                {
-                    new LogEventProperty(nameof(value.X), new ScalarValue(value.X)),
-                    new LogEventProperty(nameof(value.Y), new ScalarValue(value.Y))
-                }))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, format));
     }
 
@@ -321,17 +319,14 @@ public class VerboseLogInterpolatedStringHandlerTests : BaseFixture
         var handler = new VerboseLogInterpolatedStringHandler(0, 1, Logger,  out _);
         handler.AppendFormatted(value, alignment, format);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value," + alignment + ":" + format + "}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value," + alignment + ":" + format + "}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new StructureValue(new []
-                {
-                    new LogEventProperty(nameof(value.X), new ScalarValue(value.X)),
-                    new LogEventProperty(nameof(value.Y), new ScalarValue(value.Y))
-                }))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment, format));
     }
 
@@ -381,7 +376,8 @@ public class DebugLogInterpolatedStringHandlerTests : BaseFixture
         var handler = new DebugLogInterpolatedStringHandler(3, 0, Logger,  out _);
         handler.AppendLiteral("A{B}C");
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("A{B}C");
+        logEvent.MessageTemplate.Text.Should().Be("A{{B}}C");
+        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C", 0));
         logEvent.Properties.Count.Should().Be(0);
         logEvent.RenderMessage().Should().Be("A{B}C");
     }
@@ -420,8 +416,9 @@ public class DebugLogInterpolatedStringHandlerTests : BaseFixture
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new ScalarValue(value))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value));
     }
 
@@ -439,8 +436,9 @@ public class DebugLogInterpolatedStringHandlerTests : BaseFixture
         logEvent.Properties.Should().BeEquivalentTo(
             new[]
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new ScalarValue(value))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment));
     }
 
@@ -457,8 +455,9 @@ public class DebugLogInterpolatedStringHandlerTests : BaseFixture
         logEvent.Properties.Should().BeEquivalentTo(
             new[]
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new ScalarValue(value))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, format));
     }
 
@@ -475,8 +474,9 @@ public class DebugLogInterpolatedStringHandlerTests : BaseFixture
         logEvent.Properties.Should().BeEquivalentTo(
             new[]
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new ScalarValue(value))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment, format));
     }
 
@@ -494,13 +494,14 @@ public class DebugLogInterpolatedStringHandlerTests : BaseFixture
         var handler = new DebugLogInterpolatedStringHandler(0, 1, Logger,  out _);
         handler.AppendFormatted(value);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new SequenceValue(value.Select(v => new ScalarValue(v))))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value));
     }
 
@@ -514,13 +515,14 @@ public class DebugLogInterpolatedStringHandlerTests : BaseFixture
         var handler = new DebugLogInterpolatedStringHandler(0, 1, Logger,  out _);
         handler.AppendFormatted(value, alignment);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value," + alignment + "}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value," + alignment + "}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new SequenceValue(value.Select(v => new ScalarValue(v))))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment));
     }
 
@@ -534,13 +536,14 @@ public class DebugLogInterpolatedStringHandlerTests : BaseFixture
         var handler = new DebugLogInterpolatedStringHandler(0, 1, Logger,  out _);
         handler.AppendFormatted(value, format: format);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value:" + format + "}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value:" + format + "}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new SequenceValue(value.Select(v => new ScalarValue(v))))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, format));
     }
 
@@ -554,13 +557,14 @@ public class DebugLogInterpolatedStringHandlerTests : BaseFixture
         var handler = new DebugLogInterpolatedStringHandler(0, 1, Logger,  out _);
         handler.AppendFormatted(value, alignment, format);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value," + alignment + ":" + format + "}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value," + alignment + ":" + format + "}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new SequenceValue(value.Select(v => new ScalarValue(v))))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment, format));
     }
 
@@ -578,17 +582,14 @@ public class DebugLogInterpolatedStringHandlerTests : BaseFixture
         var handler = new DebugLogInterpolatedStringHandler(0, 1, Logger,  out _);
         handler.AppendFormatted(value);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new StructureValue(new []
-                {
-                    new LogEventProperty(nameof(value.X), new ScalarValue(value.X)),
-                    new LogEventProperty(nameof(value.Y), new ScalarValue(value.Y))
-                }))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value));
     }
 
@@ -602,17 +603,14 @@ public class DebugLogInterpolatedStringHandlerTests : BaseFixture
         var handler = new DebugLogInterpolatedStringHandler(0, 1, Logger,  out _);
         handler.AppendFormatted(value, alignment);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value," + alignment + "}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value," + alignment + "}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new StructureValue(new []
-                {
-                    new LogEventProperty(nameof(value.X), new ScalarValue(value.X)),
-                    new LogEventProperty(nameof(value.Y), new ScalarValue(value.Y))
-                }))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment));
     }
 
@@ -626,17 +624,14 @@ public class DebugLogInterpolatedStringHandlerTests : BaseFixture
         var handler = new DebugLogInterpolatedStringHandler(0, 1, Logger,  out _);
         handler.AppendFormatted(value, format: format);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value:" + format + "}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value:" + format + "}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new StructureValue(new []
-                {
-                    new LogEventProperty(nameof(value.X), new ScalarValue(value.X)),
-                    new LogEventProperty(nameof(value.Y), new ScalarValue(value.Y))
-                }))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, format));
     }
 
@@ -650,17 +645,14 @@ public class DebugLogInterpolatedStringHandlerTests : BaseFixture
         var handler = new DebugLogInterpolatedStringHandler(0, 1, Logger,  out _);
         handler.AppendFormatted(value, alignment, format);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value," + alignment + ":" + format + "}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value," + alignment + ":" + format + "}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new StructureValue(new []
-                {
-                    new LogEventProperty(nameof(value.X), new ScalarValue(value.X)),
-                    new LogEventProperty(nameof(value.Y), new ScalarValue(value.Y))
-                }))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment, format));
     }
 
@@ -710,7 +702,8 @@ public class InformationLogInterpolatedStringHandlerTests : BaseFixture
         var handler = new InformationLogInterpolatedStringHandler(3, 0, Logger,  out _);
         handler.AppendLiteral("A{B}C");
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("A{B}C");
+        logEvent.MessageTemplate.Text.Should().Be("A{{B}}C");
+        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C", 0));
         logEvent.Properties.Count.Should().Be(0);
         logEvent.RenderMessage().Should().Be("A{B}C");
     }
@@ -749,8 +742,9 @@ public class InformationLogInterpolatedStringHandlerTests : BaseFixture
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new ScalarValue(value))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value));
     }
 
@@ -768,8 +762,9 @@ public class InformationLogInterpolatedStringHandlerTests : BaseFixture
         logEvent.Properties.Should().BeEquivalentTo(
             new[]
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new ScalarValue(value))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment));
     }
 
@@ -786,8 +781,9 @@ public class InformationLogInterpolatedStringHandlerTests : BaseFixture
         logEvent.Properties.Should().BeEquivalentTo(
             new[]
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new ScalarValue(value))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, format));
     }
 
@@ -804,8 +800,9 @@ public class InformationLogInterpolatedStringHandlerTests : BaseFixture
         logEvent.Properties.Should().BeEquivalentTo(
             new[]
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new ScalarValue(value))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment, format));
     }
 
@@ -823,13 +820,14 @@ public class InformationLogInterpolatedStringHandlerTests : BaseFixture
         var handler = new InformationLogInterpolatedStringHandler(0, 1, Logger,  out _);
         handler.AppendFormatted(value);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new SequenceValue(value.Select(v => new ScalarValue(v))))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value));
     }
 
@@ -843,13 +841,14 @@ public class InformationLogInterpolatedStringHandlerTests : BaseFixture
         var handler = new InformationLogInterpolatedStringHandler(0, 1, Logger,  out _);
         handler.AppendFormatted(value, alignment);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value," + alignment + "}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value," + alignment + "}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new SequenceValue(value.Select(v => new ScalarValue(v))))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment));
     }
 
@@ -863,13 +862,14 @@ public class InformationLogInterpolatedStringHandlerTests : BaseFixture
         var handler = new InformationLogInterpolatedStringHandler(0, 1, Logger,  out _);
         handler.AppendFormatted(value, format: format);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value:" + format + "}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value:" + format + "}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new SequenceValue(value.Select(v => new ScalarValue(v))))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, format));
     }
 
@@ -883,13 +883,14 @@ public class InformationLogInterpolatedStringHandlerTests : BaseFixture
         var handler = new InformationLogInterpolatedStringHandler(0, 1, Logger,  out _);
         handler.AppendFormatted(value, alignment, format);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value," + alignment + ":" + format + "}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value," + alignment + ":" + format + "}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new SequenceValue(value.Select(v => new ScalarValue(v))))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment, format));
     }
 
@@ -907,17 +908,14 @@ public class InformationLogInterpolatedStringHandlerTests : BaseFixture
         var handler = new InformationLogInterpolatedStringHandler(0, 1, Logger,  out _);
         handler.AppendFormatted(value);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new StructureValue(new []
-                {
-                    new LogEventProperty(nameof(value.X), new ScalarValue(value.X)),
-                    new LogEventProperty(nameof(value.Y), new ScalarValue(value.Y))
-                }))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value));
     }
 
@@ -931,17 +929,14 @@ public class InformationLogInterpolatedStringHandlerTests : BaseFixture
         var handler = new InformationLogInterpolatedStringHandler(0, 1, Logger,  out _);
         handler.AppendFormatted(value, alignment);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value," + alignment + "}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value," + alignment + "}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new StructureValue(new []
-                {
-                    new LogEventProperty(nameof(value.X), new ScalarValue(value.X)),
-                    new LogEventProperty(nameof(value.Y), new ScalarValue(value.Y))
-                }))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment));
     }
 
@@ -955,17 +950,14 @@ public class InformationLogInterpolatedStringHandlerTests : BaseFixture
         var handler = new InformationLogInterpolatedStringHandler(0, 1, Logger,  out _);
         handler.AppendFormatted(value, format: format);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value:" + format + "}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value:" + format + "}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new StructureValue(new []
-                {
-                    new LogEventProperty(nameof(value.X), new ScalarValue(value.X)),
-                    new LogEventProperty(nameof(value.Y), new ScalarValue(value.Y))
-                }))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, format));
     }
 
@@ -979,17 +971,14 @@ public class InformationLogInterpolatedStringHandlerTests : BaseFixture
         var handler = new InformationLogInterpolatedStringHandler(0, 1, Logger,  out _);
         handler.AppendFormatted(value, alignment, format);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value," + alignment + ":" + format + "}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value," + alignment + ":" + format + "}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new StructureValue(new []
-                {
-                    new LogEventProperty(nameof(value.X), new ScalarValue(value.X)),
-                    new LogEventProperty(nameof(value.Y), new ScalarValue(value.Y))
-                }))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment, format));
     }
 
@@ -1039,7 +1028,8 @@ public class WarningLogInterpolatedStringHandlerTests : BaseFixture
         var handler = new WarningLogInterpolatedStringHandler(3, 0, Logger,  out _);
         handler.AppendLiteral("A{B}C");
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("A{B}C");
+        logEvent.MessageTemplate.Text.Should().Be("A{{B}}C");
+        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C", 0));
         logEvent.Properties.Count.Should().Be(0);
         logEvent.RenderMessage().Should().Be("A{B}C");
     }
@@ -1078,8 +1068,9 @@ public class WarningLogInterpolatedStringHandlerTests : BaseFixture
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new ScalarValue(value))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value));
     }
 
@@ -1097,8 +1088,9 @@ public class WarningLogInterpolatedStringHandlerTests : BaseFixture
         logEvent.Properties.Should().BeEquivalentTo(
             new[]
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new ScalarValue(value))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment));
     }
 
@@ -1115,8 +1107,9 @@ public class WarningLogInterpolatedStringHandlerTests : BaseFixture
         logEvent.Properties.Should().BeEquivalentTo(
             new[]
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new ScalarValue(value))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, format));
     }
 
@@ -1133,8 +1126,9 @@ public class WarningLogInterpolatedStringHandlerTests : BaseFixture
         logEvent.Properties.Should().BeEquivalentTo(
             new[]
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new ScalarValue(value))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment, format));
     }
 
@@ -1152,13 +1146,14 @@ public class WarningLogInterpolatedStringHandlerTests : BaseFixture
         var handler = new WarningLogInterpolatedStringHandler(0, 1, Logger,  out _);
         handler.AppendFormatted(value);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new SequenceValue(value.Select(v => new ScalarValue(v))))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value));
     }
 
@@ -1172,13 +1167,14 @@ public class WarningLogInterpolatedStringHandlerTests : BaseFixture
         var handler = new WarningLogInterpolatedStringHandler(0, 1, Logger,  out _);
         handler.AppendFormatted(value, alignment);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value," + alignment + "}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value," + alignment + "}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new SequenceValue(value.Select(v => new ScalarValue(v))))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment));
     }
 
@@ -1192,13 +1188,14 @@ public class WarningLogInterpolatedStringHandlerTests : BaseFixture
         var handler = new WarningLogInterpolatedStringHandler(0, 1, Logger,  out _);
         handler.AppendFormatted(value, format: format);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value:" + format + "}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value:" + format + "}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new SequenceValue(value.Select(v => new ScalarValue(v))))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, format));
     }
 
@@ -1212,13 +1209,14 @@ public class WarningLogInterpolatedStringHandlerTests : BaseFixture
         var handler = new WarningLogInterpolatedStringHandler(0, 1, Logger,  out _);
         handler.AppendFormatted(value, alignment, format);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value," + alignment + ":" + format + "}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value," + alignment + ":" + format + "}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new SequenceValue(value.Select(v => new ScalarValue(v))))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment, format));
     }
 
@@ -1236,17 +1234,14 @@ public class WarningLogInterpolatedStringHandlerTests : BaseFixture
         var handler = new WarningLogInterpolatedStringHandler(0, 1, Logger,  out _);
         handler.AppendFormatted(value);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new StructureValue(new []
-                {
-                    new LogEventProperty(nameof(value.X), new ScalarValue(value.X)),
-                    new LogEventProperty(nameof(value.Y), new ScalarValue(value.Y))
-                }))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value));
     }
 
@@ -1260,17 +1255,14 @@ public class WarningLogInterpolatedStringHandlerTests : BaseFixture
         var handler = new WarningLogInterpolatedStringHandler(0, 1, Logger,  out _);
         handler.AppendFormatted(value, alignment);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value," + alignment + "}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value," + alignment + "}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new StructureValue(new []
-                {
-                    new LogEventProperty(nameof(value.X), new ScalarValue(value.X)),
-                    new LogEventProperty(nameof(value.Y), new ScalarValue(value.Y))
-                }))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment));
     }
 
@@ -1284,17 +1276,14 @@ public class WarningLogInterpolatedStringHandlerTests : BaseFixture
         var handler = new WarningLogInterpolatedStringHandler(0, 1, Logger,  out _);
         handler.AppendFormatted(value, format: format);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value:" + format + "}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value:" + format + "}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new StructureValue(new []
-                {
-                    new LogEventProperty(nameof(value.X), new ScalarValue(value.X)),
-                    new LogEventProperty(nameof(value.Y), new ScalarValue(value.Y))
-                }))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, format));
     }
 
@@ -1308,17 +1297,14 @@ public class WarningLogInterpolatedStringHandlerTests : BaseFixture
         var handler = new WarningLogInterpolatedStringHandler(0, 1, Logger,  out _);
         handler.AppendFormatted(value, alignment, format);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value," + alignment + ":" + format + "}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value," + alignment + ":" + format + "}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new StructureValue(new []
-                {
-                    new LogEventProperty(nameof(value.X), new ScalarValue(value.X)),
-                    new LogEventProperty(nameof(value.Y), new ScalarValue(value.Y))
-                }))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment, format));
     }
 
@@ -1368,7 +1354,8 @@ public class ErrorLogInterpolatedStringHandlerTests : BaseFixture
         var handler = new ErrorLogInterpolatedStringHandler(3, 0, Logger,  out _);
         handler.AppendLiteral("A{B}C");
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("A{B}C");
+        logEvent.MessageTemplate.Text.Should().Be("A{{B}}C");
+        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C", 0));
         logEvent.Properties.Count.Should().Be(0);
         logEvent.RenderMessage().Should().Be("A{B}C");
     }
@@ -1407,8 +1394,9 @@ public class ErrorLogInterpolatedStringHandlerTests : BaseFixture
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new ScalarValue(value))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value));
     }
 
@@ -1426,8 +1414,9 @@ public class ErrorLogInterpolatedStringHandlerTests : BaseFixture
         logEvent.Properties.Should().BeEquivalentTo(
             new[]
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new ScalarValue(value))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment));
     }
 
@@ -1444,8 +1433,9 @@ public class ErrorLogInterpolatedStringHandlerTests : BaseFixture
         logEvent.Properties.Should().BeEquivalentTo(
             new[]
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new ScalarValue(value))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, format));
     }
 
@@ -1462,8 +1452,9 @@ public class ErrorLogInterpolatedStringHandlerTests : BaseFixture
         logEvent.Properties.Should().BeEquivalentTo(
             new[]
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new ScalarValue(value))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment, format));
     }
 
@@ -1481,13 +1472,14 @@ public class ErrorLogInterpolatedStringHandlerTests : BaseFixture
         var handler = new ErrorLogInterpolatedStringHandler(0, 1, Logger,  out _);
         handler.AppendFormatted(value);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new SequenceValue(value.Select(v => new ScalarValue(v))))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value));
     }
 
@@ -1501,13 +1493,14 @@ public class ErrorLogInterpolatedStringHandlerTests : BaseFixture
         var handler = new ErrorLogInterpolatedStringHandler(0, 1, Logger,  out _);
         handler.AppendFormatted(value, alignment);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value," + alignment + "}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value," + alignment + "}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new SequenceValue(value.Select(v => new ScalarValue(v))))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment));
     }
 
@@ -1521,13 +1514,14 @@ public class ErrorLogInterpolatedStringHandlerTests : BaseFixture
         var handler = new ErrorLogInterpolatedStringHandler(0, 1, Logger,  out _);
         handler.AppendFormatted(value, format: format);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value:" + format + "}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value:" + format + "}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new SequenceValue(value.Select(v => new ScalarValue(v))))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, format));
     }
 
@@ -1541,13 +1535,14 @@ public class ErrorLogInterpolatedStringHandlerTests : BaseFixture
         var handler = new ErrorLogInterpolatedStringHandler(0, 1, Logger,  out _);
         handler.AppendFormatted(value, alignment, format);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value," + alignment + ":" + format + "}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value," + alignment + ":" + format + "}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new SequenceValue(value.Select(v => new ScalarValue(v))))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment, format));
     }
 
@@ -1565,17 +1560,14 @@ public class ErrorLogInterpolatedStringHandlerTests : BaseFixture
         var handler = new ErrorLogInterpolatedStringHandler(0, 1, Logger,  out _);
         handler.AppendFormatted(value);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new StructureValue(new []
-                {
-                    new LogEventProperty(nameof(value.X), new ScalarValue(value.X)),
-                    new LogEventProperty(nameof(value.Y), new ScalarValue(value.Y))
-                }))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value));
     }
 
@@ -1589,17 +1581,14 @@ public class ErrorLogInterpolatedStringHandlerTests : BaseFixture
         var handler = new ErrorLogInterpolatedStringHandler(0, 1, Logger,  out _);
         handler.AppendFormatted(value, alignment);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value," + alignment + "}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value," + alignment + "}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new StructureValue(new []
-                {
-                    new LogEventProperty(nameof(value.X), new ScalarValue(value.X)),
-                    new LogEventProperty(nameof(value.Y), new ScalarValue(value.Y))
-                }))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment));
     }
 
@@ -1613,17 +1602,14 @@ public class ErrorLogInterpolatedStringHandlerTests : BaseFixture
         var handler = new ErrorLogInterpolatedStringHandler(0, 1, Logger,  out _);
         handler.AppendFormatted(value, format: format);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value:" + format + "}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value:" + format + "}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new StructureValue(new []
-                {
-                    new LogEventProperty(nameof(value.X), new ScalarValue(value.X)),
-                    new LogEventProperty(nameof(value.Y), new ScalarValue(value.Y))
-                }))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, format));
     }
 
@@ -1637,17 +1623,14 @@ public class ErrorLogInterpolatedStringHandlerTests : BaseFixture
         var handler = new ErrorLogInterpolatedStringHandler(0, 1, Logger,  out _);
         handler.AppendFormatted(value, alignment, format);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value," + alignment + ":" + format + "}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value," + alignment + ":" + format + "}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new StructureValue(new []
-                {
-                    new LogEventProperty(nameof(value.X), new ScalarValue(value.X)),
-                    new LogEventProperty(nameof(value.Y), new ScalarValue(value.Y))
-                }))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment, format));
     }
 
@@ -1697,7 +1680,8 @@ public class FatalLogInterpolatedStringHandlerTests : BaseFixture
         var handler = new FatalLogInterpolatedStringHandler(3, 0, Logger,  out _);
         handler.AppendLiteral("A{B}C");
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("A{B}C");
+        logEvent.MessageTemplate.Text.Should().Be("A{{B}}C");
+        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C", 0));
         logEvent.Properties.Count.Should().Be(0);
         logEvent.RenderMessage().Should().Be("A{B}C");
     }
@@ -1736,8 +1720,9 @@ public class FatalLogInterpolatedStringHandlerTests : BaseFixture
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new ScalarValue(value))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value));
     }
 
@@ -1755,8 +1740,9 @@ public class FatalLogInterpolatedStringHandlerTests : BaseFixture
         logEvent.Properties.Should().BeEquivalentTo(
             new[]
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new ScalarValue(value))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment));
     }
 
@@ -1773,8 +1759,9 @@ public class FatalLogInterpolatedStringHandlerTests : BaseFixture
         logEvent.Properties.Should().BeEquivalentTo(
             new[]
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new ScalarValue(value))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, format));
     }
 
@@ -1791,8 +1778,9 @@ public class FatalLogInterpolatedStringHandlerTests : BaseFixture
         logEvent.Properties.Should().BeEquivalentTo(
             new[]
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new ScalarValue(value))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment, format));
     }
 
@@ -1810,13 +1798,14 @@ public class FatalLogInterpolatedStringHandlerTests : BaseFixture
         var handler = new FatalLogInterpolatedStringHandler(0, 1, Logger,  out _);
         handler.AppendFormatted(value);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new SequenceValue(value.Select(v => new ScalarValue(v))))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value));
     }
 
@@ -1830,13 +1819,14 @@ public class FatalLogInterpolatedStringHandlerTests : BaseFixture
         var handler = new FatalLogInterpolatedStringHandler(0, 1, Logger,  out _);
         handler.AppendFormatted(value, alignment);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value," + alignment + "}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value," + alignment + "}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new SequenceValue(value.Select(v => new ScalarValue(v))))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment));
     }
 
@@ -1850,13 +1840,14 @@ public class FatalLogInterpolatedStringHandlerTests : BaseFixture
         var handler = new FatalLogInterpolatedStringHandler(0, 1, Logger,  out _);
         handler.AppendFormatted(value, format: format);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value:" + format + "}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value:" + format + "}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new SequenceValue(value.Select(v => new ScalarValue(v))))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, format));
     }
 
@@ -1870,13 +1861,14 @@ public class FatalLogInterpolatedStringHandlerTests : BaseFixture
         var handler = new FatalLogInterpolatedStringHandler(0, 1, Logger,  out _);
         handler.AppendFormatted(value, alignment, format);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value," + alignment + ":" + format + "}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value," + alignment + ":" + format + "}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new SequenceValue(value.Select(v => new ScalarValue(v))))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment, format));
     }
 
@@ -1894,17 +1886,14 @@ public class FatalLogInterpolatedStringHandlerTests : BaseFixture
         var handler = new FatalLogInterpolatedStringHandler(0, 1, Logger,  out _);
         handler.AppendFormatted(value);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new StructureValue(new []
-                {
-                    new LogEventProperty(nameof(value.X), new ScalarValue(value.X)),
-                    new LogEventProperty(nameof(value.Y), new ScalarValue(value.Y))
-                }))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value));
     }
 
@@ -1918,17 +1907,14 @@ public class FatalLogInterpolatedStringHandlerTests : BaseFixture
         var handler = new FatalLogInterpolatedStringHandler(0, 1, Logger,  out _);
         handler.AppendFormatted(value, alignment);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value," + alignment + "}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value," + alignment + "}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new StructureValue(new []
-                {
-                    new LogEventProperty(nameof(value.X), new ScalarValue(value.X)),
-                    new LogEventProperty(nameof(value.Y), new ScalarValue(value.Y))
-                }))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment));
     }
 
@@ -1942,17 +1928,14 @@ public class FatalLogInterpolatedStringHandlerTests : BaseFixture
         var handler = new FatalLogInterpolatedStringHandler(0, 1, Logger,  out _);
         handler.AppendFormatted(value, format: format);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value:" + format + "}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value:" + format + "}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new StructureValue(new []
-                {
-                    new LogEventProperty(nameof(value.X), new ScalarValue(value.X)),
-                    new LogEventProperty(nameof(value.Y), new ScalarValue(value.Y))
-                }))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, format));
     }
 
@@ -1966,17 +1949,14 @@ public class FatalLogInterpolatedStringHandlerTests : BaseFixture
         var handler = new FatalLogInterpolatedStringHandler(0, 1, Logger,  out _);
         handler.AppendFormatted(value, alignment, format);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value," + alignment + ":" + format + "}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value," + alignment + ":" + format + "}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new StructureValue(new []
-                {
-                    new LogEventProperty(nameof(value.X), new ScalarValue(value.X)),
-                    new LogEventProperty(nameof(value.Y), new ScalarValue(value.Y))
-                }))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment, format));
     }
 
@@ -2025,7 +2005,8 @@ public class LogInterpolatedStringHandlerTests : BaseFixture
         var handler = new LogInterpolatedStringHandler(3, 0, Logger,  logEventLevel,  out _);
         handler.AppendLiteral("A{B}C");
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("A{B}C");
+        logEvent.MessageTemplate.Text.Should().Be("A{{B}}C");
+        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C", 0));
         logEvent.Properties.Count.Should().Be(0);
         logEvent.RenderMessage().Should().Be("A{B}C");
     }
@@ -2064,8 +2045,9 @@ public class LogInterpolatedStringHandlerTests : BaseFixture
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new ScalarValue(value))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value));
     }
 
@@ -2083,8 +2065,9 @@ public class LogInterpolatedStringHandlerTests : BaseFixture
         logEvent.Properties.Should().BeEquivalentTo(
             new[]
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new ScalarValue(value))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment));
     }
 
@@ -2101,8 +2084,9 @@ public class LogInterpolatedStringHandlerTests : BaseFixture
         logEvent.Properties.Should().BeEquivalentTo(
             new[]
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new ScalarValue(value))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, format));
     }
 
@@ -2119,8 +2103,9 @@ public class LogInterpolatedStringHandlerTests : BaseFixture
         logEvent.Properties.Should().BeEquivalentTo(
             new[]
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new ScalarValue(value))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment, format));
     }
 
@@ -2138,13 +2123,14 @@ public class LogInterpolatedStringHandlerTests : BaseFixture
         var handler = new LogInterpolatedStringHandler(0, 1, Logger,  logEventLevel,  out _);
         handler.AppendFormatted(value);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new SequenceValue(value.Select(v => new ScalarValue(v))))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value));
     }
 
@@ -2158,13 +2144,14 @@ public class LogInterpolatedStringHandlerTests : BaseFixture
         var handler = new LogInterpolatedStringHandler(0, 1, Logger,  logEventLevel,  out _);
         handler.AppendFormatted(value, alignment);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value," + alignment + "}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value," + alignment + "}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new SequenceValue(value.Select(v => new ScalarValue(v))))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment));
     }
 
@@ -2178,13 +2165,14 @@ public class LogInterpolatedStringHandlerTests : BaseFixture
         var handler = new LogInterpolatedStringHandler(0, 1, Logger,  logEventLevel,  out _);
         handler.AppendFormatted(value, format: format);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value:" + format + "}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value:" + format + "}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new SequenceValue(value.Select(v => new ScalarValue(v))))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, format));
     }
 
@@ -2198,13 +2186,14 @@ public class LogInterpolatedStringHandlerTests : BaseFixture
         var handler = new LogInterpolatedStringHandler(0, 1, Logger,  logEventLevel,  out _);
         handler.AppendFormatted(value, alignment, format);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value," + alignment + ":" + format + "}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value," + alignment + ":" + format + "}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new SequenceValue(value.Select(v => new ScalarValue(v))))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment, format));
     }
 
@@ -2222,17 +2211,14 @@ public class LogInterpolatedStringHandlerTests : BaseFixture
         var handler = new LogInterpolatedStringHandler(0, 1, Logger,  logEventLevel,  out _);
         handler.AppendFormatted(value);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new StructureValue(new []
-                {
-                    new LogEventProperty(nameof(value.X), new ScalarValue(value.X)),
-                    new LogEventProperty(nameof(value.Y), new ScalarValue(value.Y))
-                }))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value));
     }
 
@@ -2246,17 +2232,14 @@ public class LogInterpolatedStringHandlerTests : BaseFixture
         var handler = new LogInterpolatedStringHandler(0, 1, Logger,  logEventLevel,  out _);
         handler.AppendFormatted(value, alignment);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value," + alignment + "}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value," + alignment + "}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new StructureValue(new []
-                {
-                    new LogEventProperty(nameof(value.X), new ScalarValue(value.X)),
-                    new LogEventProperty(nameof(value.Y), new ScalarValue(value.Y))
-                }))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment));
     }
 
@@ -2270,17 +2253,14 @@ public class LogInterpolatedStringHandlerTests : BaseFixture
         var handler = new LogInterpolatedStringHandler(0, 1, Logger,  logEventLevel,  out _);
         handler.AppendFormatted(value, format: format);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value:" + format + "}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value:" + format + "}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new StructureValue(new []
-                {
-                    new LogEventProperty(nameof(value.X), new ScalarValue(value.X)),
-                    new LogEventProperty(nameof(value.Y), new ScalarValue(value.Y))
-                }))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, format));
     }
 
@@ -2294,17 +2274,14 @@ public class LogInterpolatedStringHandlerTests : BaseFixture
         var handler = new LogInterpolatedStringHandler(0, 1, Logger,  logEventLevel,  out _);
         handler.AppendFormatted(value, alignment, format);
         var logEvent = handler.GetLogEventAndReset();
-        logEvent.MessageTemplate.Text.Should().Be("{value," + alignment + ":" + format + "}");
+        logEvent.MessageTemplate.Text.Should().Be("{@value," + alignment + ":" + format + "}");
         logEvent.Properties.Count.Should().Be(1);
         logEvent.Properties.Should().BeEquivalentTo(
             new []
             {
-                new KeyValuePair<string, LogEventPropertyValue>(nameof(value), new StructureValue(new []
-                {
-                    new LogEventProperty(nameof(value.X), new ScalarValue(value.X)),
-                    new LogEventProperty(nameof(value.Y), new ScalarValue(value.Y))
-                }))
-            });
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment, format));
     }
 

@@ -2,7 +2,7 @@
 using FluentAssertions;
 using NUnit.Framework;
 
-namespace Isle.Extensions.Logging.Tests;
+namespace Isle.Core.Tests;
 
 public class StringBuilderExtensionsTests
 {
