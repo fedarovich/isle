@@ -38,7 +38,7 @@ public abstract class BaseFixture
     protected virtual void OneTimeSetUp()
     {
         IsleConfiguration.Configure(builder => builder.WithAutomaticDestructuring()
-            //.ConfigureSerilog(cfg => cfg.EnableMessageTemplateCaching = EnableCaching)
+            .ConfigureSerilog(cfg => cfg.EnableMessageTemplateCaching = EnableCaching)
         );
         Logger = new LoggerConfiguration()
             .WriteTo.TestSink(opt => opt.LogEvents = _logEvents)

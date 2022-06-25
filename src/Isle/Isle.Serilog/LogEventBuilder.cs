@@ -1,4 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
+using Isle.Serilog.Configuration;
 using Serilog;
 using Serilog.Events;
 
@@ -11,7 +12,7 @@ internal abstract class LogEventBuilder
 
     public static LogEventBuilder Acquire(int literalLength, int formattedCount, ILogger logger)
     {
-        bool enableCaching = false; //ExtensionsLoggingConfiguration.Current.EnableMessageTemplateCaching;
+        bool enableCaching = SerilogConfiguration.Current.EnableMessageTemplateCaching;
         var builder = _cachedInstance;
         if (builder != null)
         {
@@ -30,14 +31,14 @@ internal abstract class LogEventBuilder
         return builder;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        static LogEventBuilder CreateFormattedLogValuesBuilder(bool enableCaching) => new SimpleLogEventBuilder();
-            //enableCaching ? new CachingFormattedLogValuesBuilder() : new SimpleFormattedLogValuesBuilder();
+        static LogEventBuilder CreateFormattedLogValuesBuilder(bool enableCaching) => 
+            enableCaching ? new CachingLogEventBuilder() : new SimpleLogEventBuilder();
     }
 
     public static LogEvent BuildAndRelease(LogEventBuilder builder, LogEventLevel level, Exception? exception = null)
     {
         var result = builder.BuildAndReset(level, exception);
-        //_cachedInstance = builder;
+        _cachedInstance = builder;
         return result;
     }
 

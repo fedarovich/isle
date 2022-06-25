@@ -43,6 +43,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="buildTransitive\Isle.Extensions.Logging.targets">
+      <PackagePath>/</PackagePath>
+      <Pack>True</Pack>
+    </None>
     <None Update="LoggerExtensions.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>LoggerExtensions.g.cs</LastGenOutput>
@@ -68,6 +72,10 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>LogHandlers.tt</DependentUpon>
     </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="buildTransitive/**" Pack="True" PackagePath="/" />
   </ItemGroup>
 
 </Project>

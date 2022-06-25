@@ -2,6 +2,7 @@
 using System.Runtime.CompilerServices;
 using Serilog;
 using Serilog.Events;
+using Isle.Extensions;
 
 namespace Isle.Serilog;
 
@@ -55,7 +56,7 @@ public ref partial struct VerboseLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "")
     {
-        _builder.AppendFormatted(name, value, alignment, format);
+        _builder.AppendFormatted(name.GetNameFromCallerArgumentExpression<T>(), value, alignment, format);
     }
 
     /// <summary>
@@ -126,7 +127,7 @@ public ref partial struct DebugLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "")
     {
-        _builder.AppendFormatted(name, value, alignment, format);
+        _builder.AppendFormatted(name.GetNameFromCallerArgumentExpression<T>(), value, alignment, format);
     }
 
     /// <summary>
@@ -197,7 +198,7 @@ public ref partial struct InformationLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "")
     {
-        _builder.AppendFormatted(name, value, alignment, format);
+        _builder.AppendFormatted(name.GetNameFromCallerArgumentExpression<T>(), value, alignment, format);
     }
 
     /// <summary>
@@ -268,7 +269,7 @@ public ref partial struct WarningLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "")
     {
-        _builder.AppendFormatted(name, value, alignment, format);
+        _builder.AppendFormatted(name.GetNameFromCallerArgumentExpression<T>(), value, alignment, format);
     }
 
     /// <summary>
@@ -339,7 +340,7 @@ public ref partial struct ErrorLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "")
     {
-        _builder.AppendFormatted(name, value, alignment, format);
+        _builder.AppendFormatted(name.GetNameFromCallerArgumentExpression<T>(), value, alignment, format);
     }
 
     /// <summary>
@@ -410,7 +411,7 @@ public ref partial struct FatalLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "")
     {
-        _builder.AppendFormatted(name, value, alignment, format);
+        _builder.AppendFormatted(name.GetNameFromCallerArgumentExpression<T>(), value, alignment, format);
     }
 
     /// <summary>
@@ -484,7 +485,7 @@ public ref partial struct LogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "")
     {
-        _builder.AppendFormatted(name, value, alignment, format);
+        _builder.AppendFormatted(name.GetNameFromCallerArgumentExpression<T>(), value, alignment, format);
     }
 
     /// <summary>
