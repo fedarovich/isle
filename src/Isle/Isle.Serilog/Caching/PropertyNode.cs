@@ -8,7 +8,7 @@ internal sealed class PropertyNode : Node
     private const char DestructureOperator = '@';
     private const char StringifyOperator = '$';
 
-    public PropertyNode(Node parent, string name, string? format = null, int alignment = 0) 
+    public PropertyNode(Node parent, string name, string rawName, string? format = null, int alignment = 0) 
         : base(parent, GetRawText(name, format, alignment))
     {
         var destructuring = Destructuring.Default;
@@ -17,12 +17,16 @@ internal sealed class PropertyNode : Node
         if (name.StartsWith(DestructureOperator))
         {
             destructuring = Destructuring.Destructure;
-            propertyName = name.Substring(1);
+            propertyName = ReferenceEquals(name, rawName)
+                ? name.Substring(1)
+                : rawName;
         }
         else if (name.StartsWith(StringifyOperator))
         {
             destructuring = Destructuring.Stringify;
-            propertyName = name.Substring(1);
+            propertyName = ReferenceEquals(name, rawName)
+                ? name.Substring(1)
+                : rawName;
         }
 
         Token = new PropertyToken(

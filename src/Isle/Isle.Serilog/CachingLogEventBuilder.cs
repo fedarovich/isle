@@ -1,5 +1,7 @@
 ﻿using System.Buffers;
 using System.Diagnostics;
+using Isle.Configuration;
+using Isle.Extensions;
 using Isle.Serilog.Caching;
 using Serilog;
 using Serilog.Events;
@@ -63,15 +65,15 @@ internal sealed class CachingLogEventBuilder : LogEventBuilder
 
     public override void AppendFormatted<T>(string name, T value, int alignment, string? format)
     {
-        _lastNode = (alignment == 0 && string.IsNullOrEmpty(format))
-            ? _lastNode.GetOrAddPropertyNode(name)
-            : _lastNode.GetOrAddPropertyNode(name, alignment, format);
-        _propertyValues[_propertyIndex++] = value;
+        AppendFormatted(value.Named(IsleConfiguration.Current.ValueNameConverter(name), false), alignment, format);
     }
 
     public override void AppendFormatted(in NamedLogValue namedLogValue, int alignment, string? format)
     {
-        AppendFormatted(namedLogValue.Name, namedLogValue.Value, alignment, format);
+        _lastNode = (alignment == 0 && string.IsNullOrEmpty(format))
+            ? _lastNode.GetOrAddPropertyNode(namedLogValue.Name, namedLogValue.RawName)
+            : _lastNode.GetOrAddPropertyNode(namedLogValue.Name, namedLogValue.RawName, alignment, format);
+        _propertyValues[_propertyIndex++] = namedLogValue.Value;
     }
 
     private LogEventProperty BindLogEventProperty(PropertyNode node, object? value)

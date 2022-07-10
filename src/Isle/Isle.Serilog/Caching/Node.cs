@@ -45,16 +45,16 @@ internal abstract class Node
         return TextNodes.GetOrAdd(rawLiteral, static (rl, parent) => new TextNode(parent, rl), this);
     }
 
-    public PropertyNode GetOrAddPropertyNode(string name)
+    public PropertyNode GetOrAddPropertyNode(string name, string rawName)
     {
-        return PropertyNodes.GetOrAdd(name, static (n, parent) => new PropertyNode(parent, n), this);
+        return PropertyNodes.GetOrAdd(name, static (n, arg) => new PropertyNode(arg.parent, n, arg.rawName), (parent: this, rawName));
     }
 
-    public PropertyNode GetOrAddPropertyNode(string name, int alignment, string? format)
+    public PropertyNode GetOrAddPropertyNode(string name, string rawName, int alignment, string? format)
     {
         var formatKey = new FormatKey(name, format, alignment);
         return FormattedPropertyNodes.GetOrAdd(formatKey, static (key, arg) =>
-            new PropertyNode(arg.parent, key.Name, key.Format, key.Alignment), (parent: this, formatKey));
+            new PropertyNode(arg.parent, key.Name, arg.rawName, key.Format, key.Alignment), (parent: this, formatKey, rawName));
     }
 
     public TemplateNode GetTemplateNode()
