@@ -64,6 +64,14 @@ steps:
     custom: pack
     projects: 'src/Isle/Isle.Extensions.Logging/Isle.Extensions.Logging.csproj'
     arguments: '-c $(BuildConfiguration) -p:VersionPrefix=$(Build.BuildNumber) --version-suffix "$(Suffix)" --no-build --include-symbols -o "$(Build.ArtifactStagingDirectory)"'
+    
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet pack Isle.Serilog'
+  inputs:
+    command: custom
+    custom: pack
+    projects: 'src/Isle/Isle.Serilog/Isle.Serilog.csproj'
+    arguments: '-c $(BuildConfiguration) -p:VersionPrefix=$(Build.BuildNumber) --version-suffix "$(Suffix)" --no-build --include-symbols -o "$(Build.ArtifactStagingDirectory)"'
 
 - task: PublishBuildArtifacts@1
 
