@@ -44,8 +44,8 @@ public static class ValueNameConverters
         static Func<string, string> Create(Func<string, string> converter, int maxCacheSize)
         {
             var cache = new ConcurrentDictionary<string, string>();
-            return expression => cache.Count > maxCacheSize
-                ? converter(expression)
+            return expression => cache.Count >= maxCacheSize
+                ? (cache.TryGetValue(expression, out var value) ? value : converter(expression))
                 : cache.GetOrAdd(expression, static (expr, conv) => conv(expr), converter);
         }
     }
