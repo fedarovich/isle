@@ -92,8 +92,19 @@ public sealed class IsleConfiguration
         }
     }
 
-    // For unit testing.
-    internal static void Reset()
+    /// <summary>
+    /// Resets the current configuration and calls the <see cref="IIsleExtensionConfigurationHook.ResetExtensionConfiguration"/>
+    /// for all registered extensions.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// This method is intended for unit testing and should never be used in production environment.
+    /// </para>
+    /// <para>
+    /// If ISLE has not been configured yet or the configuration has been reset, this method will have no effect.
+    /// </para>
+    /// </remarks>
+    public static void Reset()
     {
         var configuration = Interlocked.Exchange(ref _current, null);
         if (configuration != null)
