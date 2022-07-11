@@ -1,0 +1,102 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".g.cs" #>
+<#
+    //const string Scope = "Scope";
+
+	string[] logEventLevels = { "Verbose", "Debug", "Information", "Warning", "Error", "Fatal", null }; 
+
+    string GetTypeName(string logEventLevel) => logEventLevel + "LogInterpolatedStringHandler";
+#>
+#nullable enable
+using System.Runtime.CompilerServices;
+using Serilog;
+using Serilog.Events;
+
+namespace Isle.Serilog;
+
+<# foreach (var logEventLevel in logEventLevels) { #>
+
+/// <summary>
+/// Interpolated string handler for <#= $"Log{logEventLevel}()" #> method.
+/// </summary>
+/// <remarks>
+/// This class should not be used directly in your code.
+/// </remarks>
+[InterpolatedStringHandler]
+public ref partial struct <#= GetTypeName(logEventLevel) #>
+{
+    private LogEventBuilder _builder = null!;
+<# if (logEventLevel == null) { #>
+    private LogEventLevel _logEventLevel = default;
+<# } #>
+    
+    /// <summary>
+    /// Creates a new instance of <see cref="<#= GetTypeName(logEventLevel) #>" />.
+    /// </summary>
+    public <#= GetTypeName(logEventLevel) #>(
+        int literalLength, 
+        int formattedCount,
+        ILogger logger,
+<# if (logEventLevel == null) { #>
+        LogEventLevel logEventLevel,
+<# } #>
+        out bool isEnabled
+    )
+    {
+        isEnabled = logger.IsEnabled(<#= logEventLevel != null ? "LogEventLevel." + logEventLevel : "logEventLevel" #>);
+        if (isEnabled)
+        {
+            _builder = LogEventBuilder.Acquire(literalLength, formattedCount, logger);
+<# if (logEventLevel == null) { #>
+            _logEventLevel = logEventLevel;
+<# } #>
+        }
+    }
+
+
+    /// <summary>
+    /// Gets the value indicating whether the handler is enabled.
+    /// </summary>
+    public bool IsEnabled => _builder != null;
+
+    /// <summary>
+    /// Appends a string literal to the template string.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void AppendLiteral(string? str)
+    {
+        _builder.AppendLiteral(str);
+    }
+
+    /// <summary>
+    /// Appends a <paramref name="value" /> to the log message.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "")
+    {
+        _builder.AppendFormatted(name, value, alignment, format);
+    }
+
+    /// <summary>
+    /// Appends a <paramref name="namedLogValue" /> to the log message.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void AppendFormatted(in NamedLogValue namedLogValue, int alignment = 0, string? format = null)
+    {
+        _builder.AppendFormatted(namedLogValue, alignment, format);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal LogEvent GetLogEventAndReset(Exception? exception = null)
+    {
+        var result = LogEventBuilder.BuildAndRelease(_builder, <#= logEventLevel != null ? $"LogEventLevel.{logEventLevel}" : "_logEventLevel" #>, exception);
+        _builder = null!;
+        return result;
+    }
+}
+
+<# } #>

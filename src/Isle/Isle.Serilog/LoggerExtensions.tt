@@ -1,0 +1,68 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".g.cs" #>
+<#
+	string[] logEventLevels = { "Verbose", "Debug", "Information", "Warning", "Error", "Fatal", null }; 
+	
+	string GetTypeName(string logEventLevel) => logEventLevel + "LogInterpolatedStringHandler";
+	
+	string GetMethodName(string logEventLevel) => $"{logEventLevel ?? "Write"}Interpolated";
+
+	string GetLogEventLevel(string logEventLevel) => logEventLevel != null ? "LogEventLevel." + logEventLevel : "logEventLevel";
+
+	string GetDescription(string logEventLevel, bool withException)
+	{
+		var additionalDescription = withException ? " and associated exception" : "";
+		return logEventLevel != null
+			? $"Write a log event with the <see cref=\"LogEventLevel.{logEventLevel}\" /> level{additionalDescription}."
+			: $"Write a log event with the specified level{additionalDescription}.";
+	}
+#>
+#nullable enable
+using System.Runtime.CompilerServices;
+using Serilog;
+using Serilog.Events;
+
+namespace Isle.Serilog;
+
+/// <summary>
+/// Provides extensions methods for <see cref="ILogger" /> to enable structured logging using interpolated strings.
+/// </summary>
+public static class LoggerExtensions
+{
+<# foreach (var logEventLevel in logEventLevels) { #>
+<# foreach (var withException in new[] { false, true }) { #>
+	/// <summary>
+	/// <#= GetDescription(logEventLevel, withException) #>
+	/// </summary>
+	/// <param name="logger">The <see cref="ILogger" /> to write to.</param>
+<#if (logEventLevel == null) { #>
+	/// <param name="logEventLevel">The level of the event.</param>
+<# } #><#if (withException) { #>
+    /// <param name="exception">The exception related to the event.</param>
+<# } #>
+    /// <param name="handler">The interpolated string of the log event message.</param>
+	public static void <#= GetMethodName(logEventLevel) #>(
+		this ILogger logger,
+<# if (logEventLevel == null) { #>
+		LogEventLevel logEventLevel,
+<# } #>
+<# if (withException) { #>
+		Exception? exception,
+<# } #>
+		[InterpolatedStringHandlerArgument("logger"<#= logEventLevel == null ? ", \"logEventLevel\"" : "" #>)] ref <#= GetTypeName(logEventLevel) #> handler
+	)
+	{
+		if (handler.IsEnabled)
+		{
+			var logEvent = handler.GetLogEventAndReset(<# if (withException) { #>exception<# } #>);
+			logger.Write(logEvent);
+		}
+	}
+
+<# } #>
+<# } #>
+}

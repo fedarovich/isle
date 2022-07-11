@@ -1,7 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Text;
 
-namespace Isle.Extensions.Logging;
+namespace Isle;
 
 internal static class StringBuilderExtensions
 {

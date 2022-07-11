@@ -1,0 +1,645 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".g.cs" #>
+<#
+    string[] logEventLevels = { "Verbose", "Debug", "Information", "Warning", "Error", "Fatal", null }; 
+
+    string GetMethodName(string logEventLevel, bool interpolated) => $"{logEventLevel ?? "Write"}{(interpolated ? "Interpolated" : "")}";
+
+    string GetTestName(string name, string logEventLevel, bool withException) => 
+        $"{GetMethodName(logEventLevel, true)}_{name}{(withException ? "_WithException" : "")}";
+#>
+#nullable enable
+using System;
+using System.Globalization;
+using System.Linq;
+using NUnit.Framework;
+using FluentAssertions;
+using Serilog.Events;
+using Serilog.Parsing;
+using Isle.Extensions;
+
+namespace Isle.Serilog.Tests;
+
+[TestFixtureSource(nameof(FixtureArgs))]
+public class LoggerExtensionsTests : BaseFixture
+{
+    public LoggerExtensionsTests(LogEventLevel minLogEventLevel, bool enableCaching) : base(minLogEventLevel, enableCaching)
+    {
+    }
+
+<# foreach (var logEventLevel in logEventLevels) { #>
+
+    #region <#= logEventLevel ?? "Write" #>
+
+<# foreach (var withException in new[] { false, true }) { #>
+    [Test]
+    public void <#= GetTestName("Literal", logEventLevel, withException) #>(<#if (logEventLevel == null) { #>[ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel<# } #>)
+    {
+<#if (logEventLevel != null) { #> 
+        const LogEventLevel logEventLevel = LogEventLevel.<#= (logEventLevel) #>;
+<# } #>
+        const string message = "Test";
+
+        <#if (withException) { #>Exception exception = new InvalidOperationException("Test exception."); <# } #>
+
+        Logger.<#= GetMethodName(logEventLevel, true)  #>(<#if (logEventLevel == null) { #>logEventLevel, <# } #><#if (withException) { #>exception, <# } #>$"Test");
+        Logger.<#= GetMethodName(logEventLevel, false) #>(<#if (logEventLevel == null) { #>logEventLevel, <# } #><#if (withException) { #>exception, <# } #>message);
+
+        if (logEventLevel < MinLogEventLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.MessageTemplate.Text.Should().Be(message);
+            logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
+                new[] 
+                { 
+                    new TextToken(message, 0) 
+                }, 
+                MessageTemplateTokenEquivalency);
+            logEvent.Properties.Count.Should().Be(0);
+            logEvent.Level.Should().Be(<#= logEventLevel == null ? "logEventLevel" : $"LogEventLevel.{logEventLevel}" #>);
+<#if (withException) { #>
+            logEvent.Exception.Should().BeSameAs(exception);
+<# } else { #>
+            logEvent.Exception.Should().BeNull();
+<# } #>
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(message);
+        }
+    }
+
+    [Test]
+    public void <#= GetTestName("LiteralWithBraces", logEventLevel, withException) #>(<#if (logEventLevel == null) { #>[ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel<# } #>)
+    {
+<#if (logEventLevel != null) { #> 
+        const LogEventLevel logEventLevel = LogEventLevel.<#= (logEventLevel) #>;
+<# } #>
+        const string message = "T{{es}}t";
+
+        <#if (withException) { #>Exception exception = new InvalidOperationException("Test exception."); <# } #>
+
+        Logger.<#= GetMethodName(logEventLevel, true)  #>(<#if (logEventLevel == null) { #>logEventLevel, <# } #><#if (withException) { #>exception, <# } #>$"T{{es}}t");
+        Logger.<#= GetMethodName(logEventLevel, false) #>(<#if (logEventLevel == null) { #>logEventLevel, <# } #><#if (withException) { #>exception, <# } #>message);
+
+        if (logEventLevel < MinLogEventLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.MessageTemplate.Text.Should().Be("T{{es}}t");
+            logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
+                new[] 
+                { 
+                    new TextToken("T{es}t", 0) 
+                }, 
+                MessageTemplateTokenEquivalency);
+            logEvent.Properties.Count.Should().Be(0);
+            logEvent.Level.Should().Be(<#= logEventLevel == null ? "logEventLevel" : $"LogEventLevel.{logEventLevel}" #>);
+<#if (withException) { #>
+            logEvent.Exception.Should().BeSameAs(exception);
+<# } else { #>
+            logEvent.Exception.Should().BeNull();
+<# } #>
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
+    [Test]
+    public void <#= GetTestName("Scalar", logEventLevel, withException) #>(<#if (logEventLevel == null) { #>[ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel<# } #>)
+    {
+<#if (logEventLevel != null) { #> 
+        const LogEventLevel logEventLevel = LogEventLevel.<#= (logEventLevel) #>;
+<# } #>
+        int value = 7;
+
+        <#if (withException) { #>Exception exception = new InvalidOperationException("Test exception."); <# } #>
+
+        Logger.<#= GetMethodName(logEventLevel, true)  #>(<#if (logEventLevel == null) { #>logEventLevel, <# } #><#if (withException) { #>exception, <# } #>$"{value}");
+        Logger.<#= GetMethodName(logEventLevel, false) #>(<#if (logEventLevel == null) { #>logEventLevel, <# } #><#if (withException) { #>exception, <# } #>"{value}", value);
+
+        if (logEventLevel < MinLogEventLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.MessageTemplate.Text.Should().Be("{value}");
+            logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
+                new[]
+                {
+                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 0)
+                },
+                MessageTemplateTokenEquivalency);
+            logEvent.Properties.Count.Should().Be(1);
+            logEvent.Properties.Should().BeEquivalentTo(
+                new []
+                {
+                    value.ToLogEventPropertyValue()
+                },
+                PropertiesEquivalency);
+            logEvent.Level.Should().Be(<#= logEventLevel == null ? "logEventLevel" : $"LogEventLevel.{logEventLevel}" #>);
+<#if (withException) { #>
+            logEvent.Exception.Should().BeSameAs(exception);
+<# } else { #>
+            logEvent.Exception.Should().BeNull();
+<# } #>
+            logEvent.RenderMessage().Should().Be(Format(value));
+        }
+    }
+
+    [Test]
+    public void <#= GetTestName("ScalarWithAlignment", logEventLevel, withException) #>(<#if (logEventLevel == null) { #>[ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel<# } #>)
+    {
+<#if (logEventLevel != null) { #> 
+        const LogEventLevel logEventLevel = LogEventLevel.<#= (logEventLevel) #>;
+<# } #>
+        int value = 7;
+
+        <#if (withException) { #>Exception exception = new InvalidOperationException("Test exception."); <# } #>
+
+        Logger.<#= GetMethodName(logEventLevel, true)  #>(<#if (logEventLevel == null) { #>logEventLevel, <# } #><#if (withException) { #>exception, <# } #>$"{value,3}");
+        Logger.<#= GetMethodName(logEventLevel, false) #>(<#if (logEventLevel == null) { #>logEventLevel, <# } #><#if (withException) { #>exception, <# } #>"{value,3}", value);
+
+        if (logEventLevel < MinLogEventLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.MessageTemplate.Text.Should().Be("{value,3}");
+            logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
+                new[]
+                {
+                    new PropertyToken(nameof(value), "{value,3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 3), startIndex: 0)
+                },
+                MessageTemplateTokenEquivalency);
+            logEvent.Properties.Count.Should().Be(1);
+            logEvent.Properties.Should().BeEquivalentTo(
+                new []
+                {
+                    value.ToLogEventPropertyValue()
+                },
+                PropertiesEquivalency);
+            logEvent.Level.Should().Be(<#= logEventLevel == null ? "logEventLevel" : $"LogEventLevel.{logEventLevel}" #>);
+<#if (withException) { #>
+            logEvent.Exception.Should().BeSameAs(exception);
+<# } else { #>
+            logEvent.Exception.Should().BeNull();
+<# } #>
+            logEvent.RenderMessage().Should().Be(Format(value, 3));
+        }
+    }
+
+    [Test]
+    public void <#= GetTestName("ScalarWithFormat", logEventLevel, withException) #>(<#if (logEventLevel == null) { #>[ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel<# } #>)
+    {
+<#if (logEventLevel != null) { #> 
+        const LogEventLevel logEventLevel = LogEventLevel.<#= (logEventLevel) #>;
+<# } #>
+        int value = 7;
+
+        <#if (withException) { #>Exception exception = new InvalidOperationException("Test exception."); <# } #>
+
+        Logger.<#= GetMethodName(logEventLevel, true)  #>(<#if (logEventLevel == null) { #>logEventLevel, <# } #><#if (withException) { #>exception, <# } #>$"{value:N}");
+        Logger.<#= GetMethodName(logEventLevel, false) #>(<#if (logEventLevel == null) { #>logEventLevel, <# } #><#if (withException) { #>exception, <# } #>"{value:N}", value);
+
+        if (logEventLevel < MinLogEventLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.MessageTemplate.Text.Should().Be("{value:N}");
+            logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
+                new[]
+                {
+                    new PropertyToken(nameof(value), "{value:N}", format: "N", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 0)
+                },
+                MessageTemplateTokenEquivalency);
+            logEvent.Properties.Count.Should().Be(1);
+            logEvent.Properties.Should().BeEquivalentTo(
+                new []
+                {
+                    value.ToLogEventPropertyValue()
+                },
+                PropertiesEquivalency);
+            logEvent.Level.Should().Be(<#= logEventLevel == null ? "logEventLevel" : $"LogEventLevel.{logEventLevel}" #>);
+<#if (withException) { #>
+            logEvent.Exception.Should().BeSameAs(exception);
+<# } else { #>
+            logEvent.Exception.Should().BeNull();
+<# } #>
+            logEvent.RenderMessage().Should().Be(Format(value, "N"));
+        }
+    }
+
+    [Test]
+    public void <#= GetTestName("ScalarWithAlignmentAndFormat", logEventLevel, withException) #>(<#if (logEventLevel == null) { #>[ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel<# } #>)
+    {
+<#if (logEventLevel != null) { #> 
+        const LogEventLevel logEventLevel = LogEventLevel.<#= (logEventLevel) #>;
+<# } #>
+        int value = 7;
+
+        <#if (withException) { #>Exception exception = new InvalidOperationException("Test exception."); <# } #>
+
+        Logger.<#= GetMethodName(logEventLevel, true)  #>(<#if (logEventLevel == null) { #>logEventLevel, <# } #><#if (withException) { #>exception, <# } #>$"{value,6:N}");
+        Logger.<#= GetMethodName(logEventLevel, false) #>(<#if (logEventLevel == null) { #>logEventLevel, <# } #><#if (withException) { #>exception, <# } #>"{value,6:N}", value);
+
+        if (logEventLevel < MinLogEventLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.MessageTemplate.Text.Should().Be("{value,6:N}");
+            logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
+                new[]
+                {
+                    new PropertyToken(nameof(value), "{value,6:N}", format: "N", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 6), startIndex: 0)
+                },
+                MessageTemplateTokenEquivalency);
+            logEvent.Properties.Count.Should().Be(1);
+            logEvent.Properties.Should().BeEquivalentTo(
+                new []
+                {
+                    value.ToLogEventPropertyValue()
+                },
+                PropertiesEquivalency);
+            logEvent.Level.Should().Be(<#= logEventLevel == null ? "logEventLevel" : $"LogEventLevel.{logEventLevel}" #>);
+<#if (withException) { #>
+            logEvent.Exception.Should().BeSameAs(exception);
+<# } else { #>
+            logEvent.Exception.Should().BeNull();
+<# } #>
+            logEvent.RenderMessage().Should().Be(Format(value, 6, "N"));
+        }
+    }
+
+    [Test]
+    public void <#= GetTestName("Complex", logEventLevel, withException) #>(<#if (logEventLevel == null) { #>[ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel<# } #>)
+    {
+<#if (logEventLevel != null) { #> 
+        const LogEventLevel logEventLevel = LogEventLevel.<#= (logEventLevel) #>;
+<# } #>
+        var value = new TestObject(3, 5);
+
+        <#if (withException) { #>Exception exception = new InvalidOperationException("Test exception."); <# } #>
+
+        Logger.<#= GetMethodName(logEventLevel, true)  #>(<#if (logEventLevel == null) { #>logEventLevel, <# } #><#if (withException) { #>exception, <# } #>$"{value}");
+        Logger.<#= GetMethodName(logEventLevel, false) #>(<#if (logEventLevel == null) { #>logEventLevel, <# } #><#if (withException) { #>exception, <# } #>"{@value}", value);
+
+        if (logEventLevel < MinLogEventLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.MessageTemplate.Text.Should().Be("{@value}");
+            logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
+                new[]
+                {
+                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 0)
+                },
+                MessageTemplateTokenEquivalency);
+            logEvent.Properties.Count.Should().Be(1);
+            logEvent.Properties.Should().BeEquivalentTo(
+                new []
+                {
+                    value.ToLogEventPropertyValue()
+                },
+                PropertiesEquivalency);
+            logEvent.Level.Should().Be(<#= logEventLevel == null ? "logEventLevel" : $"LogEventLevel.{logEventLevel}" #>);
+<#if (withException) { #>
+            logEvent.Exception.Should().BeSameAs(exception);
+<# } else { #>
+            logEvent.Exception.Should().BeNull();
+<# } #>
+            logEvent.RenderMessage().Should().Be(Format(value));   
+        }
+    }
+
+    [Test]
+    public void <#= GetTestName("Collection", logEventLevel, withException) #>(<#if (logEventLevel == null) { #>[ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel<# } #>)
+    {
+<#if (logEventLevel != null) { #> 
+        const LogEventLevel logEventLevel = LogEventLevel.<#= (logEventLevel) #>;
+<# } #>
+        var value = new int[] {1, 2, 3};
+
+        <#if (withException) { #>Exception exception = new InvalidOperationException("Test exception."); <# } #>
+
+        Logger.<#= GetMethodName(logEventLevel, true)  #>(<#if (logEventLevel == null) { #>logEventLevel, <# } #><#if (withException) { #>exception, <# } #>$"{value}");
+        Logger.<#= GetMethodName(logEventLevel, false) #>(<#if (logEventLevel == null) { #>logEventLevel, <# } #><#if (withException) { #>exception, <# } #>"{@value}", value);
+
+        if (logEventLevel < MinLogEventLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.MessageTemplate.Text.Should().Be("{@value}");
+            logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
+                new[]
+                {
+                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 0)
+                },
+                MessageTemplateTokenEquivalency);
+            logEvent.Properties.Count.Should().Be(1);
+            logEvent.Properties.Should().BeEquivalentTo(
+                new []
+                {
+                    value.ToLogEventPropertyValue()
+                },
+                PropertiesEquivalency);
+            logEvent.Level.Should().Be(<#= logEventLevel == null ? "logEventLevel" : $"LogEventLevel.{logEventLevel}" #>);
+<#if (withException) { #>
+            logEvent.Exception.Should().BeSameAs(exception);
+<# } else { #>
+            logEvent.Exception.Should().BeNull();
+<# } #>
+            logEvent.RenderMessage().Should().Be(Format(value));
+        }
+    }
+
+    [Test]
+    public void <#= GetTestName("String", logEventLevel, withException) #>(<#if (logEventLevel == null) { #>[ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel<# } #>)
+    {
+<#if (logEventLevel != null) { #> 
+        const LogEventLevel logEventLevel = LogEventLevel.<#= (logEventLevel) #>;
+<# } #>
+        string value = "Test";
+
+        <#if (withException) { #>Exception exception = new InvalidOperationException("Test exception."); <# } #>
+
+        Logger.<#= GetMethodName(logEventLevel, true)  #>(<#if (logEventLevel == null) { #>logEventLevel, <# } #><#if (withException) { #>exception, <# } #>$"{value}");
+        Logger.<#= GetMethodName(logEventLevel, false) #>(<#if (logEventLevel == null) { #>logEventLevel, <# } #><#if (withException) { #>exception, <# } #>"{value}", value);
+
+        if (logEventLevel < MinLogEventLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.MessageTemplate.Text.Should().Be("{value}");
+            logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
+                new[]
+                {
+                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 0)
+                },
+                MessageTemplateTokenEquivalency);
+            logEvent.Properties.Count.Should().Be(1);
+            logEvent.Properties.Should().BeEquivalentTo(
+                new []
+                {
+                    value.ToLogEventPropertyValue()
+                },
+                PropertiesEquivalency);
+            logEvent.Level.Should().Be(<#= logEventLevel == null ? "logEventLevel" : $"LogEventLevel.{logEventLevel}" #>);
+<#if (withException) { #>
+            logEvent.Exception.Should().BeSameAs(exception);
+<# } else { #>
+            logEvent.Exception.Should().BeNull();
+<# } #>
+            logEvent.RenderMessage().Should().Be(Format(value));
+        }
+    }
+
+    [Test]
+    public void <#= GetTestName("Mixed", logEventLevel, withException) #>(<#if (logEventLevel == null) { #>[ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel<# } #>)
+    {
+<#if (logEventLevel != null) { #> 
+        const LogEventLevel logEventLevel = LogEventLevel.<#= (logEventLevel) #>;
+<# } #>
+        var arg1 = "Test";
+        var arg2 = 5000;
+        var arg3 = 4.5;
+        var arg4 = new TestObject(7, 11);
+        var arg5 = new int[] {5, 4, 3};
+        var veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg = "veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongValue";
+
+        <#if (withException) { #>Exception exception = new InvalidOperationException("Test exception."); <# } #>
+
+        Logger.<#= GetMethodName(logEventLevel, true)  #>(<#if (logEventLevel == null) { #>logEventLevel, <# } #><#if (withException) { #>exception, <# } #>
+            $"ABCD{arg1,7}EFGH{arg2:N}IJKL{arg3,-10:F3}MNOP{arg4}QRST{arg5}UVWX{veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg}YZ");
+        Logger.<#= GetMethodName(logEventLevel, false) #>(<#if (logEventLevel == null) { #>logEventLevel, <# } #><#if (withException) { #>exception, <# } #>
+            "ABCD{arg1,7}EFGH{arg2:N}IJKL{arg3,-10:F3}MNOP{@arg4}QRST{@arg5}UVWX{veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg}YZ",
+            arg1,
+            arg2,
+            arg3,
+            arg4,
+            arg5,
+            veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg);
+
+        if (logEventLevel < MinLogEventLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.MessageTemplate.Text.Should().Be("ABCD{arg1,7}EFGH{arg2:N}IJKL{arg3,-10:F3}MNOP{@arg4}QRST{@arg5}UVWX{veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg}YZ");
+            logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
+                new MessageTemplateToken[]
+                {
+                    new TextToken("ABCD", 0),
+                    new PropertyToken(nameof(arg1), "{arg1,7}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 7), startIndex: 4),
+                    new TextToken("EFGH", 12),
+                    new PropertyToken(nameof(arg2), "{arg2:N}", destructuring: Destructuring.Default, alignment: default(Alignment), format: "N", startIndex: 16),
+                    new TextToken("IJKL", 24),
+                    new PropertyToken(nameof(arg3), "{arg3,-10:F3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Left, 10), format: "F3", startIndex: 28),
+                    new TextToken("MNOP", 41),
+                    new PropertyToken(nameof(arg4), "{@arg4}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 45),
+                    new TextToken("QRST", 52),
+                    new PropertyToken(nameof(arg5), "{@arg5}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 56),
+                    new TextToken("UVWX", 63),
+                    new PropertyToken(nameof(veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg), 
+                        "{veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg}", 
+                        destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 67),
+                    new TextToken("YZ", 152)
+                },
+                MessageTemplateTokenEquivalency);
+            logEvent.Properties.Count.Should().Be(6);
+            logEvent.Properties.Should().BeEquivalentTo(
+                new []
+                {
+                    arg1.ToLogEventPropertyValue(),
+                    arg2.ToLogEventPropertyValue(),
+                    arg3.ToLogEventPropertyValue(),
+                    arg4.ToLogEventPropertyValue(),
+                    arg5.ToLogEventPropertyValue(),
+                    veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg.ToLogEventPropertyValue(),
+                },
+                PropertiesEquivalency);
+            logEvent.Level.Should().Be(<#= logEventLevel == null ? "logEventLevel" : $"LogEventLevel.{logEventLevel}" #>);
+<#if (withException) { #>
+            logEvent.Exception.Should().BeSameAs(exception);
+<# } else { #>
+            logEvent.Exception.Should().BeNull();
+<# } #>
+            logEvent.RenderMessage().Should().Be($"ABCD {Format(arg1, 7)}EFGH{Format(arg2, "N")}IJKL{Format(arg3,-10,"F3")}MNOP{Format(arg4)}QRST{Format(arg5)}UVWX{Format(veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg)}YZ");   
+        }
+    }
+
+    [Test]
+    public void <#= GetTestName("NamedScalar", logEventLevel, withException) #>(<#if (logEventLevel == null) { #>[ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel<# } #>)
+    {
+<#if (logEventLevel != null) { #> 
+        const LogEventLevel logEventLevel = LogEventLevel.<#= (logEventLevel) #>;
+<# } #>
+        var value = 42;
+
+        <#if (withException) { #>Exception exception = new InvalidOperationException("Test exception."); <# } #>
+
+        Logger.<#= GetMethodName(logEventLevel, true)  #>(<#if (logEventLevel == null) { #>logEventLevel, <# } #><#if (withException) { #>exception, <# } #>
+            $"Default: {value.Named("default")}, Stringified: {value.Named("$str")}, Destructured: {value.Named("@destructured")}");
+        Logger.<#= GetMethodName(logEventLevel, false) #>(<#if (logEventLevel == null) { #>logEventLevel, <# } #><#if (withException) { #>exception, <# } #>
+            "Default: {default}, Stringified: {$str}, Destructured: {@destructured}", value, value, value);
+
+        if (logEventLevel < MinLogEventLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.MessageTemplate.Text.Should().Be("Default: {default}, Stringified: {$str}, Destructured: {@destructured}");
+            logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
+                new MessageTemplateToken[]
+                {
+                    new TextToken("Default: ", 0),
+                    new PropertyToken("default", "{default}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 9),
+                    new TextToken(", Stringified: ", 18),
+                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment), startIndex: 33),
+                    new TextToken(", Destructured: ", 39),
+                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 55)
+                },
+                MessageTemplateTokenEquivalency);
+            logEvent.Properties.Count.Should().Be(3);
+            logEvent.Properties.Should().BeEquivalentTo(
+                new []
+                {
+                    value.ToLogEventPropertyValue("default"),
+                    value.ToString().ToLogEventPropertyValue("str"),
+                    value.ToLogEventPropertyValue("destructured"),
+                },
+                PropertiesEquivalency);
+            logEvent.Level.Should().Be(<#= logEventLevel == null ? "logEventLevel" : $"LogEventLevel.{logEventLevel}" #>);
+<#if (withException) { #>
+            logEvent.Exception.Should().BeSameAs(exception);
+<# } else { #>
+            logEvent.Exception.Should().BeNull();
+<# } #>
+            logEvent.RenderMessage().Should().Be($"Default: {Format(value)}, Stringified: {Format(value.ToString())}, Destructured: {Format(value)}");   
+        }
+    }
+
+    [Test]
+    public void <#= GetTestName("NamedComplex", logEventLevel, withException) #>(<#if (logEventLevel == null) { #>[ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel<# } #>)
+    {
+<#if (logEventLevel != null) { #> 
+        const LogEventLevel logEventLevel = LogEventLevel.<#= (logEventLevel) #>;
+<# } #>
+        var value = new TestObject(3, 5);
+
+        <#if (withException) { #>Exception exception = new InvalidOperationException("Test exception."); <# } #>
+
+        Logger.<#= GetMethodName(logEventLevel, true)  #>(<#if (logEventLevel == null) { #>logEventLevel, <# } #><#if (withException) { #>exception, <# } #>
+            $"Default: {value.Named("default")}, Stringified: {value.Named("$str")}, Destructured: {value.Named("@destructured")}");
+        Logger.<#= GetMethodName(logEventLevel, false) #>(<#if (logEventLevel == null) { #>logEventLevel, <# } #><#if (withException) { #>exception, <# } #>
+            "Default: {@default}, Stringified: {$str}, Destructured: {@destructured}", value, value, value);
+
+        if (logEventLevel < MinLogEventLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.MessageTemplate.Text.Should().Be("Default: {@default}, Stringified: {$str}, Destructured: {@destructured}");
+            logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
+                new MessageTemplateToken[]
+                {
+                    new TextToken("Default: ", 0),
+                    new PropertyToken("default", "{@default}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 9),
+                    new TextToken(", Stringified: ", 19),
+                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment), startIndex: 34),
+                    new TextToken(", Destructured: ", 40),
+                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 56)
+                },
+                MessageTemplateTokenEquivalency);
+            logEvent.Properties.Count.Should().Be(3);
+            logEvent.Properties.Should().BeEquivalentTo(
+                new []
+                {
+                    value.ToLogEventPropertyValue("default"),
+                    value.ToString().ToLogEventPropertyValue("str"),
+                    value.ToLogEventPropertyValue("destructured"),
+                },
+                PropertiesEquivalency);
+            logEvent.Level.Should().Be(<#= logEventLevel == null ? "logEventLevel" : $"LogEventLevel.{logEventLevel}" #>);
+<#if (withException) { #>
+            logEvent.Exception.Should().BeSameAs(exception);
+<# } else { #>
+            logEvent.Exception.Should().BeNull();
+<# } #>
+            logEvent.RenderMessage().Should().Be($"Default: {Format(value)}, Stringified: {Format(value.ToString())}, Destructured: {Format(value)}");   
+        }
+    }
+
+<# } #>
+
+    #endregion
+<# } #>
+}

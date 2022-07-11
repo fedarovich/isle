@@ -57,6 +57,7 @@ public static class LoggingExtensions
         if (string.IsNullOrWhiteSpace(name))
             throw new ArgumentException("The name cannot be null or empty string.", nameof(name));
 
+        string rawName = name;
         if (!preserveDefaultValueRepresentation && !name.StartsWith(DestructureOperator) && !name.StartsWith(StringifyOperator))
         {
             var representation = IsleConfiguration.Current.ValueRepresentationPolicy.GetRepresentationOfType<T>();
@@ -71,7 +72,7 @@ public static class LoggingExtensions
             }
         }
 
-        return new NamedLogValue(value, name);
+        return new NamedLogValue(value, name, rawName);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

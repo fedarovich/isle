@@ -33,7 +33,7 @@ public class MELBenchmarks
         GlobalSetup();
     }
 
-    [GlobalSetup(Target = nameof(InterpolatedWithManualDestructuring))]
+    [GlobalSetup(Targets = new [] { nameof(InterpolatedWithManualDestructuring), nameof(InterpolatedWithNamed) })]
     public void GlobalSetupWithManualDestructuring()
     {
         GlobalSetup();
@@ -41,7 +41,7 @@ public class MELBenchmarks
             .ConfigureExtensionsLogging(cfg => cfg.EnableMessageTemplateCaching = EnableCaching));
     }
 
-    [GlobalSetup(Targets = new [] { nameof(InterpolatedWithExplicitAutomaticDestructuring), nameof(InterpolatedWithImplicitAutomaticDestructuring) })]
+    [GlobalSetup(Targets = new[] { nameof(InterpolatedWithExplicitAutomaticDestructuring), nameof(InterpolatedWithImplicitAutomaticDestructuring) })]
     public void GlobalSetupWithAutoDestructuring()
     {
         GlobalSetup();
@@ -82,6 +82,12 @@ public class MELBenchmarks
     public void InterpolatedWithManualDestructuring()
     {
         _logger.LogInformation($"The area of rectangle {@Rect} is Width * Height = {Area} and its perimeter is 2 * (Width + Height) = {Perimeter}.");
+    }
+
+    [Benchmark]
+    public void InterpolatedWithNamed()
+    {
+        _logger.LogInformation($"The area of rectangle {Rect.Named("@Rect")} is Width * Height = {Area.Named("Area")} and its perimeter is 2 * (Width + Height) = {Perimeter.Named("Perimeter")}.");
     }
 
     [Benchmark]

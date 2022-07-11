@@ -1,37 +1,39 @@
 ﻿#nullable enable
 using System.Runtime.CompilerServices;
-using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Events;
 
-namespace Isle.Extensions.Logging;
+namespace Isle.Serilog;
 
 
 /// <summary>
-/// Interpolated string handler for LogTrace() method.
+/// Interpolated string handler for LogVerbose() method.
 /// </summary>
 /// <remarks>
 /// This class should not be used directly in your code.
 /// </remarks>
 [InterpolatedStringHandler]
-public ref partial struct TraceLogInterpolatedStringHandler
+public ref partial struct VerboseLogInterpolatedStringHandler
 {
-    private FormattedLogValuesBuilder _builder = null!;
-
+    private LogEventBuilder _builder = null!;
+    
     /// <summary>
-    /// Creates a new instance of <see cref="TraceLogInterpolatedStringHandler" />.
+    /// Creates a new instance of <see cref="VerboseLogInterpolatedStringHandler" />.
     /// </summary>
-    public TraceLogInterpolatedStringHandler(
+    public VerboseLogInterpolatedStringHandler(
         int literalLength, 
         int formattedCount,
         ILogger logger,
         out bool isEnabled
     )
     {
-        isEnabled = logger.IsEnabled(LogLevel.Trace);
+        isEnabled = logger.IsEnabled(LogEventLevel.Verbose);
         if (isEnabled)
         {
-            _builder = FormattedLogValuesBuilder.Acquire(literalLength, formattedCount);
+            _builder = LogEventBuilder.Acquire(literalLength, formattedCount, logger);
         }
     }
+
 
     /// <summary>
     /// Gets the value indicating whether the handler is enabled.
@@ -51,11 +53,10 @@ public ref partial struct TraceLogInterpolatedStringHandler
     /// Appends a <paramref name="value" /> to the log message.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "") => _builder.AppendFormatted(
-        name.GetNameFromCallerArgumentExpression<T>(),
-        value,
-        alignment, 
-        format);
+    public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "")
+    {
+        _builder.AppendFormatted(name, value, alignment, format);
+    }
 
     /// <summary>
     /// Appends a <paramref name="namedLogValue" /> to the log message.
@@ -63,13 +64,13 @@ public ref partial struct TraceLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in NamedLogValue namedLogValue, int alignment = 0, string? format = null)
     {
-        _builder.AppendFormatted(namedLogValue.Name, namedLogValue.Value, alignment, format);
+        _builder.AppendFormatted(namedLogValue, alignment, format);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal FormattedLogValuesBase GetFormattedLogValuesAndReset()
+    internal LogEvent GetLogEventAndReset(Exception? exception = null)
     {
-        var result = FormattedLogValuesBuilder.BuildAndRelease(_builder);
+        var result = LogEventBuilder.BuildAndRelease(_builder, LogEventLevel.Verbose, exception);
         _builder = null!;
         return result;
     }
@@ -85,8 +86,8 @@ public ref partial struct TraceLogInterpolatedStringHandler
 [InterpolatedStringHandler]
 public ref partial struct DebugLogInterpolatedStringHandler
 {
-    private FormattedLogValuesBuilder _builder = null!;
-
+    private LogEventBuilder _builder = null!;
+    
     /// <summary>
     /// Creates a new instance of <see cref="DebugLogInterpolatedStringHandler" />.
     /// </summary>
@@ -97,12 +98,13 @@ public ref partial struct DebugLogInterpolatedStringHandler
         out bool isEnabled
     )
     {
-        isEnabled = logger.IsEnabled(LogLevel.Debug);
+        isEnabled = logger.IsEnabled(LogEventLevel.Debug);
         if (isEnabled)
         {
-            _builder = FormattedLogValuesBuilder.Acquire(literalLength, formattedCount);
+            _builder = LogEventBuilder.Acquire(literalLength, formattedCount, logger);
         }
     }
+
 
     /// <summary>
     /// Gets the value indicating whether the handler is enabled.
@@ -122,11 +124,10 @@ public ref partial struct DebugLogInterpolatedStringHandler
     /// Appends a <paramref name="value" /> to the log message.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "") => _builder.AppendFormatted(
-        name.GetNameFromCallerArgumentExpression<T>(),
-        value,
-        alignment, 
-        format);
+    public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "")
+    {
+        _builder.AppendFormatted(name, value, alignment, format);
+    }
 
     /// <summary>
     /// Appends a <paramref name="namedLogValue" /> to the log message.
@@ -134,13 +135,13 @@ public ref partial struct DebugLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in NamedLogValue namedLogValue, int alignment = 0, string? format = null)
     {
-        _builder.AppendFormatted(namedLogValue.Name, namedLogValue.Value, alignment, format);
+        _builder.AppendFormatted(namedLogValue, alignment, format);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal FormattedLogValuesBase GetFormattedLogValuesAndReset()
+    internal LogEvent GetLogEventAndReset(Exception? exception = null)
     {
-        var result = FormattedLogValuesBuilder.BuildAndRelease(_builder);
+        var result = LogEventBuilder.BuildAndRelease(_builder, LogEventLevel.Debug, exception);
         _builder = null!;
         return result;
     }
@@ -156,8 +157,8 @@ public ref partial struct DebugLogInterpolatedStringHandler
 [InterpolatedStringHandler]
 public ref partial struct InformationLogInterpolatedStringHandler
 {
-    private FormattedLogValuesBuilder _builder = null!;
-
+    private LogEventBuilder _builder = null!;
+    
     /// <summary>
     /// Creates a new instance of <see cref="InformationLogInterpolatedStringHandler" />.
     /// </summary>
@@ -168,12 +169,13 @@ public ref partial struct InformationLogInterpolatedStringHandler
         out bool isEnabled
     )
     {
-        isEnabled = logger.IsEnabled(LogLevel.Information);
+        isEnabled = logger.IsEnabled(LogEventLevel.Information);
         if (isEnabled)
         {
-            _builder = FormattedLogValuesBuilder.Acquire(literalLength, formattedCount);
+            _builder = LogEventBuilder.Acquire(literalLength, formattedCount, logger);
         }
     }
+
 
     /// <summary>
     /// Gets the value indicating whether the handler is enabled.
@@ -193,11 +195,10 @@ public ref partial struct InformationLogInterpolatedStringHandler
     /// Appends a <paramref name="value" /> to the log message.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "") => _builder.AppendFormatted(
-        name.GetNameFromCallerArgumentExpression<T>(),
-        value,
-        alignment, 
-        format);
+    public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "")
+    {
+        _builder.AppendFormatted(name, value, alignment, format);
+    }
 
     /// <summary>
     /// Appends a <paramref name="namedLogValue" /> to the log message.
@@ -205,13 +206,13 @@ public ref partial struct InformationLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in NamedLogValue namedLogValue, int alignment = 0, string? format = null)
     {
-        _builder.AppendFormatted(namedLogValue.Name, namedLogValue.Value, alignment, format);
+        _builder.AppendFormatted(namedLogValue, alignment, format);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal FormattedLogValuesBase GetFormattedLogValuesAndReset()
+    internal LogEvent GetLogEventAndReset(Exception? exception = null)
     {
-        var result = FormattedLogValuesBuilder.BuildAndRelease(_builder);
+        var result = LogEventBuilder.BuildAndRelease(_builder, LogEventLevel.Information, exception);
         _builder = null!;
         return result;
     }
@@ -227,8 +228,8 @@ public ref partial struct InformationLogInterpolatedStringHandler
 [InterpolatedStringHandler]
 public ref partial struct WarningLogInterpolatedStringHandler
 {
-    private FormattedLogValuesBuilder _builder = null!;
-
+    private LogEventBuilder _builder = null!;
+    
     /// <summary>
     /// Creates a new instance of <see cref="WarningLogInterpolatedStringHandler" />.
     /// </summary>
@@ -239,12 +240,13 @@ public ref partial struct WarningLogInterpolatedStringHandler
         out bool isEnabled
     )
     {
-        isEnabled = logger.IsEnabled(LogLevel.Warning);
+        isEnabled = logger.IsEnabled(LogEventLevel.Warning);
         if (isEnabled)
         {
-            _builder = FormattedLogValuesBuilder.Acquire(literalLength, formattedCount);
+            _builder = LogEventBuilder.Acquire(literalLength, formattedCount, logger);
         }
     }
+
 
     /// <summary>
     /// Gets the value indicating whether the handler is enabled.
@@ -264,11 +266,10 @@ public ref partial struct WarningLogInterpolatedStringHandler
     /// Appends a <paramref name="value" /> to the log message.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "") => _builder.AppendFormatted(
-        name.GetNameFromCallerArgumentExpression<T>(),
-        value,
-        alignment, 
-        format);
+    public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "")
+    {
+        _builder.AppendFormatted(name, value, alignment, format);
+    }
 
     /// <summary>
     /// Appends a <paramref name="namedLogValue" /> to the log message.
@@ -276,13 +277,13 @@ public ref partial struct WarningLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in NamedLogValue namedLogValue, int alignment = 0, string? format = null)
     {
-        _builder.AppendFormatted(namedLogValue.Name, namedLogValue.Value, alignment, format);
+        _builder.AppendFormatted(namedLogValue, alignment, format);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal FormattedLogValuesBase GetFormattedLogValuesAndReset()
+    internal LogEvent GetLogEventAndReset(Exception? exception = null)
     {
-        var result = FormattedLogValuesBuilder.BuildAndRelease(_builder);
+        var result = LogEventBuilder.BuildAndRelease(_builder, LogEventLevel.Warning, exception);
         _builder = null!;
         return result;
     }
@@ -298,8 +299,8 @@ public ref partial struct WarningLogInterpolatedStringHandler
 [InterpolatedStringHandler]
 public ref partial struct ErrorLogInterpolatedStringHandler
 {
-    private FormattedLogValuesBuilder _builder = null!;
-
+    private LogEventBuilder _builder = null!;
+    
     /// <summary>
     /// Creates a new instance of <see cref="ErrorLogInterpolatedStringHandler" />.
     /// </summary>
@@ -310,12 +311,13 @@ public ref partial struct ErrorLogInterpolatedStringHandler
         out bool isEnabled
     )
     {
-        isEnabled = logger.IsEnabled(LogLevel.Error);
+        isEnabled = logger.IsEnabled(LogEventLevel.Error);
         if (isEnabled)
         {
-            _builder = FormattedLogValuesBuilder.Acquire(literalLength, formattedCount);
+            _builder = LogEventBuilder.Acquire(literalLength, formattedCount, logger);
         }
     }
+
 
     /// <summary>
     /// Gets the value indicating whether the handler is enabled.
@@ -335,11 +337,10 @@ public ref partial struct ErrorLogInterpolatedStringHandler
     /// Appends a <paramref name="value" /> to the log message.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "") => _builder.AppendFormatted(
-        name.GetNameFromCallerArgumentExpression<T>(),
-        value,
-        alignment, 
-        format);
+    public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "")
+    {
+        _builder.AppendFormatted(name, value, alignment, format);
+    }
 
     /// <summary>
     /// Appends a <paramref name="namedLogValue" /> to the log message.
@@ -347,13 +348,13 @@ public ref partial struct ErrorLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in NamedLogValue namedLogValue, int alignment = 0, string? format = null)
     {
-        _builder.AppendFormatted(namedLogValue.Name, namedLogValue.Value, alignment, format);
+        _builder.AppendFormatted(namedLogValue, alignment, format);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal FormattedLogValuesBase GetFormattedLogValuesAndReset()
+    internal LogEvent GetLogEventAndReset(Exception? exception = null)
     {
-        var result = FormattedLogValuesBuilder.BuildAndRelease(_builder);
+        var result = LogEventBuilder.BuildAndRelease(_builder, LogEventLevel.Error, exception);
         _builder = null!;
         return result;
     }
@@ -361,32 +362,33 @@ public ref partial struct ErrorLogInterpolatedStringHandler
 
 
 /// <summary>
-/// Interpolated string handler for LogCritical() method.
+/// Interpolated string handler for LogFatal() method.
 /// </summary>
 /// <remarks>
 /// This class should not be used directly in your code.
 /// </remarks>
 [InterpolatedStringHandler]
-public ref partial struct CriticalLogInterpolatedStringHandler
+public ref partial struct FatalLogInterpolatedStringHandler
 {
-    private FormattedLogValuesBuilder _builder = null!;
-
+    private LogEventBuilder _builder = null!;
+    
     /// <summary>
-    /// Creates a new instance of <see cref="CriticalLogInterpolatedStringHandler" />.
+    /// Creates a new instance of <see cref="FatalLogInterpolatedStringHandler" />.
     /// </summary>
-    public CriticalLogInterpolatedStringHandler(
+    public FatalLogInterpolatedStringHandler(
         int literalLength, 
         int formattedCount,
         ILogger logger,
         out bool isEnabled
     )
     {
-        isEnabled = logger.IsEnabled(LogLevel.Critical);
+        isEnabled = logger.IsEnabled(LogEventLevel.Fatal);
         if (isEnabled)
         {
-            _builder = FormattedLogValuesBuilder.Acquire(literalLength, formattedCount);
+            _builder = LogEventBuilder.Acquire(literalLength, formattedCount, logger);
         }
     }
+
 
     /// <summary>
     /// Gets the value indicating whether the handler is enabled.
@@ -406,11 +408,10 @@ public ref partial struct CriticalLogInterpolatedStringHandler
     /// Appends a <paramref name="value" /> to the log message.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "") => _builder.AppendFormatted(
-        name.GetNameFromCallerArgumentExpression<T>(),
-        value,
-        alignment, 
-        format);
+    public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "")
+    {
+        _builder.AppendFormatted(name, value, alignment, format);
+    }
 
     /// <summary>
     /// Appends a <paramref name="namedLogValue" /> to the log message.
@@ -418,13 +419,13 @@ public ref partial struct CriticalLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in NamedLogValue namedLogValue, int alignment = 0, string? format = null)
     {
-        _builder.AppendFormatted(namedLogValue.Name, namedLogValue.Value, alignment, format);
+        _builder.AppendFormatted(namedLogValue, alignment, format);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal FormattedLogValuesBase GetFormattedLogValuesAndReset()
+    internal LogEvent GetLogEventAndReset(Exception? exception = null)
     {
-        var result = FormattedLogValuesBuilder.BuildAndRelease(_builder);
+        var result = LogEventBuilder.BuildAndRelease(_builder, LogEventLevel.Fatal, exception);
         _builder = null!;
         return result;
     }
@@ -440,8 +441,9 @@ public ref partial struct CriticalLogInterpolatedStringHandler
 [InterpolatedStringHandler]
 public ref partial struct LogInterpolatedStringHandler
 {
-    private FormattedLogValuesBuilder _builder = null!;
-
+    private LogEventBuilder _builder = null!;
+    private LogEventLevel _logEventLevel = default;
+    
     /// <summary>
     /// Creates a new instance of <see cref="LogInterpolatedStringHandler" />.
     /// </summary>
@@ -449,16 +451,18 @@ public ref partial struct LogInterpolatedStringHandler
         int literalLength, 
         int formattedCount,
         ILogger logger,
-        LogLevel logLevel,
+        LogEventLevel logEventLevel,
         out bool isEnabled
     )
     {
-        isEnabled = logger.IsEnabled(logLevel);
+        isEnabled = logger.IsEnabled(logEventLevel);
         if (isEnabled)
         {
-            _builder = FormattedLogValuesBuilder.Acquire(literalLength, formattedCount);
+            _builder = LogEventBuilder.Acquire(literalLength, formattedCount, logger);
+            _logEventLevel = logEventLevel;
         }
     }
+
 
     /// <summary>
     /// Gets the value indicating whether the handler is enabled.
@@ -478,11 +482,10 @@ public ref partial struct LogInterpolatedStringHandler
     /// Appends a <paramref name="value" /> to the log message.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "") => _builder.AppendFormatted(
-        name.GetNameFromCallerArgumentExpression<T>(),
-        value,
-        alignment, 
-        format);
+    public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "")
+    {
+        _builder.AppendFormatted(name, value, alignment, format);
+    }
 
     /// <summary>
     /// Appends a <paramref name="namedLogValue" /> to the log message.
@@ -490,74 +493,13 @@ public ref partial struct LogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in NamedLogValue namedLogValue, int alignment = 0, string? format = null)
     {
-        _builder.AppendFormatted(namedLogValue.Name, namedLogValue.Value, alignment, format);
+        _builder.AppendFormatted(namedLogValue, alignment, format);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal FormattedLogValuesBase GetFormattedLogValuesAndReset()
+    internal LogEvent GetLogEventAndReset(Exception? exception = null)
     {
-        var result = FormattedLogValuesBuilder.BuildAndRelease(_builder);
-        _builder = null!;
-        return result;
-    }
-}
-
-
-/// <summary>
-/// Interpolated string handler for BeginScope() method.
-/// </summary>
-/// <remarks>
-/// This class should not be used directly in your code.
-/// </remarks>
-[InterpolatedStringHandler]
-public ref partial struct ScopeLogInterpolatedStringHandler
-{
-    private FormattedLogValuesBuilder _builder = null!;
-
-    /// <summary>
-    /// Creates a new instance of <see cref="ScopeLogInterpolatedStringHandler" />.
-    /// </summary>
-    public ScopeLogInterpolatedStringHandler(
-        int literalLength, 
-        int formattedCount,
-        ILogger logger    )
-    {
-            _builder = FormattedLogValuesBuilder.Acquire(literalLength, formattedCount);
-    }
-
-
-    /// <summary>
-    /// Appends a string literal to the template string.
-    /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void AppendLiteral(string? str)
-    {
-        _builder.AppendLiteral(str);
-    }
-
-    /// <summary>
-    /// Appends a <paramref name="value" /> to the log message.
-    /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "") => _builder.AppendFormatted(
-        name.GetNameFromCallerArgumentExpression<T>(),
-        value,
-        alignment, 
-        format);
-
-    /// <summary>
-    /// Appends a <paramref name="namedLogValue" /> to the log message.
-    /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void AppendFormatted(in NamedLogValue namedLogValue, int alignment = 0, string? format = null)
-    {
-        _builder.AppendFormatted(namedLogValue.Name, namedLogValue.Value, alignment, format);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal FormattedLogValuesBase GetFormattedLogValuesAndReset()
-    {
-        var result = FormattedLogValuesBuilder.BuildAndRelease(_builder);
+        var result = LogEventBuilder.BuildAndRelease(_builder, _logEventLevel, exception);
         _builder = null!;
         return result;
     }
