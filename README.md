@@ -6,6 +6,7 @@ ISLE (Interpolated String Logging Extensions) is a library that allows developer
 | ------- | ---------- | ------- |
 | Isle.Core | [![nuget](https://img.shields.io/nuget/v/Isle.Core.svg?label=nuget)](https://www.nuget.org/packages/Isle.Core) | [![myget](https://img.shields.io/myget/fedarovich/vpre/Isle.Core.svg?label=myget)](https://www.myget.org/feed/fedarovich/package/nuget/Isle.Core) |
 | Isle.Extensions.Logging | [![nuget](https://img.shields.io/nuget/v/Isle.Extensions.Logging.svg?label=nuget)](https://www.nuget.org/packages/Isle.Extensions.Logging) | [![myget](https://img.shields.io/myget/fedarovich/vpre/Isle.Extensions.Logging.svg?label=myget)](https://www.myget.org/feed/fedarovich/package/nuget/Isle.Extensions.Logging) |
+| Isle.Serilog | [![nuget](https://img.shields.io/nuget/v/Isle.Serilog.svg?label=nuget)](https://www.nuget.org/packages/Isle.Serilog) | [![myget](https://img.shields.io/myget/fedarovich/vpre/Isle.Serilog.svg?label=myget)](https://www.myget.org/feed/fedarovich/package/nuget/Isle.Serilog) |
 
 [![Build Status](https://dev.azure.com/pavelfedarovich/ISLE/_apis/build/status/fedarovich.isle?branchName=main)](https://dev.azure.com/pavelfedarovich/ISLE/_build/latest?definitionId=12&branchName=main)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/fedarovich/isle/blob/master/LICENSE)
@@ -89,4 +90,6 @@ string CapitalizeFirstLetter(string name) => name[0..1].ToUpper() + name[1..];
 
 IsleConfiguration.Configure(builder => builder.WithNameConverter(CapitalizeFirstLetter));
 ```
+You can find some built-in name converters in the class `Isle.Converters.ValueNameConverters`. It also contains some helper functions for writing your own converters.
+
 Please note that the transform is not applied to the names explicitly specified using the `Named` method.
