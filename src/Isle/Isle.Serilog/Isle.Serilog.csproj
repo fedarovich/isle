@@ -43,7 +43,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="buildTransitive\Isle.Extensions.Logging.targets">
+    <None Update="buildTransitive\Isle.Serilog.targets">
       <PackagePath>/</PackagePath>
       <Pack>True</Pack>
     </None>
