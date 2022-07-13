@@ -7,6 +7,8 @@ namespace Isle.Serilog;
 
 internal abstract class LogEventBuilder
 {
+    private readonly object?[] _pooledValueArray = new object?[1];
+
     [ThreadStatic]
     private static LogEventBuilder? _cachedInstance;
 
@@ -53,4 +55,17 @@ internal abstract class LogEventBuilder
     public abstract void AppendFormatted<T>(string name, T value, int alignment, string? format);
 
     public abstract void AppendFormatted(in NamedLogValue namedLogValue, int alignment, string? format);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    protected object?[] AcquirePooledValueArray(object? value)
+    {
+        _pooledValueArray[0] = value;
+        return _pooledValueArray;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    protected void ReleasePooledValueArray()
+    {
+        _pooledValueArray[0] = null;
+    }
 }

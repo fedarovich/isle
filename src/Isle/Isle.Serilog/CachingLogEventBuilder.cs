@@ -11,8 +11,6 @@ namespace Isle.Serilog;
 
 internal sealed class CachingLogEventBuilder : LogEventBuilder
 {
-    private readonly object?[] _pooledValueArray = new object?[1];
-
     private ILogger _logger = null!;
     private Node _lastNode = null!;
     private object?[] _propertyValues = null!;
@@ -86,17 +84,17 @@ internal sealed class CachingLogEventBuilder : LogEventBuilder
         // Unfortunately, BindProperty does not handle Stringify option correctly, so we have a separate, less efficient branch for it.
         else
         {
-            _pooledValueArray[0] = value;
+            var pooledValueArray = AcquirePooledValueArray(value);
             try
             {
-                if (_logger.BindMessageTemplate(node.RawText, _pooledValueArray, out _, out var properties))
+                if (_logger.BindMessageTemplate(node.RawText, pooledValueArray, out _, out var properties))
                 {
                     return properties.First();
                 }
             }
             finally
             {
-                _pooledValueArray[0] = null;
+                ReleasePooledValueArray();
             }
         }
 

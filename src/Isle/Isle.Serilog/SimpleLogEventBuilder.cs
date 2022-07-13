@@ -12,8 +12,6 @@ internal sealed class SimpleLogEventBuilder : LogEventBuilder
 {
     private const char DestructureOperator = '@';
     private const char StringifyOperator = '$';
-
-    private readonly object?[] _pooledValueArray = new object?[1];
     
     private List<MessageTemplateToken> _tokens = null!;
     private LogEventProperty[] _properties = null!;
@@ -187,10 +185,10 @@ internal sealed class SimpleLogEventBuilder : LogEventBuilder
         // Unfortunately, BindProperty does not handle Stringify option correctly, so we have a separate, less efficient branch for it.
         else
         {
-            _pooledValueArray[0] = value;
+            var pooledValueArray = AcquirePooledValueArray(value);
             try
             {
-                if (_logger.BindMessageTemplate(rawText, _pooledValueArray, out _, out var properties))
+                if (_logger.BindMessageTemplate(rawText, pooledValueArray, out _, out var properties))
                 {
                     _properties[_propertyIndex++] = properties.First();
                     return;
@@ -198,12 +196,11 @@ internal sealed class SimpleLogEventBuilder : LogEventBuilder
             }
             finally
             {
-                _pooledValueArray[0] = null;
+                ReleasePooledValueArray();
             }
         }
 
         // We should actually never get here, but if we suddenly do, we'll just log the string representation of the value. 
         _properties[_propertyIndex++] = new LogEventProperty(name, new ScalarValue(value?.ToString()));
     }
-
 }

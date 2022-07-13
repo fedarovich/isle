@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using System.Threading;
 using FluentAssertions;
 using Isle.Serilog.Caching;
 using NUnit.Framework;
@@ -131,5 +133,243 @@ internal abstract class NodeTests<TNode> where TNode : Node
 
         var holeNode2 = ParentNode.GetOrAddPropertyNode("$" + name, name, alignment, format);
         holeNode2.Should().BeSameAs(propertyNode);
+    }
+
+    [Test]
+    [Repeat(10)]
+    public void GetOrAddTextNodeMultithreaded()
+    {
+        var text = Guid.NewGuid().ToString();
+
+        var threadCount = Math.Max(Environment.ProcessorCount, 4);
+
+        using var barrier = new Barrier(threadCount);
+        var nodes = new TextNode[threadCount];
+
+        var threads = Enumerable.Range(0, threadCount)
+            .Select(index => new Thread(() =>
+            {
+                // ReSharper disable once AccessToDisposedClosure
+                barrier.SignalAndWait();
+                nodes[index] = ParentNode.GetOrAddTextNode(text);
+            }))
+            .ToArray();
+
+        foreach (var thread in threads)
+        {
+            thread.Start();
+        }
+
+        foreach (var thread in threads)
+        {
+            thread.Join();
+        }
+
+        var firstNode = nodes[0];
+        foreach (var node in nodes.Skip(1))
+        {
+            node.Should().BeSameAs(firstNode);
+        }
+    }
+
+    [Test]
+    [Repeat(10)]
+    public void GetOrAddTextNodesMultithreaded()
+    {
+        string[] texts =
+        {
+            Guid.NewGuid().ToString(),
+            Guid.NewGuid().ToString()
+        };
+
+        var threadCount = Math.Max(Environment.ProcessorCount, 4);
+
+        using var barrier = new Barrier(threadCount);
+        var nodes = new TextNode[threadCount];
+
+        var threads = Enumerable.Range(0, threadCount)
+            .Select(index => new Thread(() =>
+            {
+                var text = texts[index & 1];
+                // ReSharper disable once AccessToDisposedClosure
+                barrier.SignalAndWait();
+                nodes[index] = ParentNode.GetOrAddTextNode(text);
+            }))
+            .ToArray();
+
+        foreach (var thread in threads)
+        {
+            thread.Start();
+        }
+
+        foreach (var thread in threads)
+        {
+            thread.Join();
+        }
+
+        for (int i = 2; i < threadCount; i++)
+        {
+            nodes[i].Should().BeSameAs(nodes[i & 1]);
+        }
+    }
+
+    [Test]
+    [Repeat(10)]
+    public void GetOrAddPropertyNodeMultithreaded()
+    {
+        var name = "X" + Guid.NewGuid().ToString("N");
+
+        var threadCount = Math.Max(Environment.ProcessorCount, 4);
+
+        using var barrier = new Barrier(threadCount);
+        var nodes = new PropertyNode[threadCount];
+
+        var threads = Enumerable.Range(0, threadCount)
+            .Select(index => new Thread(() =>
+            {
+                // ReSharper disable once AccessToDisposedClosure
+                barrier.SignalAndWait();
+                nodes[index] = ParentNode.GetOrAddPropertyNode(name, name);
+            }))
+            .ToArray();
+
+        foreach (var thread in threads)
+        {
+            thread.Start();
+        }
+
+        foreach (var thread in threads)
+        {
+            thread.Join();
+        }
+
+        var firstNode = nodes[0];
+        foreach (var node in nodes.Skip(1))
+        {
+            node.Should().BeSameAs(firstNode);
+        }
+    }
+
+    [Test]
+    [Repeat(10)]
+    public void GetOrAddPropertyNodesMultithreaded()
+    {
+        string[] names =
+        {
+            "X" + Guid.NewGuid().ToString("N"),
+            "Y" + Guid.NewGuid().ToString("N")
+        };
+
+        var threadCount = Math.Max(Environment.ProcessorCount, 4);
+
+        using var barrier = new Barrier(threadCount);
+        var nodes = new PropertyNode[threadCount];
+
+        var threads = Enumerable.Range(0, threadCount)
+            .Select(index => new Thread(() =>
+            {
+                var name = names[index & 1];
+                // ReSharper disable once AccessToDisposedClosure
+                barrier.SignalAndWait();
+                nodes[index] = ParentNode.GetOrAddPropertyNode(name, name);
+            }))
+            .ToArray();
+
+        foreach (var thread in threads)
+        {
+            thread.Start();
+        }
+
+        foreach (var thread in threads)
+        {
+            thread.Join();
+        }
+
+        for (int i = 2; i < threadCount; i++)
+        {
+            nodes[i].Should().BeSameAs(nodes[i & 1]);
+        }
+    }
+
+    [Test]
+    [Repeat(10)]
+    public void GetOrAddFormattedPropertyNodeMultithreaded()
+    {
+        var name = "X" + Guid.NewGuid().ToString("N");
+        var format = "F3";
+        var alignment = -6;
+
+        var threadCount = Math.Max(Environment.ProcessorCount, 4);
+
+        using var barrier = new Barrier(threadCount);
+        var nodes = new PropertyNode[threadCount];
+
+        var threads = Enumerable.Range(0, threadCount)
+            .Select(index => new Thread(() =>
+            {
+                // ReSharper disable once AccessToDisposedClosure
+                barrier.SignalAndWait();
+                nodes[index] = ParentNode.GetOrAddPropertyNode(name, name, alignment, format);
+            }))
+            .ToArray();
+
+        foreach (var thread in threads)
+        {
+            thread.Start();
+        }
+
+        foreach (var thread in threads)
+        {
+            thread.Join();
+        }
+
+        var firstNode = nodes[0];
+        foreach (var node in nodes.Skip(1))
+        {
+            node.Should().BeSameAs(firstNode);
+        }
+    }
+
+    [Test]
+    [Repeat(10)]
+    public void GetOrAddFormattedPropertyNodesMultithreaded()
+    {
+        string[] names =
+        {
+            "X" + Guid.NewGuid().ToString("N"),
+            "Y" + Guid.NewGuid().ToString("N")
+        };
+        var format = "F3";
+        var alignment = -6;
+
+        var threadCount = Math.Max(Environment.ProcessorCount, 4);
+
+        using var barrier = new Barrier(threadCount);
+        var nodes = new PropertyNode[threadCount];
+
+        var threads = Enumerable.Range(0, threadCount)
+            .Select(index => new Thread(() =>
+            {
+                var name = names[index & 1];
+                // ReSharper disable once AccessToDisposedClosure
+                barrier.SignalAndWait();
+                nodes[index] = ParentNode.GetOrAddPropertyNode(name, name, alignment, format);
+            }))
+            .ToArray();
+
+        foreach (var thread in threads)
+        {
+            thread.Start();
+        }
+
+        foreach (var thread in threads)
+        {
+            thread.Join();
+        }
+
+        for (int i = 2; i < threadCount; i++)
+        {
+            nodes[i].Should().BeSameAs(nodes[i & 1]);
+        }
     }
 }

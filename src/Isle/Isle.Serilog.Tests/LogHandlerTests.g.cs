@@ -1,9 +1,11 @@
 ﻿#nullable enable
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using FluentAssertions;
 using Serilog.Events;
 using Serilog.Parsing;
+using Isle.Extensions;
 
 namespace Isle.Serilog.Tests;
 
@@ -244,7 +246,7 @@ public class VerboseLogInterpolatedStringHandlerTests : BaseFixture
 
     #endregion
 
-    #region AppendFormat with Complex Object
+    #region AppendFormatted with Complex Object
 
     [Test]
     public void AppendFormattedComplexType()
@@ -328,6 +330,140 @@ public class VerboseLogInterpolatedStringHandlerTests : BaseFixture
             },
             PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment, format));
+    }
+
+    #endregion
+
+    #region AppendFormatted with explicit value representation
+
+    [Test]
+    public void AppendFormattedWithExplicitDestructure()
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var value = new TestObject(1, 2);
+
+        var handler = new VerboseLogInterpolatedStringHandler(0, 1, Logger,  out _);
+        handler.AppendFormatted(value, name: "@" + nameof(value));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("{@value}");
+        logEvent.Properties.Count.Should().Be(1);
+        logEvent.Properties.Should().BeEquivalentTo(
+            new []
+            {
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
+        logEvent.RenderMessage().Should().Be(Format(value));
+    }
+
+    [Test]
+    public void AppendFormattedWithExplicitStringify()
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var value = 5;
+
+        var handler = new VerboseLogInterpolatedStringHandler(0, 1, Logger,  out _);
+        handler.AppendFormatted(value, name: "$" + nameof(value));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("{$value}");
+        logEvent.Properties.Count.Should().Be(1);
+        logEvent.Properties.Should().BeEquivalentTo(
+            new []
+            {
+                value.ToString().ToLogEventPropertyValue(nameof(value))
+            },
+            PropertiesEquivalency);
+        logEvent.RenderMessage().Should().Be($"\"{Format(value)}\"");
+    }
+
+    #endregion
+
+    #region AppendFormatted Named
+
+    [Test]
+    public void AppendFormattedNamedComplex()
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var value = new TestObject(1, 2);
+
+        var handler = new VerboseLogInterpolatedStringHandler(0, 1, Logger,  out _);
+        handler.AppendFormatted(value.Named("complexValue"));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("{@complexValue}");
+        logEvent.Properties.Count.Should().Be(1);
+        logEvent.Properties.Should().BeEquivalentTo(
+            new []
+            {
+                value.ToLogEventPropertyValue("complexValue")
+            },
+            PropertiesEquivalency);
+        logEvent.RenderMessage().Should().Be(Format(value));
+    }
+
+    [Test]
+    public void AppendFormattedNamedWithExplicitDestructure()
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var value = new TestObject(1, 2);
+
+        var handler = new VerboseLogInterpolatedStringHandler(0, 1, Logger,  out _);
+        handler.AppendFormatted(value.Named("@value"));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("{@value}");
+        logEvent.Properties.Count.Should().Be(1);
+        logEvent.Properties.Should().BeEquivalentTo(
+            new []
+            {
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
+        logEvent.RenderMessage().Should().Be(Format(value));
+    }
+
+    [Test]
+    public void AppendFormattedNamedScalar()
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var value = 5;
+
+        var handler = new VerboseLogInterpolatedStringHandler(0, 1, Logger,  out _);
+        handler.AppendFormatted(value.Named("scalarValue"));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("{scalarValue}");
+        logEvent.Properties.Count.Should().Be(1);
+        logEvent.Properties.Should().BeEquivalentTo(
+            new []
+            {
+                value.ToLogEventPropertyValue("scalarValue")
+            },
+            PropertiesEquivalency);
+        logEvent.RenderMessage().Should().Be($"{Format(value)}");
+    }
+
+    [Test]
+    public void AppendFormattedNamedWithExplicitStringify()
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var value = 5;
+
+        var handler = new VerboseLogInterpolatedStringHandler(0, 1, Logger,  out _);
+        handler.AppendFormatted(value.Named("$value"));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("{$value}");
+        logEvent.Properties.Count.Should().Be(1);
+        logEvent.Properties.Should().BeEquivalentTo(
+            new []
+            {
+                value.ToString().ToLogEventPropertyValue(nameof(value))
+            },
+            PropertiesEquivalency);
+        logEvent.RenderMessage().Should().Be($"\"{Format(value)}\"");
     }
 
     #endregion
@@ -570,7 +706,7 @@ public class DebugLogInterpolatedStringHandlerTests : BaseFixture
 
     #endregion
 
-    #region AppendFormat with Complex Object
+    #region AppendFormatted with Complex Object
 
     [Test]
     public void AppendFormattedComplexType()
@@ -654,6 +790,140 @@ public class DebugLogInterpolatedStringHandlerTests : BaseFixture
             },
             PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment, format));
+    }
+
+    #endregion
+
+    #region AppendFormatted with explicit value representation
+
+    [Test]
+    public void AppendFormattedWithExplicitDestructure()
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var value = new TestObject(1, 2);
+
+        var handler = new DebugLogInterpolatedStringHandler(0, 1, Logger,  out _);
+        handler.AppendFormatted(value, name: "@" + nameof(value));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("{@value}");
+        logEvent.Properties.Count.Should().Be(1);
+        logEvent.Properties.Should().BeEquivalentTo(
+            new []
+            {
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
+        logEvent.RenderMessage().Should().Be(Format(value));
+    }
+
+    [Test]
+    public void AppendFormattedWithExplicitStringify()
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var value = 5;
+
+        var handler = new DebugLogInterpolatedStringHandler(0, 1, Logger,  out _);
+        handler.AppendFormatted(value, name: "$" + nameof(value));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("{$value}");
+        logEvent.Properties.Count.Should().Be(1);
+        logEvent.Properties.Should().BeEquivalentTo(
+            new []
+            {
+                value.ToString().ToLogEventPropertyValue(nameof(value))
+            },
+            PropertiesEquivalency);
+        logEvent.RenderMessage().Should().Be($"\"{Format(value)}\"");
+    }
+
+    #endregion
+
+    #region AppendFormatted Named
+
+    [Test]
+    public void AppendFormattedNamedComplex()
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var value = new TestObject(1, 2);
+
+        var handler = new DebugLogInterpolatedStringHandler(0, 1, Logger,  out _);
+        handler.AppendFormatted(value.Named("complexValue"));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("{@complexValue}");
+        logEvent.Properties.Count.Should().Be(1);
+        logEvent.Properties.Should().BeEquivalentTo(
+            new []
+            {
+                value.ToLogEventPropertyValue("complexValue")
+            },
+            PropertiesEquivalency);
+        logEvent.RenderMessage().Should().Be(Format(value));
+    }
+
+    [Test]
+    public void AppendFormattedNamedWithExplicitDestructure()
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var value = new TestObject(1, 2);
+
+        var handler = new DebugLogInterpolatedStringHandler(0, 1, Logger,  out _);
+        handler.AppendFormatted(value.Named("@value"));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("{@value}");
+        logEvent.Properties.Count.Should().Be(1);
+        logEvent.Properties.Should().BeEquivalentTo(
+            new []
+            {
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
+        logEvent.RenderMessage().Should().Be(Format(value));
+    }
+
+    [Test]
+    public void AppendFormattedNamedScalar()
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var value = 5;
+
+        var handler = new DebugLogInterpolatedStringHandler(0, 1, Logger,  out _);
+        handler.AppendFormatted(value.Named("scalarValue"));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("{scalarValue}");
+        logEvent.Properties.Count.Should().Be(1);
+        logEvent.Properties.Should().BeEquivalentTo(
+            new []
+            {
+                value.ToLogEventPropertyValue("scalarValue")
+            },
+            PropertiesEquivalency);
+        logEvent.RenderMessage().Should().Be($"{Format(value)}");
+    }
+
+    [Test]
+    public void AppendFormattedNamedWithExplicitStringify()
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var value = 5;
+
+        var handler = new DebugLogInterpolatedStringHandler(0, 1, Logger,  out _);
+        handler.AppendFormatted(value.Named("$value"));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("{$value}");
+        logEvent.Properties.Count.Should().Be(1);
+        logEvent.Properties.Should().BeEquivalentTo(
+            new []
+            {
+                value.ToString().ToLogEventPropertyValue(nameof(value))
+            },
+            PropertiesEquivalency);
+        logEvent.RenderMessage().Should().Be($"\"{Format(value)}\"");
     }
 
     #endregion
@@ -896,7 +1166,7 @@ public class InformationLogInterpolatedStringHandlerTests : BaseFixture
 
     #endregion
 
-    #region AppendFormat with Complex Object
+    #region AppendFormatted with Complex Object
 
     [Test]
     public void AppendFormattedComplexType()
@@ -980,6 +1250,140 @@ public class InformationLogInterpolatedStringHandlerTests : BaseFixture
             },
             PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment, format));
+    }
+
+    #endregion
+
+    #region AppendFormatted with explicit value representation
+
+    [Test]
+    public void AppendFormattedWithExplicitDestructure()
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var value = new TestObject(1, 2);
+
+        var handler = new InformationLogInterpolatedStringHandler(0, 1, Logger,  out _);
+        handler.AppendFormatted(value, name: "@" + nameof(value));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("{@value}");
+        logEvent.Properties.Count.Should().Be(1);
+        logEvent.Properties.Should().BeEquivalentTo(
+            new []
+            {
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
+        logEvent.RenderMessage().Should().Be(Format(value));
+    }
+
+    [Test]
+    public void AppendFormattedWithExplicitStringify()
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var value = 5;
+
+        var handler = new InformationLogInterpolatedStringHandler(0, 1, Logger,  out _);
+        handler.AppendFormatted(value, name: "$" + nameof(value));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("{$value}");
+        logEvent.Properties.Count.Should().Be(1);
+        logEvent.Properties.Should().BeEquivalentTo(
+            new []
+            {
+                value.ToString().ToLogEventPropertyValue(nameof(value))
+            },
+            PropertiesEquivalency);
+        logEvent.RenderMessage().Should().Be($"\"{Format(value)}\"");
+    }
+
+    #endregion
+
+    #region AppendFormatted Named
+
+    [Test]
+    public void AppendFormattedNamedComplex()
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var value = new TestObject(1, 2);
+
+        var handler = new InformationLogInterpolatedStringHandler(0, 1, Logger,  out _);
+        handler.AppendFormatted(value.Named("complexValue"));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("{@complexValue}");
+        logEvent.Properties.Count.Should().Be(1);
+        logEvent.Properties.Should().BeEquivalentTo(
+            new []
+            {
+                value.ToLogEventPropertyValue("complexValue")
+            },
+            PropertiesEquivalency);
+        logEvent.RenderMessage().Should().Be(Format(value));
+    }
+
+    [Test]
+    public void AppendFormattedNamedWithExplicitDestructure()
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var value = new TestObject(1, 2);
+
+        var handler = new InformationLogInterpolatedStringHandler(0, 1, Logger,  out _);
+        handler.AppendFormatted(value.Named("@value"));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("{@value}");
+        logEvent.Properties.Count.Should().Be(1);
+        logEvent.Properties.Should().BeEquivalentTo(
+            new []
+            {
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
+        logEvent.RenderMessage().Should().Be(Format(value));
+    }
+
+    [Test]
+    public void AppendFormattedNamedScalar()
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var value = 5;
+
+        var handler = new InformationLogInterpolatedStringHandler(0, 1, Logger,  out _);
+        handler.AppendFormatted(value.Named("scalarValue"));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("{scalarValue}");
+        logEvent.Properties.Count.Should().Be(1);
+        logEvent.Properties.Should().BeEquivalentTo(
+            new []
+            {
+                value.ToLogEventPropertyValue("scalarValue")
+            },
+            PropertiesEquivalency);
+        logEvent.RenderMessage().Should().Be($"{Format(value)}");
+    }
+
+    [Test]
+    public void AppendFormattedNamedWithExplicitStringify()
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var value = 5;
+
+        var handler = new InformationLogInterpolatedStringHandler(0, 1, Logger,  out _);
+        handler.AppendFormatted(value.Named("$value"));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("{$value}");
+        logEvent.Properties.Count.Should().Be(1);
+        logEvent.Properties.Should().BeEquivalentTo(
+            new []
+            {
+                value.ToString().ToLogEventPropertyValue(nameof(value))
+            },
+            PropertiesEquivalency);
+        logEvent.RenderMessage().Should().Be($"\"{Format(value)}\"");
     }
 
     #endregion
@@ -1222,7 +1626,7 @@ public class WarningLogInterpolatedStringHandlerTests : BaseFixture
 
     #endregion
 
-    #region AppendFormat with Complex Object
+    #region AppendFormatted with Complex Object
 
     [Test]
     public void AppendFormattedComplexType()
@@ -1306,6 +1710,140 @@ public class WarningLogInterpolatedStringHandlerTests : BaseFixture
             },
             PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment, format));
+    }
+
+    #endregion
+
+    #region AppendFormatted with explicit value representation
+
+    [Test]
+    public void AppendFormattedWithExplicitDestructure()
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var value = new TestObject(1, 2);
+
+        var handler = new WarningLogInterpolatedStringHandler(0, 1, Logger,  out _);
+        handler.AppendFormatted(value, name: "@" + nameof(value));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("{@value}");
+        logEvent.Properties.Count.Should().Be(1);
+        logEvent.Properties.Should().BeEquivalentTo(
+            new []
+            {
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
+        logEvent.RenderMessage().Should().Be(Format(value));
+    }
+
+    [Test]
+    public void AppendFormattedWithExplicitStringify()
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var value = 5;
+
+        var handler = new WarningLogInterpolatedStringHandler(0, 1, Logger,  out _);
+        handler.AppendFormatted(value, name: "$" + nameof(value));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("{$value}");
+        logEvent.Properties.Count.Should().Be(1);
+        logEvent.Properties.Should().BeEquivalentTo(
+            new []
+            {
+                value.ToString().ToLogEventPropertyValue(nameof(value))
+            },
+            PropertiesEquivalency);
+        logEvent.RenderMessage().Should().Be($"\"{Format(value)}\"");
+    }
+
+    #endregion
+
+    #region AppendFormatted Named
+
+    [Test]
+    public void AppendFormattedNamedComplex()
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var value = new TestObject(1, 2);
+
+        var handler = new WarningLogInterpolatedStringHandler(0, 1, Logger,  out _);
+        handler.AppendFormatted(value.Named("complexValue"));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("{@complexValue}");
+        logEvent.Properties.Count.Should().Be(1);
+        logEvent.Properties.Should().BeEquivalentTo(
+            new []
+            {
+                value.ToLogEventPropertyValue("complexValue")
+            },
+            PropertiesEquivalency);
+        logEvent.RenderMessage().Should().Be(Format(value));
+    }
+
+    [Test]
+    public void AppendFormattedNamedWithExplicitDestructure()
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var value = new TestObject(1, 2);
+
+        var handler = new WarningLogInterpolatedStringHandler(0, 1, Logger,  out _);
+        handler.AppendFormatted(value.Named("@value"));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("{@value}");
+        logEvent.Properties.Count.Should().Be(1);
+        logEvent.Properties.Should().BeEquivalentTo(
+            new []
+            {
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
+        logEvent.RenderMessage().Should().Be(Format(value));
+    }
+
+    [Test]
+    public void AppendFormattedNamedScalar()
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var value = 5;
+
+        var handler = new WarningLogInterpolatedStringHandler(0, 1, Logger,  out _);
+        handler.AppendFormatted(value.Named("scalarValue"));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("{scalarValue}");
+        logEvent.Properties.Count.Should().Be(1);
+        logEvent.Properties.Should().BeEquivalentTo(
+            new []
+            {
+                value.ToLogEventPropertyValue("scalarValue")
+            },
+            PropertiesEquivalency);
+        logEvent.RenderMessage().Should().Be($"{Format(value)}");
+    }
+
+    [Test]
+    public void AppendFormattedNamedWithExplicitStringify()
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var value = 5;
+
+        var handler = new WarningLogInterpolatedStringHandler(0, 1, Logger,  out _);
+        handler.AppendFormatted(value.Named("$value"));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("{$value}");
+        logEvent.Properties.Count.Should().Be(1);
+        logEvent.Properties.Should().BeEquivalentTo(
+            new []
+            {
+                value.ToString().ToLogEventPropertyValue(nameof(value))
+            },
+            PropertiesEquivalency);
+        logEvent.RenderMessage().Should().Be($"\"{Format(value)}\"");
     }
 
     #endregion
@@ -1548,7 +2086,7 @@ public class ErrorLogInterpolatedStringHandlerTests : BaseFixture
 
     #endregion
 
-    #region AppendFormat with Complex Object
+    #region AppendFormatted with Complex Object
 
     [Test]
     public void AppendFormattedComplexType()
@@ -1632,6 +2170,140 @@ public class ErrorLogInterpolatedStringHandlerTests : BaseFixture
             },
             PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment, format));
+    }
+
+    #endregion
+
+    #region AppendFormatted with explicit value representation
+
+    [Test]
+    public void AppendFormattedWithExplicitDestructure()
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var value = new TestObject(1, 2);
+
+        var handler = new ErrorLogInterpolatedStringHandler(0, 1, Logger,  out _);
+        handler.AppendFormatted(value, name: "@" + nameof(value));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("{@value}");
+        logEvent.Properties.Count.Should().Be(1);
+        logEvent.Properties.Should().BeEquivalentTo(
+            new []
+            {
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
+        logEvent.RenderMessage().Should().Be(Format(value));
+    }
+
+    [Test]
+    public void AppendFormattedWithExplicitStringify()
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var value = 5;
+
+        var handler = new ErrorLogInterpolatedStringHandler(0, 1, Logger,  out _);
+        handler.AppendFormatted(value, name: "$" + nameof(value));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("{$value}");
+        logEvent.Properties.Count.Should().Be(1);
+        logEvent.Properties.Should().BeEquivalentTo(
+            new []
+            {
+                value.ToString().ToLogEventPropertyValue(nameof(value))
+            },
+            PropertiesEquivalency);
+        logEvent.RenderMessage().Should().Be($"\"{Format(value)}\"");
+    }
+
+    #endregion
+
+    #region AppendFormatted Named
+
+    [Test]
+    public void AppendFormattedNamedComplex()
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var value = new TestObject(1, 2);
+
+        var handler = new ErrorLogInterpolatedStringHandler(0, 1, Logger,  out _);
+        handler.AppendFormatted(value.Named("complexValue"));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("{@complexValue}");
+        logEvent.Properties.Count.Should().Be(1);
+        logEvent.Properties.Should().BeEquivalentTo(
+            new []
+            {
+                value.ToLogEventPropertyValue("complexValue")
+            },
+            PropertiesEquivalency);
+        logEvent.RenderMessage().Should().Be(Format(value));
+    }
+
+    [Test]
+    public void AppendFormattedNamedWithExplicitDestructure()
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var value = new TestObject(1, 2);
+
+        var handler = new ErrorLogInterpolatedStringHandler(0, 1, Logger,  out _);
+        handler.AppendFormatted(value.Named("@value"));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("{@value}");
+        logEvent.Properties.Count.Should().Be(1);
+        logEvent.Properties.Should().BeEquivalentTo(
+            new []
+            {
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
+        logEvent.RenderMessage().Should().Be(Format(value));
+    }
+
+    [Test]
+    public void AppendFormattedNamedScalar()
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var value = 5;
+
+        var handler = new ErrorLogInterpolatedStringHandler(0, 1, Logger,  out _);
+        handler.AppendFormatted(value.Named("scalarValue"));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("{scalarValue}");
+        logEvent.Properties.Count.Should().Be(1);
+        logEvent.Properties.Should().BeEquivalentTo(
+            new []
+            {
+                value.ToLogEventPropertyValue("scalarValue")
+            },
+            PropertiesEquivalency);
+        logEvent.RenderMessage().Should().Be($"{Format(value)}");
+    }
+
+    [Test]
+    public void AppendFormattedNamedWithExplicitStringify()
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var value = 5;
+
+        var handler = new ErrorLogInterpolatedStringHandler(0, 1, Logger,  out _);
+        handler.AppendFormatted(value.Named("$value"));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("{$value}");
+        logEvent.Properties.Count.Should().Be(1);
+        logEvent.Properties.Should().BeEquivalentTo(
+            new []
+            {
+                value.ToString().ToLogEventPropertyValue(nameof(value))
+            },
+            PropertiesEquivalency);
+        logEvent.RenderMessage().Should().Be($"\"{Format(value)}\"");
     }
 
     #endregion
@@ -1874,7 +2546,7 @@ public class FatalLogInterpolatedStringHandlerTests : BaseFixture
 
     #endregion
 
-    #region AppendFormat with Complex Object
+    #region AppendFormatted with Complex Object
 
     [Test]
     public void AppendFormattedComplexType()
@@ -1958,6 +2630,140 @@ public class FatalLogInterpolatedStringHandlerTests : BaseFixture
             },
             PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment, format));
+    }
+
+    #endregion
+
+    #region AppendFormatted with explicit value representation
+
+    [Test]
+    public void AppendFormattedWithExplicitDestructure()
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var value = new TestObject(1, 2);
+
+        var handler = new FatalLogInterpolatedStringHandler(0, 1, Logger,  out _);
+        handler.AppendFormatted(value, name: "@" + nameof(value));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("{@value}");
+        logEvent.Properties.Count.Should().Be(1);
+        logEvent.Properties.Should().BeEquivalentTo(
+            new []
+            {
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
+        logEvent.RenderMessage().Should().Be(Format(value));
+    }
+
+    [Test]
+    public void AppendFormattedWithExplicitStringify()
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var value = 5;
+
+        var handler = new FatalLogInterpolatedStringHandler(0, 1, Logger,  out _);
+        handler.AppendFormatted(value, name: "$" + nameof(value));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("{$value}");
+        logEvent.Properties.Count.Should().Be(1);
+        logEvent.Properties.Should().BeEquivalentTo(
+            new []
+            {
+                value.ToString().ToLogEventPropertyValue(nameof(value))
+            },
+            PropertiesEquivalency);
+        logEvent.RenderMessage().Should().Be($"\"{Format(value)}\"");
+    }
+
+    #endregion
+
+    #region AppendFormatted Named
+
+    [Test]
+    public void AppendFormattedNamedComplex()
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var value = new TestObject(1, 2);
+
+        var handler = new FatalLogInterpolatedStringHandler(0, 1, Logger,  out _);
+        handler.AppendFormatted(value.Named("complexValue"));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("{@complexValue}");
+        logEvent.Properties.Count.Should().Be(1);
+        logEvent.Properties.Should().BeEquivalentTo(
+            new []
+            {
+                value.ToLogEventPropertyValue("complexValue")
+            },
+            PropertiesEquivalency);
+        logEvent.RenderMessage().Should().Be(Format(value));
+    }
+
+    [Test]
+    public void AppendFormattedNamedWithExplicitDestructure()
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var value = new TestObject(1, 2);
+
+        var handler = new FatalLogInterpolatedStringHandler(0, 1, Logger,  out _);
+        handler.AppendFormatted(value.Named("@value"));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("{@value}");
+        logEvent.Properties.Count.Should().Be(1);
+        logEvent.Properties.Should().BeEquivalentTo(
+            new []
+            {
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
+        logEvent.RenderMessage().Should().Be(Format(value));
+    }
+
+    [Test]
+    public void AppendFormattedNamedScalar()
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var value = 5;
+
+        var handler = new FatalLogInterpolatedStringHandler(0, 1, Logger,  out _);
+        handler.AppendFormatted(value.Named("scalarValue"));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("{scalarValue}");
+        logEvent.Properties.Count.Should().Be(1);
+        logEvent.Properties.Should().BeEquivalentTo(
+            new []
+            {
+                value.ToLogEventPropertyValue("scalarValue")
+            },
+            PropertiesEquivalency);
+        logEvent.RenderMessage().Should().Be($"{Format(value)}");
+    }
+
+    [Test]
+    public void AppendFormattedNamedWithExplicitStringify()
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var value = 5;
+
+        var handler = new FatalLogInterpolatedStringHandler(0, 1, Logger,  out _);
+        handler.AppendFormatted(value.Named("$value"));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("{$value}");
+        logEvent.Properties.Count.Should().Be(1);
+        logEvent.Properties.Should().BeEquivalentTo(
+            new []
+            {
+                value.ToString().ToLogEventPropertyValue(nameof(value))
+            },
+            PropertiesEquivalency);
+        logEvent.RenderMessage().Should().Be($"\"{Format(value)}\"");
     }
 
     #endregion
@@ -2199,7 +3005,7 @@ public class LogInterpolatedStringHandlerTests : BaseFixture
 
     #endregion
 
-    #region AppendFormat with Complex Object
+    #region AppendFormatted with Complex Object
 
     [Test]
     public void AppendFormattedComplexType( [ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel )
@@ -2283,6 +3089,140 @@ public class LogInterpolatedStringHandlerTests : BaseFixture
             },
             PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment, format));
+    }
+
+    #endregion
+
+    #region AppendFormatted with explicit value representation
+
+    [Test]
+    public void AppendFormattedWithExplicitDestructure( [ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel )
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var value = new TestObject(1, 2);
+
+        var handler = new LogInterpolatedStringHandler(0, 1, Logger,  logEventLevel,  out _);
+        handler.AppendFormatted(value, name: "@" + nameof(value));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("{@value}");
+        logEvent.Properties.Count.Should().Be(1);
+        logEvent.Properties.Should().BeEquivalentTo(
+            new []
+            {
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
+        logEvent.RenderMessage().Should().Be(Format(value));
+    }
+
+    [Test]
+    public void AppendFormattedWithExplicitStringify( [ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel )
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var value = 5;
+
+        var handler = new LogInterpolatedStringHandler(0, 1, Logger,  logEventLevel,  out _);
+        handler.AppendFormatted(value, name: "$" + nameof(value));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("{$value}");
+        logEvent.Properties.Count.Should().Be(1);
+        logEvent.Properties.Should().BeEquivalentTo(
+            new []
+            {
+                value.ToString().ToLogEventPropertyValue(nameof(value))
+            },
+            PropertiesEquivalency);
+        logEvent.RenderMessage().Should().Be($"\"{Format(value)}\"");
+    }
+
+    #endregion
+
+    #region AppendFormatted Named
+
+    [Test]
+    public void AppendFormattedNamedComplex( [ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel )
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var value = new TestObject(1, 2);
+
+        var handler = new LogInterpolatedStringHandler(0, 1, Logger,  logEventLevel,  out _);
+        handler.AppendFormatted(value.Named("complexValue"));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("{@complexValue}");
+        logEvent.Properties.Count.Should().Be(1);
+        logEvent.Properties.Should().BeEquivalentTo(
+            new []
+            {
+                value.ToLogEventPropertyValue("complexValue")
+            },
+            PropertiesEquivalency);
+        logEvent.RenderMessage().Should().Be(Format(value));
+    }
+
+    [Test]
+    public void AppendFormattedNamedWithExplicitDestructure( [ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel )
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var value = new TestObject(1, 2);
+
+        var handler = new LogInterpolatedStringHandler(0, 1, Logger,  logEventLevel,  out _);
+        handler.AppendFormatted(value.Named("@value"));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("{@value}");
+        logEvent.Properties.Count.Should().Be(1);
+        logEvent.Properties.Should().BeEquivalentTo(
+            new []
+            {
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
+        logEvent.RenderMessage().Should().Be(Format(value));
+    }
+
+    [Test]
+    public void AppendFormattedNamedScalar( [ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel )
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var value = 5;
+
+        var handler = new LogInterpolatedStringHandler(0, 1, Logger,  logEventLevel,  out _);
+        handler.AppendFormatted(value.Named("scalarValue"));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("{scalarValue}");
+        logEvent.Properties.Count.Should().Be(1);
+        logEvent.Properties.Should().BeEquivalentTo(
+            new []
+            {
+                value.ToLogEventPropertyValue("scalarValue")
+            },
+            PropertiesEquivalency);
+        logEvent.RenderMessage().Should().Be($"{Format(value)}");
+    }
+
+    [Test]
+    public void AppendFormattedNamedWithExplicitStringify( [ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel )
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var value = 5;
+
+        var handler = new LogInterpolatedStringHandler(0, 1, Logger,  logEventLevel,  out _);
+        handler.AppendFormatted(value.Named("$value"));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("{$value}");
+        logEvent.Properties.Count.Should().Be(1);
+        logEvent.Properties.Should().BeEquivalentTo(
+            new []
+            {
+                value.ToString().ToLogEventPropertyValue(nameof(value))
+            },
+            PropertiesEquivalency);
+        logEvent.RenderMessage().Should().Be($"\"{Format(value)}\"");
     }
 
     #endregion

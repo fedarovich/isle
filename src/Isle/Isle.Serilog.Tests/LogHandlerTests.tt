@@ -11,11 +11,13 @@
     string GetTestName(string logEventLevel) => GetTypeName(logEventLevel) + "Tests";
 #>
 #nullable enable
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using FluentAssertions;
 using Serilog.Events;
 using Serilog.Parsing;
+using Isle.Extensions;
 
 namespace Isle.Serilog.Tests;
 
@@ -259,7 +261,7 @@ public class <#= GetTestName(logEventLevel) #> : BaseFixture
 
     #endregion
 
-    #region AppendFormat with Complex Object
+    #region AppendFormatted with Complex Object
 
     [Test]
     public void AppendFormattedComplexType(<#if (logEventLevel == null) { #> [ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel <# } #>)
@@ -343,6 +345,140 @@ public class <#= GetTestName(logEventLevel) #> : BaseFixture
             },
             PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment, format));
+    }
+
+    #endregion
+
+    #region AppendFormatted with explicit value representation
+
+    [Test]
+    public void AppendFormattedWithExplicitDestructure(<#if (logEventLevel == null) { #> [ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel <# } #>)
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var value = new TestObject(1, 2);
+
+        var handler = new <#= GetTypeName(logEventLevel) #>(0, 1, Logger, <#if (logEventLevel == null) { #> logEventLevel, <# } #> out _);
+        handler.AppendFormatted(value, name: "@" + nameof(value));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("{@value}");
+        logEvent.Properties.Count.Should().Be(1);
+        logEvent.Properties.Should().BeEquivalentTo(
+            new []
+            {
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
+        logEvent.RenderMessage().Should().Be(Format(value));
+    }
+
+    [Test]
+    public void AppendFormattedWithExplicitStringify(<#if (logEventLevel == null) { #> [ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel <# } #>)
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var value = 5;
+
+        var handler = new <#= GetTypeName(logEventLevel) #>(0, 1, Logger, <#if (logEventLevel == null) { #> logEventLevel, <# } #> out _);
+        handler.AppendFormatted(value, name: "$" + nameof(value));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("{$value}");
+        logEvent.Properties.Count.Should().Be(1);
+        logEvent.Properties.Should().BeEquivalentTo(
+            new []
+            {
+                value.ToString().ToLogEventPropertyValue(nameof(value))
+            },
+            PropertiesEquivalency);
+        logEvent.RenderMessage().Should().Be($"\"{Format(value)}\"");
+    }
+
+    #endregion
+
+    #region AppendFormatted Named
+
+    [Test]
+    public void AppendFormattedNamedComplex(<#if (logEventLevel == null) { #> [ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel <# } #>)
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var value = new TestObject(1, 2);
+
+        var handler = new <#= GetTypeName(logEventLevel) #>(0, 1, Logger, <#if (logEventLevel == null) { #> logEventLevel, <# } #> out _);
+        handler.AppendFormatted(value.Named("complexValue"));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("{@complexValue}");
+        logEvent.Properties.Count.Should().Be(1);
+        logEvent.Properties.Should().BeEquivalentTo(
+            new []
+            {
+                value.ToLogEventPropertyValue("complexValue")
+            },
+            PropertiesEquivalency);
+        logEvent.RenderMessage().Should().Be(Format(value));
+    }
+
+    [Test]
+    public void AppendFormattedNamedWithExplicitDestructure(<#if (logEventLevel == null) { #> [ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel <# } #>)
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var value = new TestObject(1, 2);
+
+        var handler = new <#= GetTypeName(logEventLevel) #>(0, 1, Logger, <#if (logEventLevel == null) { #> logEventLevel, <# } #> out _);
+        handler.AppendFormatted(value.Named("@value"));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("{@value}");
+        logEvent.Properties.Count.Should().Be(1);
+        logEvent.Properties.Should().BeEquivalentTo(
+            new []
+            {
+                value.ToLogEventPropertyValue()
+            },
+            PropertiesEquivalency);
+        logEvent.RenderMessage().Should().Be(Format(value));
+    }
+
+    [Test]
+    public void AppendFormattedNamedScalar(<#if (logEventLevel == null) { #> [ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel <# } #>)
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var value = 5;
+
+        var handler = new <#= GetTypeName(logEventLevel) #>(0, 1, Logger, <#if (logEventLevel == null) { #> logEventLevel, <# } #> out _);
+        handler.AppendFormatted(value.Named("scalarValue"));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("{scalarValue}");
+        logEvent.Properties.Count.Should().Be(1);
+        logEvent.Properties.Should().BeEquivalentTo(
+            new []
+            {
+                value.ToLogEventPropertyValue("scalarValue")
+            },
+            PropertiesEquivalency);
+        logEvent.RenderMessage().Should().Be($"{Format(value)}");
+    }
+
+    [Test]
+    public void AppendFormattedNamedWithExplicitStringify(<#if (logEventLevel == null) { #> [ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel <# } #>)
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var value = 5;
+
+        var handler = new <#= GetTypeName(logEventLevel) #>(0, 1, Logger, <#if (logEventLevel == null) { #> logEventLevel, <# } #> out _);
+        handler.AppendFormatted(value.Named("$value"));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("{$value}");
+        logEvent.Properties.Count.Should().Be(1);
+        logEvent.Properties.Should().BeEquivalentTo(
+            new []
+            {
+                value.ToString().ToLogEventPropertyValue(nameof(value))
+            },
+            PropertiesEquivalency);
+        logEvent.RenderMessage().Should().Be($"\"{Format(value)}\"");
     }
 
     #endregion
