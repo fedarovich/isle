@@ -55,7 +55,7 @@ public class SerilogBenchmark
     [GlobalCleanup]
     public void GlobalCleanup()
     {
-        typeof(IsleConfiguration).GetMethod("Reset", BindingFlags.NonPublic | BindingFlags.Static)!.Invoke(null, null);
+        IsleConfiguration.Reset();
         (_logger as IDisposable)?.Dispose();
     }
 
