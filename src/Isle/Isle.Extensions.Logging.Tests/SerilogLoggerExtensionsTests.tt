@@ -62,19 +62,22 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
             LogEvents.Should().HaveCount(2);
             var logEvent = LogEvents.First();
             var serilogEvent = LogEvents.Last();
-            logEvent.Should().BeEquivalentTo(serilogEvent, config => config.Excluding(e => e.Timestamp));
-            logEvent.Should().BeEquivalentTo(new 
-            {
-                Exception = <#= withException ? "exception" : "default(Exception)" #>,
-                Level = ToSerilogLevel(logLevel),
-                MessageTemplate = Parser.Parse(message),
-                Properties = new Dictionary<string, LogEventPropertyValue>
-                {
-                    ["SourceContext"] = new ScalarValue(GetType().FullName),
-                    <#if (withEventId) { #>["EventId"] = new ScalarValue(eventId)<# } #>
-
-                }
-            });
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    <#= withException ? "exception" : "default(Exception)" #>,
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+<#if (withEventId) { #>
+                        EventIdProperty(eventId)
+<# } #>
+                    }
+                ),
+                LogEventEquivalency);
             logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(message);
         }
     }
@@ -103,19 +106,22 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
             LogEvents.Should().HaveCount(2);
             var logEvent = LogEvents.First();
             var serilogEvent = LogEvents.Last();
-            logEvent.Should().BeEquivalentTo(serilogEvent, config => config.Excluding(e => e.Timestamp));
-            logEvent.Should().BeEquivalentTo(new 
-            {
-                Exception = <#= withException ? "exception" : "default(Exception)" #>,
-                Level = ToSerilogLevel(logLevel),
-                MessageTemplate = Parser.Parse(message),
-                Properties = new Dictionary<string, LogEventPropertyValue>
-                {
-                    ["SourceContext"] = new ScalarValue(GetType().FullName),
-                    <#if (withEventId) { #>["EventId"] = new ScalarValue(eventId)<# } #>
-
-                }
-            });
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    <#= withException ? "exception" : "default(Exception)" #>,
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+<#if (withEventId) { #>
+                        EventIdProperty(eventId)
+<# } #>
+                    }
+                ),
+                LogEventEquivalency);
             logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
         }
     }
@@ -144,21 +150,24 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
             LogEvents.Should().HaveCount(2);
             var logEvent = LogEvents.First();
             var serilogEvent = LogEvents.Last();
-            logEvent.Should().BeEquivalentTo(serilogEvent, config => config.Excluding(e => e.Timestamp));
-            logEvent.Should().BeEquivalentTo(new 
-            {
-                Exception = <#= withException ? "exception" : "default(Exception)" #>,
-                Level = ToSerilogLevel(logLevel),
-                MessageTemplate = Parser.Parse("{value}"),
-                Properties = new Dictionary<string, LogEventPropertyValue>
-                {
-                    ["value"] = new ScalarValue(value),
-                    ["SourceContext"] = new ScalarValue(GetType().FullName),
-                    <#if (withEventId) { #>["EventId"] = new ScalarValue(eventId)<# } #>
-
-                }
-            });
-            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(string.Format(CultureInfo.InvariantCulture, "{0}", value));
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    <#= withException ? "exception" : "default(Exception)" #>,
+                    Parser.Parse("{value}"),
+                    new LogEventProperty[]
+                    {
+                        value.ToLogEventProperty(),
+                        SourceContextProperty,
+<#if (withEventId) { #>
+                        EventIdProperty(eventId)
+<# } #>
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(Format(value));
         }
     }
 
@@ -186,21 +195,24 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
             LogEvents.Should().HaveCount(2);
             var logEvent = LogEvents.First();
             var serilogEvent = LogEvents.Last();
-            logEvent.Should().BeEquivalentTo(serilogEvent, config => config.Excluding(e => e.Timestamp));
-            logEvent.Should().BeEquivalentTo(new 
-            {
-                Exception = <#= withException ? "exception" : "default(Exception)" #>,
-                Level = ToSerilogLevel(logLevel),
-                MessageTemplate = Parser.Parse("{value,3}"),
-                Properties = new Dictionary<string, LogEventPropertyValue>
-                {
-                    ["value"] = new ScalarValue(value),
-                    ["SourceContext"] = new ScalarValue(GetType().FullName),
-                    <#if (withEventId) { #>["EventId"] = new ScalarValue(eventId)<# } #>
-
-                }
-            });
-            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(string.Format(CultureInfo.InvariantCulture, "{0,3}", value));
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    <#= withException ? "exception" : "default(Exception)" #>,
+                    Parser.Parse("{value,3}"),
+                    new LogEventProperty[]
+                    {
+                        value.ToLogEventProperty(),
+                        SourceContextProperty,
+<#if (withEventId) { #>
+                        EventIdProperty(eventId)
+<# } #>
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(Format(value,3));
         }
     }
 
@@ -228,21 +240,24 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
             LogEvents.Should().HaveCount(2);
             var logEvent = LogEvents.First();
             var serilogEvent = LogEvents.Last();
-            logEvent.Should().BeEquivalentTo(serilogEvent, config => config.Excluding(e => e.Timestamp));
-            logEvent.Should().BeEquivalentTo(new 
-            {
-                Exception = <#= withException ? "exception" : "default(Exception)" #>,
-                Level = ToSerilogLevel(logLevel),
-                MessageTemplate = Parser.Parse("{value:N}"),
-                Properties = new Dictionary<string, LogEventPropertyValue>
-                {
-                    ["value"] = new ScalarValue(value),
-                    ["SourceContext"] = new ScalarValue(GetType().FullName),
-                    <#if (withEventId) { #>["EventId"] = new ScalarValue(eventId)<# } #>
-
-                }
-            });
-            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(string.Format(CultureInfo.InvariantCulture, "{0:N}", value));
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    <#= withException ? "exception" : "default(Exception)" #>,
+                    Parser.Parse("{value:N}"),
+                    new LogEventProperty[]
+                    {
+                        value.ToLogEventProperty(),
+                        SourceContextProperty,
+<#if (withEventId) { #>
+                        EventIdProperty(eventId)
+<# } #>
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(Format(value, "N"));
         }
     }
 
@@ -270,21 +285,24 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
             LogEvents.Should().HaveCount(2);
             var logEvent = LogEvents.First();
             var serilogEvent = LogEvents.Last();
-            logEvent.Should().BeEquivalentTo(serilogEvent, config => config.Excluding(e => e.Timestamp));
-            logEvent.Should().BeEquivalentTo(new 
-            {
-                Exception = <#= withException ? "exception" : "default(Exception)" #>,
-                Level = ToSerilogLevel(logLevel),
-                MessageTemplate = Parser.Parse("{value,8:N}"),
-                Properties = new Dictionary<string, LogEventPropertyValue>
-                {
-                    ["value"] = new ScalarValue(value),
-                    ["SourceContext"] = new ScalarValue(GetType().FullName),
-                    <#if (withEventId) { #>["EventId"] = new ScalarValue(eventId)<# } #>
-
-                }
-            });
-            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(string.Format(CultureInfo.InvariantCulture, "{0,8:N}", value));
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    <#= withException ? "exception" : "default(Exception)" #>,
+                    Parser.Parse("{value,8:N}"),
+                    new LogEventProperty[]
+                    {
+                        value.ToLogEventProperty(),
+                        SourceContextProperty,
+<#if (withEventId) { #>
+                        EventIdProperty(eventId)
+<# } #>
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(Format(value, 8, "N"));
         }
     }
 
@@ -312,22 +330,24 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
             LogEvents.Should().HaveCount(2);
             var logEvent = LogEvents.First();
             var serilogEvent = LogEvents.Last();
-            logEvent.Should().BeEquivalentTo(serilogEvent, config => config.Excluding(e => e.Timestamp));
-            logEvent.Should().BeEquivalentTo(new 
-            {
-                Exception = <#= withException ? "exception" : "default(Exception)" #>,
-                Level = ToSerilogLevel(logLevel),
-                MessageTemplate = Parser.Parse("{@value}"),
-                Properties = new Dictionary<string, LogEventPropertyValue>
-                {
-                    ["value"] = new ScalarValue(value),
-                    ["SourceContext"] = new ScalarValue(GetType().FullName),
-                    <#if (withEventId) { #>["EventId"] = new ScalarValue(eventId)<# } #>
-
-                }
-            });
-            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(string.Format(CultureInfo.InvariantCulture, 
-                "TestObject {{ X: {0}, Y: {1} }}", value.X, value.Y));          
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    <#= withException ? "exception" : "default(Exception)" #>,
+                    Parser.Parse("{@value}"),
+                    new LogEventProperty[]
+                    {
+                        value.ToLogEventProperty(),
+                        SourceContextProperty,
+<#if (withEventId) { #>
+                        EventIdProperty(eventId)
+<# } #>
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(Format(value));      
         }
     }
 
@@ -355,21 +375,24 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
             LogEvents.Should().HaveCount(2);
             var logEvent = LogEvents.First();
             var serilogEvent = LogEvents.Last();
-            logEvent.Should().BeEquivalentTo(serilogEvent, config => config.Excluding(e => e.Timestamp));
-            logEvent.Should().BeEquivalentTo(new 
-            {
-                Exception = <#= withException ? "exception" : "default(Exception)" #>,
-                Level = ToSerilogLevel(logLevel),
-                MessageTemplate = Parser.Parse("{@value}"),
-                Properties = new Dictionary<string, LogEventPropertyValue>
-                {
-                    ["value"] = new ScalarValue(value),
-                    ["SourceContext"] = new ScalarValue(GetType().FullName),
-                    <#if (withEventId) { #>["EventId"] = new ScalarValue(eventId)<# } #>
-
-                }
-            });
-            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(string.Format(CultureInfo.InvariantCulture, "[1, 2, 3]", value));
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    <#= withException ? "exception" : "default(Exception)" #>,
+                    Parser.Parse("{@value}"),
+                    new LogEventProperty[]
+                    {
+                        value.ToLogEventProperty(),
+                        SourceContextProperty,
+<#if (withEventId) { #>
+                        EventIdProperty(eventId)
+<# } #>
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(Format(value));
         }
     }
 
@@ -397,21 +420,24 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
             LogEvents.Should().HaveCount(2);
             var logEvent = LogEvents.First();
             var serilogEvent = LogEvents.Last();
-            logEvent.Should().BeEquivalentTo(serilogEvent, config => config.Excluding(e => e.Timestamp));
-            logEvent.Should().BeEquivalentTo(new 
-            {
-                Exception = <#= withException ? "exception" : "default(Exception)" #>,
-                Level = ToSerilogLevel(logLevel),
-                MessageTemplate = Parser.Parse("{value}"),
-                Properties = new Dictionary<string, LogEventPropertyValue>
-                {
-                    ["value"] = new ScalarValue(value),
-                    ["SourceContext"] = new ScalarValue(GetType().FullName),
-                    <#if (withEventId) { #>["EventId"] = new ScalarValue(eventId)<# } #>
-
-                }
-            });
-            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(string.Format(CultureInfo.InvariantCulture, "\"{0}\"", value));
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    <#= withException ? "exception" : "default(Exception)" #>,
+                    Parser.Parse("{value}"),
+                    new LogEventProperty[]
+                    {
+                        value.ToLogEventProperty(),
+                        SourceContextProperty,
+<#if (withEventId) { #>
+                        EventIdProperty(eventId)
+<# } #>
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(Format(value));
         }
     }
 
@@ -433,9 +459,9 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
         <#if (withException) { #>Exception exception = new InvalidOperationException("Test exception."); <# } #>
 
         Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>
-            $"ABCD{arg1,7}EFGH{arg2:N}IJKL{arg3,10:F3}MNOP{arg4}QRST{arg5}UVWX{veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg}YZ");
+            $"ABCD{arg1,7}EFGH{arg2:N}IJKL{arg3,-10:F3}MNOP{arg4}QRST{arg5}UVWX{veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg}YZ");
         Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>
-            "ABCD{arg1,7}EFGH{arg2:N}IJKL{arg3,10:F3}MNOP{@arg4}QRST{@arg5}UVWX{veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg}YZ",
+            "ABCD{arg1,7}EFGH{arg2:N}IJKL{arg3,-10:F3}MNOP{@arg4}QRST{@arg5}UVWX{veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg}YZ",
             arg1,
             arg2,
             arg3,
@@ -452,33 +478,30 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
             LogEvents.Should().HaveCount(2);
             var logEvent = LogEvents.First();
             var serilogEvent = LogEvents.Last();
-            logEvent.Should().BeEquivalentTo(serilogEvent, config => config.Excluding(e => e.Timestamp));
-            logEvent.Should().BeEquivalentTo(new 
-            {
-                Exception = <#= withException ? "exception" : "default(Exception)" #>,
-                Level = ToSerilogLevel(logLevel),
-                MessageTemplate = Parser.Parse("ABCD{arg1,7}EFGH{arg2:N}IJKL{arg3,10:F3}MNOP{@arg4}QRST{@arg5}UVWX{veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg}YZ"),
-                Properties = new Dictionary<string, LogEventPropertyValue>
-                {
-                    ["arg1"] = new ScalarValue(arg1),
-                    ["arg2"] = new ScalarValue(arg2),
-                    ["arg3"] = new ScalarValue(arg3),
-                    ["arg4"] = new ScalarValue(arg4),
-                    ["arg5"] = new ScalarValue(arg5),
-                    ["veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg"] = new ScalarValue(veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg),
-                    ["SourceContext"] = new ScalarValue(GetType().FullName),
-                    <#if (withEventId) { #>["EventId"] = new ScalarValue(eventId)<# } #>
-
-                }
-            });
-            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(string.Format(CultureInfo.InvariantCulture, 
-                "ABCD{0,7}EFGH{1:N}IJKL{2,10:F3}MNOP{3}QRST{4}UVWX{5}YZ",
-                "\"" + arg1 + "\"", 
-                arg2, 
-                arg3, 
-                "TestObject { X: 7, Y: 11 }", 
-                "[5, 4, 3]",
-                "\"" + veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg + "\""));
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    <#= withException ? "exception" : "default(Exception)" #>,
+                    Parser.Parse("ABCD{arg1,7}EFGH{arg2:N}IJKL{arg3,-10:F3}MNOP{@arg4}QRST{@arg5}UVWX{veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg}YZ"),
+                    new LogEventProperty[]
+                    {
+                        arg1.ToLogEventProperty(),
+                        arg2.ToLogEventProperty(),
+                        arg3.ToLogEventProperty(),
+                        arg4.ToLogEventProperty(),
+                        arg5.ToLogEventProperty(),
+                        veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg.ToLogEventProperty(),
+                        SourceContextProperty,
+<#if (withEventId) { #>
+                        EventIdProperty(eventId)
+<# } #>
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(
+                $"ABCD {Format(arg1, 7)}EFGH{Format(arg2, "N")}IJKL{Format(arg3,-10,"F3")}MNOP{Format(arg4)}QRST{Format(arg5)}UVWX{Format(veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg)}YZ");
         }
     }
 
@@ -509,24 +532,27 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
             LogEvents.Should().HaveCount(2);
             var logEvent = LogEvents.First();
             var serilogEvent = LogEvents.Last();
-            logEvent.Should().BeEquivalentTo(serilogEvent, config => config.Excluding(e => e.Timestamp));
-            logEvent.Should().BeEquivalentTo(new 
-            {
-                Exception = <#= withException ? "exception" : "default(Exception)" #>,
-                Level = ToSerilogLevel(logLevel),
-                MessageTemplate = Parser.Parse("Default: {@default}, Stringified: {$str}, Destructured: {@destructured}"),
-                Properties = new Dictionary<string, LogEventPropertyValue>
-                {
-                    ["default"] = new ScalarValue(value),
-                    ["str"] = new ScalarValue(value),
-                    ["destructured"] = new ScalarValue(value),
-                    ["SourceContext"] = new ScalarValue(GetType().FullName),
-                    <#if (withEventId) { #>["EventId"] = new ScalarValue(eventId)<# } #>
-
-                }
-            });
-            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(string.Format(CultureInfo.InvariantCulture, 
-                "Default: TestObject {{ X: {0}, Y: {1} }}, Stringified: \"{2}\", Destructured: TestObject {{ X: {0}, Y: {1} }}", value.X, value.Y, value));          
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    <#= withException ? "exception" : "default(Exception)" #>,
+                    Parser.Parse("Default: {@default}, Stringified: {$str}, Destructured: {@destructured}"),
+                    new LogEventProperty[]
+                    {
+                        value.ToLogEventProperty("default"),
+                        value.ToString().ToLogEventProperty("str"),
+                        value.ToLogEventProperty("destructured"),
+                        SourceContextProperty,
+<#if (withEventId) { #>
+                        EventIdProperty(eventId)
+<# } #>
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(
+                $"Default: {Format(value)}, Stringified: {Format(value.ToString())}, Destructured: {Format(value)}");     
         }
     }
 

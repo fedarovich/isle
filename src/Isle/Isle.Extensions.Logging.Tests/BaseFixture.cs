@@ -76,6 +76,4 @@ public abstract class BaseFixture
     protected ILogger Logger { get; private set; } = null!;
 
     protected IReadOnlyList<TestLogItem> LogItems => _logItems;
-
-    protected record TestObject(int X, int Y);
 }

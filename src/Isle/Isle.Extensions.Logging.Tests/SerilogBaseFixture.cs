@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using FluentAssertions;
+using FluentAssertions.Equivalency;
 using Isle.Configuration;
 using Isle.Extensions.Logging.Tests.Serilog;
 using Microsoft.Extensions.Logging;
@@ -81,8 +84,6 @@ public abstract class SerilogBaseFixture
 
     protected IReadOnlyList<LogEvent> LogEvents => _serilogLogEvents;
 
-    protected record TestObject(int X, int Y);
-
     protected static LogEventLevel ToSerilogLevel(LogLevel level) =>
         level switch
         {
@@ -94,4 +95,75 @@ public abstract class SerilogBaseFixture
             LogLevel.Critical => LogEventLevel.Fatal,
             _ => throw new ArgumentOutOfRangeException(nameof(level), level, null)
         };
+
+    protected string Format(dynamic? value, int alignment, string format = "") => FormatCore(value, alignment, format);
+
+    protected string Format(dynamic? value, string format) => Format(value, 0, format);
+
+    protected string Format(dynamic? value) => Format(value, 0, "");
+
+    private string FormatCore(string str, int alignment, string format) => "\"" + str + "\"";
+
+    private string FormatCore<T>(T[] values, int alignment, string format) =>
+        "[" + string.Join(", ", values.Select(v => Format(v, 0, format))) + "]";
+
+    private string FormatCore(TestObject t, int alignment, string format) => $"TestObject {{ X: {t.X}, Y: {t.Y} }}";
+
+    private string FormatCore<T>(T value, int alignment, string format)
+    {
+        string formatString = "{0";
+        if (alignment != 0)
+        {
+            formatString += "," + alignment;
+        }
+
+        if (!string.IsNullOrEmpty(format))
+        {
+            formatString += ":" + format;
+        }
+
+        formatString += "}";
+
+        return string.Format(CultureInfo.InvariantCulture, formatString, value);
+    }
+
+    protected static EquivalencyAssertionOptions<LogEvent> LogEventEquivalency(EquivalencyAssertionOptions<LogEvent> cfg)
+    {
+        return cfg.Excluding(e => e.Timestamp)
+            .ComparingByMembers<TextToken>()
+            .ComparingByMembers<PropertyToken>()
+            .Using<MessageTemplateToken>(ctx => ctx.Subject
+                .Should().BeEquivalentTo(
+                    ctx.Expectation,
+                    config => config.RespectingRuntimeTypes()))
+                .WhenTypeIs<MessageTemplateToken>()
+            .Using<LogEventPropertyValue>(ctx => ctx.Subject
+                .Should().BeEquivalentTo(
+                    ctx.Expectation,
+                    config => config.RespectingRuntimeTypes()))
+                .WhenTypeIs<LogEventPropertyValue>()
+            .WithTracing();
+    }
+
+    protected static EquivalencyAssertionOptions<T> MessageTemplateTokenEquivalency<T>(EquivalencyAssertionOptions<T> cfg)
+        where T : MessageTemplateToken
+    {
+        return cfg.ComparingByMembers<TextToken>().ComparingByMembers<PropertyToken>().RespectingRuntimeTypes();
+    }
+
+    protected static EquivalencyAssertionOptions<KeyValuePair<string, LogEventPropertyValue>> PropertiesEquivalency(
+        EquivalencyAssertionOptions<KeyValuePair<string, LogEventPropertyValue>> cfg)
+    {
+        return cfg.Using<LogEventPropertyValue>(ctx => ctx.Subject
+            .Should().BeEquivalentTo(
+                ctx.Expectation,
+                config => config.RespectingRuntimeTypes()))
+            .WhenTypeIs<LogEventPropertyValue>();
+    }
+
+    protected LogEventProperty SourceContextProperty => new LogEventProperty("SourceContext", new ScalarValue(GetType().FullName));
+
+    protected LogEventProperty EventIdProperty(EventId eventId) =>
+        new LogEventProperty("EventId",
+            new StructureValue(new[] { new LogEventProperty(nameof(eventId.Id), new ScalarValue(eventId.Id)) }));
 }
