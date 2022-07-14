@@ -54,7 +54,7 @@ internal abstract class Node
     {
         var formatKey = new FormatKey(name, format, alignment);
         return FormattedPropertyNodes.GetOrAdd(formatKey, static (key, arg) =>
-            new PropertyNode(arg.parent, key.Name, arg.rawName, key.Format, key.Alignment), (parent: this, formatKey, rawName));
+            new PropertyNode(arg.parent, key.Name, arg.rawName, key.Alignment, key.Format), (parent: this, formatKey, rawName));
     }
 
     public TemplateNode GetTemplateNode()

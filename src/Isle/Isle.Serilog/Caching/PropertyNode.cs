@@ -8,7 +8,7 @@ internal sealed class PropertyNode : Node
     private const char DestructureOperator = '@';
     private const char StringifyOperator = '$';
 
-    public PropertyNode(Node parent, string name, string rawName, string? format = null, int alignment = 0) 
+    public PropertyNode(Node parent, string name, string rawName, int alignment = 0, string? format = null) 
         : base(parent, GetRawText(name, format, alignment))
     {
         var destructuring = Destructuring.Default;

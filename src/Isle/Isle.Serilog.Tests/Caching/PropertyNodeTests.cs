@@ -26,7 +26,7 @@ internal class PropertyNodeTests : NodeTests<PropertyNode>
     [Test]
     public void Create()
     {
-        var node = new PropertyNode(NodeCache.Instance, Name, Name, Format, Alignment);
+        var node = new PropertyNode(NodeCache.Instance, Name, Name, Alignment, Format);
         node.Parent.Should().Be(NodeCache.Instance);
         node.Depth.Should().Be(1);
         node.RawText.Should().Be($"{{{Name},{Alignment}:{Format}}}");
