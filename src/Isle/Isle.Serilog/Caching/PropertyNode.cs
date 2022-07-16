@@ -11,6 +11,8 @@ internal sealed class PropertyNode : Node
     public PropertyNode(Node parent, string name, string rawName, int alignment = 0, string? format = null) 
         : base(parent, GetRawText(name, format, alignment))
     {
+        Name = name;
+
         var destructuring = Destructuring.Default;
         var propertyName = name;
 
@@ -38,12 +40,21 @@ internal sealed class PropertyNode : Node
             Offset);
     }
 
+    public string Name { get; }
+
+    public FormatKey FormatKey => new (Name, Token.Format, GetAlignment(Token.Alignment ?? default));
+
     public override PropertyToken Token { get; }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static Alignment GetAlignment(int alignment) => alignment <= 0
         ? new Alignment(AlignmentDirection.Left, -alignment)
         : new Alignment(AlignmentDirection.Right, alignment);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static int GetAlignment(Alignment alignment) =>
+        alignment.Direction == AlignmentDirection.Right ? alignment.Width : -alignment.Width;    
+        
 
     [SkipLocalsInit]
     private static string GetRawText(string name, string? format = null, int alignment = 0)

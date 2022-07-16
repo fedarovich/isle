@@ -1,4 +1,6 @@
-﻿namespace Isle.Extensions.Logging.Caching;
+﻿using System.Collections.Concurrent;
+
+namespace Isle.Extensions.Logging.Caching;
 
 internal sealed class NodeCache : Node
 {
@@ -6,9 +8,25 @@ internal sealed class NodeCache : Node
     
     private NodeCache()
     {
+        Init(
+            literalNodes: new ConcurrentDictionary<string, LiteralNode>(),
+            holeNodes: new ConcurrentDictionary<string, HoleNode>(),
+            formattedHoleNodes: new ConcurrentDictionary<FormatKey, FormattedHoleNode>(),
+            templateNode: new TemplateNode(this)
+        );
     }
 
     static NodeCache()
     {
+    }
+
+    protected internal override void Reset()
+    {
+        Init(
+            literalNodes: new ConcurrentDictionary<string, LiteralNode>(),
+            holeNodes: new ConcurrentDictionary<string, HoleNode>(),
+            formattedHoleNodes: new ConcurrentDictionary<FormatKey, FormattedHoleNode>(),
+            templateNode: GetTemplateNode()
+        );
     }
 }

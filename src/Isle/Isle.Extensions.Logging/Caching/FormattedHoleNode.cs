@@ -14,4 +14,6 @@ internal sealed class FormattedHoleNode : Node
     public string? Format { get; }
     
     public int Alignment { get; }
+
+    public FormatKey FormatKey => new (Name, Format, Alignment);
 }
