@@ -10,6 +10,15 @@ internal abstract class FormattedLogValuesBase : IReadOnlyList<KeyValuePair<stri
 
     private ReadOnlyMemory<Segment> _segments;
 
+    private readonly int _maxCount;
+
+    private int _count;
+
+    protected FormattedLogValuesBase(int maxCount)
+    {
+        _count = _maxCount = maxCount;
+    }
+
     internal abstract Span<KeyValuePair<string, object?>> Values { get; }
 
     internal void SetSegments(in ReadOnlyMemory<Segment> segments)
@@ -36,7 +45,16 @@ internal abstract class FormattedLogValuesBase : IReadOnlyList<KeyValuePair<stri
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-    public int Count => Values.Length;
+    public int Count
+    {
+        get => _count;
+        internal set
+        {
+            if (value < 0 || value > _maxCount)
+                throw new ArgumentOutOfRangeException(nameof(value));
+            _count = value;
+        }
+    }
 
     public KeyValuePair<string, object?> this[int index]
     {

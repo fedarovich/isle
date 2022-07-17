@@ -460,6 +460,110 @@ public class LoggerExtensionsTests : BaseFixture
             logItem.Scopes.Should().BeEmpty();            
         }
     }
+    
+    [Test]
+    public void LogTrace_LiteralValue()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Trace;
+        
+        
+        Logger.LogTrace($"{new LiteralValue("Test")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = default(Exception),
+                Message = "Test"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "Test")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogTrace_LiteralValueWithBraces()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Trace;
+        
+        
+        Logger.LogTrace($"{(LiteralValue) "T{es}t"}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = default(Exception),
+                Message = "T{es}t"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "T{{es}}t")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogTrace_MixedLiteralValue()
+    {
+        var x = 1;
+        var y = 2;
+
+ 
+        const LogLevel logLevel = LogLevel.Trace;
+        
+        
+        Logger.LogTrace(            $"A{x}B{new LiteralValue("C")}D{y}E");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = default(Exception),
+                Message = "A1BCD2E"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("x", x),
+                new KeyValuePair<string, object>("y", y),
+                new KeyValuePair<string, object>("{OriginalFormat}", "A{x}BCD{y}E")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
 
 
     [Test]
@@ -900,6 +1004,110 @@ public class LoggerExtensionsTests : BaseFixture
                 new KeyValuePair<string, object>("{OriginalFormat}", "Default: {@default}, Stringified: {$str}, Destructured: {@destructured}")
             });
             logItem.Scopes.Should().BeEmpty();            
+        }
+    }
+    
+    [Test]
+    public void LogTrace_LiteralValue_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Trace;
+        
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogTrace(exception, $"{new LiteralValue("Test")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = exception,
+                Message = "Test"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "Test")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogTrace_LiteralValueWithBraces_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Trace;
+        
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogTrace(exception, $"{(LiteralValue) "T{es}t"}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = exception,
+                Message = "T{es}t"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "T{{es}}t")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogTrace_MixedLiteralValue_WithException()
+    {
+        var x = 1;
+        var y = 2;
+
+ 
+        const LogLevel logLevel = LogLevel.Trace;
+        
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogTrace(exception,             $"A{x}B{new LiteralValue("C")}D{y}E");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = exception,
+                Message = "A1BCD2E"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("x", x),
+                new KeyValuePair<string, object>("y", y),
+                new KeyValuePair<string, object>("{OriginalFormat}", "A{x}BCD{y}E")
+            });
+            logItem.Scopes.Should().BeEmpty();
         }
     }
 
@@ -1344,6 +1552,110 @@ public class LoggerExtensionsTests : BaseFixture
             logItem.Scopes.Should().BeEmpty();            
         }
     }
+    
+    [Test]
+    public void LogTrace_LiteralValue_WithEventId()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Trace;
+        EventId eventId = 5;
+        
+        Logger.LogTrace(eventId, $"{new LiteralValue("Test")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = eventId,
+                Exception = default(Exception),
+                Message = "Test"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "Test")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogTrace_LiteralValueWithBraces_WithEventId()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Trace;
+        EventId eventId = 5;
+        
+        Logger.LogTrace(eventId, $"{(LiteralValue) "T{es}t"}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = eventId,
+                Exception = default(Exception),
+                Message = "T{es}t"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "T{{es}}t")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogTrace_MixedLiteralValue_WithEventId()
+    {
+        var x = 1;
+        var y = 2;
+
+ 
+        const LogLevel logLevel = LogLevel.Trace;
+        EventId eventId = 5;
+        
+        Logger.LogTrace(eventId,             $"A{x}B{new LiteralValue("C")}D{y}E");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = eventId,
+                Exception = default(Exception),
+                Message = "A1BCD2E"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("x", x),
+                new KeyValuePair<string, object>("y", y),
+                new KeyValuePair<string, object>("{OriginalFormat}", "A{x}BCD{y}E")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
 
 
     [Test]
@@ -1784,6 +2096,110 @@ public class LoggerExtensionsTests : BaseFixture
                 new KeyValuePair<string, object>("{OriginalFormat}", "Default: {@default}, Stringified: {$str}, Destructured: {@destructured}")
             });
             logItem.Scopes.Should().BeEmpty();            
+        }
+    }
+    
+    [Test]
+    public void LogTrace_LiteralValue_WithEventId_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Trace;
+        EventId eventId = 5;
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogTrace(eventId, exception, $"{new LiteralValue("Test")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = eventId,
+                Exception = exception,
+                Message = "Test"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "Test")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogTrace_LiteralValueWithBraces_WithEventId_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Trace;
+        EventId eventId = 5;
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogTrace(eventId, exception, $"{(LiteralValue) "T{es}t"}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = eventId,
+                Exception = exception,
+                Message = "T{es}t"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "T{{es}}t")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogTrace_MixedLiteralValue_WithEventId_WithException()
+    {
+        var x = 1;
+        var y = 2;
+
+ 
+        const LogLevel logLevel = LogLevel.Trace;
+        EventId eventId = 5;
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogTrace(eventId, exception,             $"A{x}B{new LiteralValue("C")}D{y}E");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = eventId,
+                Exception = exception,
+                Message = "A1BCD2E"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("x", x),
+                new KeyValuePair<string, object>("y", y),
+                new KeyValuePair<string, object>("{OriginalFormat}", "A{x}BCD{y}E")
+            });
+            logItem.Scopes.Should().BeEmpty();
         }
     }
 
@@ -2288,6 +2704,110 @@ public class LoggerExtensionsTests : BaseFixture
             logItem.Scopes.Should().BeEmpty();            
         }
     }
+    
+    [Test]
+    public void LogDebug_LiteralValue()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Debug;
+        
+        
+        Logger.LogDebug($"{new LiteralValue("Test")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = default(Exception),
+                Message = "Test"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "Test")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogDebug_LiteralValueWithBraces()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Debug;
+        
+        
+        Logger.LogDebug($"{(LiteralValue) "T{es}t"}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = default(Exception),
+                Message = "T{es}t"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "T{{es}}t")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogDebug_MixedLiteralValue()
+    {
+        var x = 1;
+        var y = 2;
+
+ 
+        const LogLevel logLevel = LogLevel.Debug;
+        
+        
+        Logger.LogDebug(            $"A{x}B{new LiteralValue("C")}D{y}E");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = default(Exception),
+                Message = "A1BCD2E"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("x", x),
+                new KeyValuePair<string, object>("y", y),
+                new KeyValuePair<string, object>("{OriginalFormat}", "A{x}BCD{y}E")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
 
 
     [Test]
@@ -2728,6 +3248,110 @@ public class LoggerExtensionsTests : BaseFixture
                 new KeyValuePair<string, object>("{OriginalFormat}", "Default: {@default}, Stringified: {$str}, Destructured: {@destructured}")
             });
             logItem.Scopes.Should().BeEmpty();            
+        }
+    }
+    
+    [Test]
+    public void LogDebug_LiteralValue_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Debug;
+        
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogDebug(exception, $"{new LiteralValue("Test")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = exception,
+                Message = "Test"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "Test")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogDebug_LiteralValueWithBraces_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Debug;
+        
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogDebug(exception, $"{(LiteralValue) "T{es}t"}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = exception,
+                Message = "T{es}t"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "T{{es}}t")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogDebug_MixedLiteralValue_WithException()
+    {
+        var x = 1;
+        var y = 2;
+
+ 
+        const LogLevel logLevel = LogLevel.Debug;
+        
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogDebug(exception,             $"A{x}B{new LiteralValue("C")}D{y}E");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = exception,
+                Message = "A1BCD2E"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("x", x),
+                new KeyValuePair<string, object>("y", y),
+                new KeyValuePair<string, object>("{OriginalFormat}", "A{x}BCD{y}E")
+            });
+            logItem.Scopes.Should().BeEmpty();
         }
     }
 
@@ -3172,6 +3796,110 @@ public class LoggerExtensionsTests : BaseFixture
             logItem.Scopes.Should().BeEmpty();            
         }
     }
+    
+    [Test]
+    public void LogDebug_LiteralValue_WithEventId()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Debug;
+        EventId eventId = 5;
+        
+        Logger.LogDebug(eventId, $"{new LiteralValue("Test")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = eventId,
+                Exception = default(Exception),
+                Message = "Test"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "Test")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogDebug_LiteralValueWithBraces_WithEventId()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Debug;
+        EventId eventId = 5;
+        
+        Logger.LogDebug(eventId, $"{(LiteralValue) "T{es}t"}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = eventId,
+                Exception = default(Exception),
+                Message = "T{es}t"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "T{{es}}t")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogDebug_MixedLiteralValue_WithEventId()
+    {
+        var x = 1;
+        var y = 2;
+
+ 
+        const LogLevel logLevel = LogLevel.Debug;
+        EventId eventId = 5;
+        
+        Logger.LogDebug(eventId,             $"A{x}B{new LiteralValue("C")}D{y}E");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = eventId,
+                Exception = default(Exception),
+                Message = "A1BCD2E"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("x", x),
+                new KeyValuePair<string, object>("y", y),
+                new KeyValuePair<string, object>("{OriginalFormat}", "A{x}BCD{y}E")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
 
 
     [Test]
@@ -3612,6 +4340,110 @@ public class LoggerExtensionsTests : BaseFixture
                 new KeyValuePair<string, object>("{OriginalFormat}", "Default: {@default}, Stringified: {$str}, Destructured: {@destructured}")
             });
             logItem.Scopes.Should().BeEmpty();            
+        }
+    }
+    
+    [Test]
+    public void LogDebug_LiteralValue_WithEventId_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Debug;
+        EventId eventId = 5;
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogDebug(eventId, exception, $"{new LiteralValue("Test")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = eventId,
+                Exception = exception,
+                Message = "Test"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "Test")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogDebug_LiteralValueWithBraces_WithEventId_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Debug;
+        EventId eventId = 5;
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogDebug(eventId, exception, $"{(LiteralValue) "T{es}t"}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = eventId,
+                Exception = exception,
+                Message = "T{es}t"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "T{{es}}t")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogDebug_MixedLiteralValue_WithEventId_WithException()
+    {
+        var x = 1;
+        var y = 2;
+
+ 
+        const LogLevel logLevel = LogLevel.Debug;
+        EventId eventId = 5;
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogDebug(eventId, exception,             $"A{x}B{new LiteralValue("C")}D{y}E");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = eventId,
+                Exception = exception,
+                Message = "A1BCD2E"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("x", x),
+                new KeyValuePair<string, object>("y", y),
+                new KeyValuePair<string, object>("{OriginalFormat}", "A{x}BCD{y}E")
+            });
+            logItem.Scopes.Should().BeEmpty();
         }
     }
 
@@ -4116,6 +4948,110 @@ public class LoggerExtensionsTests : BaseFixture
             logItem.Scopes.Should().BeEmpty();            
         }
     }
+    
+    [Test]
+    public void LogInformation_LiteralValue()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Information;
+        
+        
+        Logger.LogInformation($"{new LiteralValue("Test")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = default(Exception),
+                Message = "Test"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "Test")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogInformation_LiteralValueWithBraces()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Information;
+        
+        
+        Logger.LogInformation($"{(LiteralValue) "T{es}t"}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = default(Exception),
+                Message = "T{es}t"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "T{{es}}t")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogInformation_MixedLiteralValue()
+    {
+        var x = 1;
+        var y = 2;
+
+ 
+        const LogLevel logLevel = LogLevel.Information;
+        
+        
+        Logger.LogInformation(            $"A{x}B{new LiteralValue("C")}D{y}E");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = default(Exception),
+                Message = "A1BCD2E"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("x", x),
+                new KeyValuePair<string, object>("y", y),
+                new KeyValuePair<string, object>("{OriginalFormat}", "A{x}BCD{y}E")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
 
 
     [Test]
@@ -4556,6 +5492,110 @@ public class LoggerExtensionsTests : BaseFixture
                 new KeyValuePair<string, object>("{OriginalFormat}", "Default: {@default}, Stringified: {$str}, Destructured: {@destructured}")
             });
             logItem.Scopes.Should().BeEmpty();            
+        }
+    }
+    
+    [Test]
+    public void LogInformation_LiteralValue_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Information;
+        
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogInformation(exception, $"{new LiteralValue("Test")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = exception,
+                Message = "Test"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "Test")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogInformation_LiteralValueWithBraces_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Information;
+        
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogInformation(exception, $"{(LiteralValue) "T{es}t"}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = exception,
+                Message = "T{es}t"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "T{{es}}t")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogInformation_MixedLiteralValue_WithException()
+    {
+        var x = 1;
+        var y = 2;
+
+ 
+        const LogLevel logLevel = LogLevel.Information;
+        
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogInformation(exception,             $"A{x}B{new LiteralValue("C")}D{y}E");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = exception,
+                Message = "A1BCD2E"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("x", x),
+                new KeyValuePair<string, object>("y", y),
+                new KeyValuePair<string, object>("{OriginalFormat}", "A{x}BCD{y}E")
+            });
+            logItem.Scopes.Should().BeEmpty();
         }
     }
 
@@ -5000,6 +6040,110 @@ public class LoggerExtensionsTests : BaseFixture
             logItem.Scopes.Should().BeEmpty();            
         }
     }
+    
+    [Test]
+    public void LogInformation_LiteralValue_WithEventId()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Information;
+        EventId eventId = 5;
+        
+        Logger.LogInformation(eventId, $"{new LiteralValue("Test")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = eventId,
+                Exception = default(Exception),
+                Message = "Test"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "Test")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogInformation_LiteralValueWithBraces_WithEventId()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Information;
+        EventId eventId = 5;
+        
+        Logger.LogInformation(eventId, $"{(LiteralValue) "T{es}t"}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = eventId,
+                Exception = default(Exception),
+                Message = "T{es}t"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "T{{es}}t")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogInformation_MixedLiteralValue_WithEventId()
+    {
+        var x = 1;
+        var y = 2;
+
+ 
+        const LogLevel logLevel = LogLevel.Information;
+        EventId eventId = 5;
+        
+        Logger.LogInformation(eventId,             $"A{x}B{new LiteralValue("C")}D{y}E");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = eventId,
+                Exception = default(Exception),
+                Message = "A1BCD2E"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("x", x),
+                new KeyValuePair<string, object>("y", y),
+                new KeyValuePair<string, object>("{OriginalFormat}", "A{x}BCD{y}E")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
 
 
     [Test]
@@ -5440,6 +6584,110 @@ public class LoggerExtensionsTests : BaseFixture
                 new KeyValuePair<string, object>("{OriginalFormat}", "Default: {@default}, Stringified: {$str}, Destructured: {@destructured}")
             });
             logItem.Scopes.Should().BeEmpty();            
+        }
+    }
+    
+    [Test]
+    public void LogInformation_LiteralValue_WithEventId_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Information;
+        EventId eventId = 5;
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogInformation(eventId, exception, $"{new LiteralValue("Test")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = eventId,
+                Exception = exception,
+                Message = "Test"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "Test")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogInformation_LiteralValueWithBraces_WithEventId_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Information;
+        EventId eventId = 5;
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogInformation(eventId, exception, $"{(LiteralValue) "T{es}t"}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = eventId,
+                Exception = exception,
+                Message = "T{es}t"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "T{{es}}t")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogInformation_MixedLiteralValue_WithEventId_WithException()
+    {
+        var x = 1;
+        var y = 2;
+
+ 
+        const LogLevel logLevel = LogLevel.Information;
+        EventId eventId = 5;
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogInformation(eventId, exception,             $"A{x}B{new LiteralValue("C")}D{y}E");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = eventId,
+                Exception = exception,
+                Message = "A1BCD2E"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("x", x),
+                new KeyValuePair<string, object>("y", y),
+                new KeyValuePair<string, object>("{OriginalFormat}", "A{x}BCD{y}E")
+            });
+            logItem.Scopes.Should().BeEmpty();
         }
     }
 
@@ -5944,6 +7192,110 @@ public class LoggerExtensionsTests : BaseFixture
             logItem.Scopes.Should().BeEmpty();            
         }
     }
+    
+    [Test]
+    public void LogWarning_LiteralValue()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Warning;
+        
+        
+        Logger.LogWarning($"{new LiteralValue("Test")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = default(Exception),
+                Message = "Test"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "Test")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogWarning_LiteralValueWithBraces()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Warning;
+        
+        
+        Logger.LogWarning($"{(LiteralValue) "T{es}t"}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = default(Exception),
+                Message = "T{es}t"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "T{{es}}t")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogWarning_MixedLiteralValue()
+    {
+        var x = 1;
+        var y = 2;
+
+ 
+        const LogLevel logLevel = LogLevel.Warning;
+        
+        
+        Logger.LogWarning(            $"A{x}B{new LiteralValue("C")}D{y}E");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = default(Exception),
+                Message = "A1BCD2E"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("x", x),
+                new KeyValuePair<string, object>("y", y),
+                new KeyValuePair<string, object>("{OriginalFormat}", "A{x}BCD{y}E")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
 
 
     [Test]
@@ -6384,6 +7736,110 @@ public class LoggerExtensionsTests : BaseFixture
                 new KeyValuePair<string, object>("{OriginalFormat}", "Default: {@default}, Stringified: {$str}, Destructured: {@destructured}")
             });
             logItem.Scopes.Should().BeEmpty();            
+        }
+    }
+    
+    [Test]
+    public void LogWarning_LiteralValue_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Warning;
+        
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogWarning(exception, $"{new LiteralValue("Test")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = exception,
+                Message = "Test"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "Test")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogWarning_LiteralValueWithBraces_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Warning;
+        
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogWarning(exception, $"{(LiteralValue) "T{es}t"}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = exception,
+                Message = "T{es}t"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "T{{es}}t")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogWarning_MixedLiteralValue_WithException()
+    {
+        var x = 1;
+        var y = 2;
+
+ 
+        const LogLevel logLevel = LogLevel.Warning;
+        
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogWarning(exception,             $"A{x}B{new LiteralValue("C")}D{y}E");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = exception,
+                Message = "A1BCD2E"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("x", x),
+                new KeyValuePair<string, object>("y", y),
+                new KeyValuePair<string, object>("{OriginalFormat}", "A{x}BCD{y}E")
+            });
+            logItem.Scopes.Should().BeEmpty();
         }
     }
 
@@ -6828,6 +8284,110 @@ public class LoggerExtensionsTests : BaseFixture
             logItem.Scopes.Should().BeEmpty();            
         }
     }
+    
+    [Test]
+    public void LogWarning_LiteralValue_WithEventId()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Warning;
+        EventId eventId = 5;
+        
+        Logger.LogWarning(eventId, $"{new LiteralValue("Test")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = eventId,
+                Exception = default(Exception),
+                Message = "Test"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "Test")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogWarning_LiteralValueWithBraces_WithEventId()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Warning;
+        EventId eventId = 5;
+        
+        Logger.LogWarning(eventId, $"{(LiteralValue) "T{es}t"}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = eventId,
+                Exception = default(Exception),
+                Message = "T{es}t"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "T{{es}}t")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogWarning_MixedLiteralValue_WithEventId()
+    {
+        var x = 1;
+        var y = 2;
+
+ 
+        const LogLevel logLevel = LogLevel.Warning;
+        EventId eventId = 5;
+        
+        Logger.LogWarning(eventId,             $"A{x}B{new LiteralValue("C")}D{y}E");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = eventId,
+                Exception = default(Exception),
+                Message = "A1BCD2E"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("x", x),
+                new KeyValuePair<string, object>("y", y),
+                new KeyValuePair<string, object>("{OriginalFormat}", "A{x}BCD{y}E")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
 
 
     [Test]
@@ -7268,6 +8828,110 @@ public class LoggerExtensionsTests : BaseFixture
                 new KeyValuePair<string, object>("{OriginalFormat}", "Default: {@default}, Stringified: {$str}, Destructured: {@destructured}")
             });
             logItem.Scopes.Should().BeEmpty();            
+        }
+    }
+    
+    [Test]
+    public void LogWarning_LiteralValue_WithEventId_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Warning;
+        EventId eventId = 5;
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogWarning(eventId, exception, $"{new LiteralValue("Test")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = eventId,
+                Exception = exception,
+                Message = "Test"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "Test")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogWarning_LiteralValueWithBraces_WithEventId_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Warning;
+        EventId eventId = 5;
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogWarning(eventId, exception, $"{(LiteralValue) "T{es}t"}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = eventId,
+                Exception = exception,
+                Message = "T{es}t"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "T{{es}}t")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogWarning_MixedLiteralValue_WithEventId_WithException()
+    {
+        var x = 1;
+        var y = 2;
+
+ 
+        const LogLevel logLevel = LogLevel.Warning;
+        EventId eventId = 5;
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogWarning(eventId, exception,             $"A{x}B{new LiteralValue("C")}D{y}E");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = eventId,
+                Exception = exception,
+                Message = "A1BCD2E"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("x", x),
+                new KeyValuePair<string, object>("y", y),
+                new KeyValuePair<string, object>("{OriginalFormat}", "A{x}BCD{y}E")
+            });
+            logItem.Scopes.Should().BeEmpty();
         }
     }
 
@@ -7772,6 +9436,110 @@ public class LoggerExtensionsTests : BaseFixture
             logItem.Scopes.Should().BeEmpty();            
         }
     }
+    
+    [Test]
+    public void LogError_LiteralValue()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Error;
+        
+        
+        Logger.LogError($"{new LiteralValue("Test")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = default(Exception),
+                Message = "Test"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "Test")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogError_LiteralValueWithBraces()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Error;
+        
+        
+        Logger.LogError($"{(LiteralValue) "T{es}t"}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = default(Exception),
+                Message = "T{es}t"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "T{{es}}t")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogError_MixedLiteralValue()
+    {
+        var x = 1;
+        var y = 2;
+
+ 
+        const LogLevel logLevel = LogLevel.Error;
+        
+        
+        Logger.LogError(            $"A{x}B{new LiteralValue("C")}D{y}E");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = default(Exception),
+                Message = "A1BCD2E"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("x", x),
+                new KeyValuePair<string, object>("y", y),
+                new KeyValuePair<string, object>("{OriginalFormat}", "A{x}BCD{y}E")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
 
 
     [Test]
@@ -8212,6 +9980,110 @@ public class LoggerExtensionsTests : BaseFixture
                 new KeyValuePair<string, object>("{OriginalFormat}", "Default: {@default}, Stringified: {$str}, Destructured: {@destructured}")
             });
             logItem.Scopes.Should().BeEmpty();            
+        }
+    }
+    
+    [Test]
+    public void LogError_LiteralValue_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Error;
+        
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogError(exception, $"{new LiteralValue("Test")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = exception,
+                Message = "Test"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "Test")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogError_LiteralValueWithBraces_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Error;
+        
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogError(exception, $"{(LiteralValue) "T{es}t"}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = exception,
+                Message = "T{es}t"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "T{{es}}t")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogError_MixedLiteralValue_WithException()
+    {
+        var x = 1;
+        var y = 2;
+
+ 
+        const LogLevel logLevel = LogLevel.Error;
+        
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogError(exception,             $"A{x}B{new LiteralValue("C")}D{y}E");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = exception,
+                Message = "A1BCD2E"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("x", x),
+                new KeyValuePair<string, object>("y", y),
+                new KeyValuePair<string, object>("{OriginalFormat}", "A{x}BCD{y}E")
+            });
+            logItem.Scopes.Should().BeEmpty();
         }
     }
 
@@ -8656,6 +10528,110 @@ public class LoggerExtensionsTests : BaseFixture
             logItem.Scopes.Should().BeEmpty();            
         }
     }
+    
+    [Test]
+    public void LogError_LiteralValue_WithEventId()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Error;
+        EventId eventId = 5;
+        
+        Logger.LogError(eventId, $"{new LiteralValue("Test")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = eventId,
+                Exception = default(Exception),
+                Message = "Test"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "Test")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogError_LiteralValueWithBraces_WithEventId()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Error;
+        EventId eventId = 5;
+        
+        Logger.LogError(eventId, $"{(LiteralValue) "T{es}t"}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = eventId,
+                Exception = default(Exception),
+                Message = "T{es}t"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "T{{es}}t")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogError_MixedLiteralValue_WithEventId()
+    {
+        var x = 1;
+        var y = 2;
+
+ 
+        const LogLevel logLevel = LogLevel.Error;
+        EventId eventId = 5;
+        
+        Logger.LogError(eventId,             $"A{x}B{new LiteralValue("C")}D{y}E");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = eventId,
+                Exception = default(Exception),
+                Message = "A1BCD2E"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("x", x),
+                new KeyValuePair<string, object>("y", y),
+                new KeyValuePair<string, object>("{OriginalFormat}", "A{x}BCD{y}E")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
 
 
     [Test]
@@ -9096,6 +11072,110 @@ public class LoggerExtensionsTests : BaseFixture
                 new KeyValuePair<string, object>("{OriginalFormat}", "Default: {@default}, Stringified: {$str}, Destructured: {@destructured}")
             });
             logItem.Scopes.Should().BeEmpty();            
+        }
+    }
+    
+    [Test]
+    public void LogError_LiteralValue_WithEventId_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Error;
+        EventId eventId = 5;
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogError(eventId, exception, $"{new LiteralValue("Test")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = eventId,
+                Exception = exception,
+                Message = "Test"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "Test")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogError_LiteralValueWithBraces_WithEventId_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Error;
+        EventId eventId = 5;
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogError(eventId, exception, $"{(LiteralValue) "T{es}t"}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = eventId,
+                Exception = exception,
+                Message = "T{es}t"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "T{{es}}t")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogError_MixedLiteralValue_WithEventId_WithException()
+    {
+        var x = 1;
+        var y = 2;
+
+ 
+        const LogLevel logLevel = LogLevel.Error;
+        EventId eventId = 5;
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogError(eventId, exception,             $"A{x}B{new LiteralValue("C")}D{y}E");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = eventId,
+                Exception = exception,
+                Message = "A1BCD2E"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("x", x),
+                new KeyValuePair<string, object>("y", y),
+                new KeyValuePair<string, object>("{OriginalFormat}", "A{x}BCD{y}E")
+            });
+            logItem.Scopes.Should().BeEmpty();
         }
     }
 
@@ -9600,6 +11680,110 @@ public class LoggerExtensionsTests : BaseFixture
             logItem.Scopes.Should().BeEmpty();            
         }
     }
+    
+    [Test]
+    public void LogCritical_LiteralValue()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Critical;
+        
+        
+        Logger.LogCritical($"{new LiteralValue("Test")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = default(Exception),
+                Message = "Test"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "Test")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogCritical_LiteralValueWithBraces()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Critical;
+        
+        
+        Logger.LogCritical($"{(LiteralValue) "T{es}t"}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = default(Exception),
+                Message = "T{es}t"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "T{{es}}t")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogCritical_MixedLiteralValue()
+    {
+        var x = 1;
+        var y = 2;
+
+ 
+        const LogLevel logLevel = LogLevel.Critical;
+        
+        
+        Logger.LogCritical(            $"A{x}B{new LiteralValue("C")}D{y}E");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = default(Exception),
+                Message = "A1BCD2E"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("x", x),
+                new KeyValuePair<string, object>("y", y),
+                new KeyValuePair<string, object>("{OriginalFormat}", "A{x}BCD{y}E")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
 
 
     [Test]
@@ -10040,6 +12224,110 @@ public class LoggerExtensionsTests : BaseFixture
                 new KeyValuePair<string, object>("{OriginalFormat}", "Default: {@default}, Stringified: {$str}, Destructured: {@destructured}")
             });
             logItem.Scopes.Should().BeEmpty();            
+        }
+    }
+    
+    [Test]
+    public void LogCritical_LiteralValue_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Critical;
+        
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogCritical(exception, $"{new LiteralValue("Test")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = exception,
+                Message = "Test"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "Test")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogCritical_LiteralValueWithBraces_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Critical;
+        
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogCritical(exception, $"{(LiteralValue) "T{es}t"}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = exception,
+                Message = "T{es}t"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "T{{es}}t")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogCritical_MixedLiteralValue_WithException()
+    {
+        var x = 1;
+        var y = 2;
+
+ 
+        const LogLevel logLevel = LogLevel.Critical;
+        
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogCritical(exception,             $"A{x}B{new LiteralValue("C")}D{y}E");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = exception,
+                Message = "A1BCD2E"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("x", x),
+                new KeyValuePair<string, object>("y", y),
+                new KeyValuePair<string, object>("{OriginalFormat}", "A{x}BCD{y}E")
+            });
+            logItem.Scopes.Should().BeEmpty();
         }
     }
 
@@ -10484,6 +12772,110 @@ public class LoggerExtensionsTests : BaseFixture
             logItem.Scopes.Should().BeEmpty();            
         }
     }
+    
+    [Test]
+    public void LogCritical_LiteralValue_WithEventId()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Critical;
+        EventId eventId = 5;
+        
+        Logger.LogCritical(eventId, $"{new LiteralValue("Test")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = eventId,
+                Exception = default(Exception),
+                Message = "Test"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "Test")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogCritical_LiteralValueWithBraces_WithEventId()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Critical;
+        EventId eventId = 5;
+        
+        Logger.LogCritical(eventId, $"{(LiteralValue) "T{es}t"}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = eventId,
+                Exception = default(Exception),
+                Message = "T{es}t"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "T{{es}}t")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogCritical_MixedLiteralValue_WithEventId()
+    {
+        var x = 1;
+        var y = 2;
+
+ 
+        const LogLevel logLevel = LogLevel.Critical;
+        EventId eventId = 5;
+        
+        Logger.LogCritical(eventId,             $"A{x}B{new LiteralValue("C")}D{y}E");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = eventId,
+                Exception = default(Exception),
+                Message = "A1BCD2E"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("x", x),
+                new KeyValuePair<string, object>("y", y),
+                new KeyValuePair<string, object>("{OriginalFormat}", "A{x}BCD{y}E")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
 
 
     [Test]
@@ -10924,6 +13316,110 @@ public class LoggerExtensionsTests : BaseFixture
                 new KeyValuePair<string, object>("{OriginalFormat}", "Default: {@default}, Stringified: {$str}, Destructured: {@destructured}")
             });
             logItem.Scopes.Should().BeEmpty();            
+        }
+    }
+    
+    [Test]
+    public void LogCritical_LiteralValue_WithEventId_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Critical;
+        EventId eventId = 5;
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogCritical(eventId, exception, $"{new LiteralValue("Test")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = eventId,
+                Exception = exception,
+                Message = "Test"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "Test")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogCritical_LiteralValueWithBraces_WithEventId_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Critical;
+        EventId eventId = 5;
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogCritical(eventId, exception, $"{(LiteralValue) "T{es}t"}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = eventId,
+                Exception = exception,
+                Message = "T{es}t"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "T{{es}}t")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void LogCritical_MixedLiteralValue_WithEventId_WithException()
+    {
+        var x = 1;
+        var y = 2;
+
+ 
+        const LogLevel logLevel = LogLevel.Critical;
+        EventId eventId = 5;
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogCritical(eventId, exception,             $"A{x}B{new LiteralValue("C")}D{y}E");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = eventId,
+                Exception = exception,
+                Message = "A1BCD2E"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("x", x),
+                new KeyValuePair<string, object>("y", y),
+                new KeyValuePair<string, object>("{OriginalFormat}", "A{x}BCD{y}E")
+            });
+            logItem.Scopes.Should().BeEmpty();
         }
     }
 
@@ -11404,6 +13900,104 @@ public class LoggerExtensionsTests : BaseFixture
             logItem.Scopes.Should().BeEmpty();            
         }
     }
+    
+    [Test]
+    public void Log_LiteralValue([ValueSource(nameof(LogLevels))] LogLevel logLevel)
+    {
+        
+        
+        Logger.Log(logLevel, $"{new LiteralValue("Test")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = default(Exception),
+                Message = "Test"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "Test")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void Log_LiteralValueWithBraces([ValueSource(nameof(LogLevels))] LogLevel logLevel)
+    {
+        
+        
+        Logger.Log(logLevel, $"{(LiteralValue) "T{es}t"}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = default(Exception),
+                Message = "T{es}t"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "T{{es}}t")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void Log_MixedLiteralValue([ValueSource(nameof(LogLevels))] LogLevel logLevel)
+    {
+        var x = 1;
+        var y = 2;
+
+        
+        
+        Logger.Log(logLevel,             $"A{x}B{new LiteralValue("C")}D{y}E");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = default(Exception),
+                Message = "A1BCD2E"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("x", x),
+                new KeyValuePair<string, object>("y", y),
+                new KeyValuePair<string, object>("{OriginalFormat}", "A{x}BCD{y}E")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
 
 
     [Test]
@@ -11820,6 +14414,104 @@ public class LoggerExtensionsTests : BaseFixture
                 new KeyValuePair<string, object>("{OriginalFormat}", "Default: {@default}, Stringified: {$str}, Destructured: {@destructured}")
             });
             logItem.Scopes.Should().BeEmpty();            
+        }
+    }
+    
+    [Test]
+    public void Log_LiteralValue_WithException([ValueSource(nameof(LogLevels))] LogLevel logLevel)
+    {
+        
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.Log(logLevel, exception, $"{new LiteralValue("Test")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = exception,
+                Message = "Test"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "Test")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void Log_LiteralValueWithBraces_WithException([ValueSource(nameof(LogLevels))] LogLevel logLevel)
+    {
+        
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.Log(logLevel, exception, $"{(LiteralValue) "T{es}t"}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = exception,
+                Message = "T{es}t"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "T{{es}}t")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void Log_MixedLiteralValue_WithException([ValueSource(nameof(LogLevels))] LogLevel logLevel)
+    {
+        var x = 1;
+        var y = 2;
+
+        
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.Log(logLevel, exception,             $"A{x}B{new LiteralValue("C")}D{y}E");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = default(EventId),
+                Exception = exception,
+                Message = "A1BCD2E"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("x", x),
+                new KeyValuePair<string, object>("y", y),
+                new KeyValuePair<string, object>("{OriginalFormat}", "A{x}BCD{y}E")
+            });
+            logItem.Scopes.Should().BeEmpty();
         }
     }
 
@@ -12240,6 +14932,104 @@ public class LoggerExtensionsTests : BaseFixture
             logItem.Scopes.Should().BeEmpty();            
         }
     }
+    
+    [Test]
+    public void Log_LiteralValue_WithEventId([ValueSource(nameof(LogLevels))] LogLevel logLevel)
+    {
+        EventId eventId = 5;
+        
+        Logger.Log(logLevel, eventId, $"{new LiteralValue("Test")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = eventId,
+                Exception = default(Exception),
+                Message = "Test"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "Test")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void Log_LiteralValueWithBraces_WithEventId([ValueSource(nameof(LogLevels))] LogLevel logLevel)
+    {
+        EventId eventId = 5;
+        
+        Logger.Log(logLevel, eventId, $"{(LiteralValue) "T{es}t"}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = eventId,
+                Exception = default(Exception),
+                Message = "T{es}t"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "T{{es}}t")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void Log_MixedLiteralValue_WithEventId([ValueSource(nameof(LogLevels))] LogLevel logLevel)
+    {
+        var x = 1;
+        var y = 2;
+
+        EventId eventId = 5;
+        
+        Logger.Log(logLevel, eventId,             $"A{x}B{new LiteralValue("C")}D{y}E");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = eventId,
+                Exception = default(Exception),
+                Message = "A1BCD2E"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("x", x),
+                new KeyValuePair<string, object>("y", y),
+                new KeyValuePair<string, object>("{OriginalFormat}", "A{x}BCD{y}E")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
 
 
     [Test]
@@ -12656,6 +15446,104 @@ public class LoggerExtensionsTests : BaseFixture
                 new KeyValuePair<string, object>("{OriginalFormat}", "Default: {@default}, Stringified: {$str}, Destructured: {@destructured}")
             });
             logItem.Scopes.Should().BeEmpty();            
+        }
+    }
+    
+    [Test]
+    public void Log_LiteralValue_WithEventId_WithException([ValueSource(nameof(LogLevels))] LogLevel logLevel)
+    {
+        EventId eventId = 5;
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.Log(logLevel, eventId, exception, $"{new LiteralValue("Test")}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = eventId,
+                Exception = exception,
+                Message = "Test"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "Test")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void Log_LiteralValueWithBraces_WithEventId_WithException([ValueSource(nameof(LogLevels))] LogLevel logLevel)
+    {
+        EventId eventId = 5;
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.Log(logLevel, eventId, exception, $"{(LiteralValue) "T{es}t"}");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = eventId,
+                Exception = exception,
+                Message = "T{es}t"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("{OriginalFormat}", "T{{es}}t")
+            });
+            logItem.Scopes.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void Log_MixedLiteralValue_WithEventId_WithException([ValueSource(nameof(LogLevels))] LogLevel logLevel)
+    {
+        var x = 1;
+        var y = 2;
+
+        EventId eventId = 5;
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.Log(logLevel, eventId, exception,             $"A{x}B{new LiteralValue("C")}D{y}E");
+
+        if (logLevel < MinLogLevel)
+        {
+            LogItems.Should().BeEmpty();
+        }
+        else
+        {
+            LogItems.Should().HaveCount(1);
+            var logItem = LogItems.Single();
+            logItem.Should().BeEquivalentTo(new
+            {
+                Category = GetType().FullName,
+                LogLevel = logLevel,
+                EventId = eventId,
+                Exception = exception,
+                Message = "A1BCD2E"
+            });
+            logItem.State.Should().BeEquivalentTo(new[]
+            {
+                new KeyValuePair<string, object>("x", x),
+                new KeyValuePair<string, object>("y", y),
+                new KeyValuePair<string, object>("{OriginalFormat}", "A{x}BCD{y}E")
+            });
+            logItem.Scopes.Should().BeEmpty();
         }
     }
 

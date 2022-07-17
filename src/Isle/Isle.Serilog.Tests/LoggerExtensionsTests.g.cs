@@ -545,6 +545,122 @@ public class LoggerExtensionsTests : BaseFixture
     }
 
     [Test]
+    public void VerboseInterpolated_LiteralValue()
+    {
+ 
+        const LogEventLevel logEventLevel = LogEventLevel.Verbose;
+        const string message = "Test";
+
+        
+        Logger.VerboseInterpolated($"{(LiteralValue) "Test"}");
+        Logger.Verbose(message);
+
+        if (logEventLevel < MinLogEventLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.MessageTemplate.Text.Should().Be(message);
+            logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
+                new[] 
+                { 
+                    new TextToken(message, 0) 
+                }, 
+                MessageTemplateTokenEquivalency);
+            logEvent.Properties.Count.Should().Be(0);
+            logEvent.Level.Should().Be(LogEventLevel.Verbose);
+            logEvent.Exception.Should().BeNull();
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(message);
+        }
+    }
+
+    [Test]
+    public void VerboseInterpolated_LiteralValueWithBraces()
+    {
+ 
+        const LogEventLevel logEventLevel = LogEventLevel.Verbose;
+        const string message = "T{{es}}t";
+
+        
+        Logger.VerboseInterpolated($"{new LiteralValue("T{es}t")}");
+        Logger.Verbose(message);
+
+        if (logEventLevel < MinLogEventLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.MessageTemplate.Text.Should().Be("T{{es}}t");
+            logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
+                new[] 
+                { 
+                    new TextToken("T{es}t", 0) 
+                }, 
+                MessageTemplateTokenEquivalency);
+            logEvent.Properties.Count.Should().Be(0);
+            logEvent.Level.Should().Be(LogEventLevel.Verbose);
+            logEvent.Exception.Should().BeNull();
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
+    [Test]
+    public void VerboseInterpolated_MixedLiteralValue()
+    {
+        var value1 = 5;
+        var value2 = 7;
+
+ 
+        const LogEventLevel logEventLevel = LogEventLevel.Verbose;
+        
+        Logger.VerboseInterpolated($"A{value1}B{(LiteralValue) "C"}D{value2}E");
+
+        if (logEventLevel < MinLogEventLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(1);
+            var logEvent = LogEvents.Single();
+            logEvent.MessageTemplate.Text.Should().Be("A{value1}BCD{value2}E");
+            logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
+                new MessageTemplateToken[] 
+                { 
+                    new TextToken("A", 0),
+                    new PropertyToken(nameof(value1), "{value1}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 1),
+                    new TextToken("B", 9),
+                    new TextToken("C", 10),
+                    new TextToken("D", 11),
+                    new PropertyToken(nameof(value2), "{value2}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 12),
+                    new TextToken("E", 20)                    
+                }, 
+                MessageTemplateTokenEquivalency);
+            logEvent.Properties.Count.Should().Be(2);
+            logEvent.Properties.Should().BeEquivalentTo(
+                new []
+                {
+                    value1.ToLogEventPropertyValue(),
+                    value2.ToLogEventPropertyValue()
+                },
+                PropertiesEquivalency);
+            logEvent.Level.Should().Be(LogEventLevel.Verbose);
+            logEvent.Exception.Should().BeNull();
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("A5BCD7E");
+        }
+    }
+
+    [Test]
     public void VerboseInterpolated_Literal_WithException()
     {
  
@@ -1065,6 +1181,122 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.Level.Should().Be(LogEventLevel.Verbose);
             logEvent.Exception.Should().BeSameAs(exception);
             logEvent.RenderMessage().Should().Be($"Default: {Format(value)}, Stringified: {Format(value.ToString())}, Destructured: {Format(value)}");   
+        }
+    }
+
+    [Test]
+    public void VerboseInterpolated_LiteralValue_WithException()
+    {
+ 
+        const LogEventLevel logEventLevel = LogEventLevel.Verbose;
+        const string message = "Test";
+
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.VerboseInterpolated(exception, $"{(LiteralValue) "Test"}");
+        Logger.Verbose(exception, message);
+
+        if (logEventLevel < MinLogEventLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.MessageTemplate.Text.Should().Be(message);
+            logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
+                new[] 
+                { 
+                    new TextToken(message, 0) 
+                }, 
+                MessageTemplateTokenEquivalency);
+            logEvent.Properties.Count.Should().Be(0);
+            logEvent.Level.Should().Be(LogEventLevel.Verbose);
+            logEvent.Exception.Should().BeSameAs(exception);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(message);
+        }
+    }
+
+    [Test]
+    public void VerboseInterpolated_LiteralValueWithBraces_WithException()
+    {
+ 
+        const LogEventLevel logEventLevel = LogEventLevel.Verbose;
+        const string message = "T{{es}}t";
+
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.VerboseInterpolated(exception, $"{new LiteralValue("T{es}t")}");
+        Logger.Verbose(exception, message);
+
+        if (logEventLevel < MinLogEventLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.MessageTemplate.Text.Should().Be("T{{es}}t");
+            logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
+                new[] 
+                { 
+                    new TextToken("T{es}t", 0) 
+                }, 
+                MessageTemplateTokenEquivalency);
+            logEvent.Properties.Count.Should().Be(0);
+            logEvent.Level.Should().Be(LogEventLevel.Verbose);
+            logEvent.Exception.Should().BeSameAs(exception);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
+    [Test]
+    public void VerboseInterpolated_MixedLiteralValue_WithException()
+    {
+        var value1 = 5;
+        var value2 = 7;
+
+ 
+        const LogEventLevel logEventLevel = LogEventLevel.Verbose;
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.VerboseInterpolated(exception, $"A{value1}B{(LiteralValue) "C"}D{value2}E");
+
+        if (logEventLevel < MinLogEventLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(1);
+            var logEvent = LogEvents.Single();
+            logEvent.MessageTemplate.Text.Should().Be("A{value1}BCD{value2}E");
+            logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
+                new MessageTemplateToken[] 
+                { 
+                    new TextToken("A", 0),
+                    new PropertyToken(nameof(value1), "{value1}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 1),
+                    new TextToken("B", 9),
+                    new TextToken("C", 10),
+                    new TextToken("D", 11),
+                    new PropertyToken(nameof(value2), "{value2}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 12),
+                    new TextToken("E", 20)                    
+                }, 
+                MessageTemplateTokenEquivalency);
+            logEvent.Properties.Count.Should().Be(2);
+            logEvent.Properties.Should().BeEquivalentTo(
+                new []
+                {
+                    value1.ToLogEventPropertyValue(),
+                    value2.ToLogEventPropertyValue()
+                },
+                PropertiesEquivalency);
+            logEvent.Level.Should().Be(LogEventLevel.Verbose);
+            logEvent.Exception.Should().BeSameAs(exception);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("A5BCD7E");
         }
     }
 
@@ -1598,6 +1830,122 @@ public class LoggerExtensionsTests : BaseFixture
     }
 
     [Test]
+    public void DebugInterpolated_LiteralValue()
+    {
+ 
+        const LogEventLevel logEventLevel = LogEventLevel.Debug;
+        const string message = "Test";
+
+        
+        Logger.DebugInterpolated($"{(LiteralValue) "Test"}");
+        Logger.Debug(message);
+
+        if (logEventLevel < MinLogEventLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.MessageTemplate.Text.Should().Be(message);
+            logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
+                new[] 
+                { 
+                    new TextToken(message, 0) 
+                }, 
+                MessageTemplateTokenEquivalency);
+            logEvent.Properties.Count.Should().Be(0);
+            logEvent.Level.Should().Be(LogEventLevel.Debug);
+            logEvent.Exception.Should().BeNull();
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(message);
+        }
+    }
+
+    [Test]
+    public void DebugInterpolated_LiteralValueWithBraces()
+    {
+ 
+        const LogEventLevel logEventLevel = LogEventLevel.Debug;
+        const string message = "T{{es}}t";
+
+        
+        Logger.DebugInterpolated($"{new LiteralValue("T{es}t")}");
+        Logger.Debug(message);
+
+        if (logEventLevel < MinLogEventLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.MessageTemplate.Text.Should().Be("T{{es}}t");
+            logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
+                new[] 
+                { 
+                    new TextToken("T{es}t", 0) 
+                }, 
+                MessageTemplateTokenEquivalency);
+            logEvent.Properties.Count.Should().Be(0);
+            logEvent.Level.Should().Be(LogEventLevel.Debug);
+            logEvent.Exception.Should().BeNull();
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
+    [Test]
+    public void DebugInterpolated_MixedLiteralValue()
+    {
+        var value1 = 5;
+        var value2 = 7;
+
+ 
+        const LogEventLevel logEventLevel = LogEventLevel.Debug;
+        
+        Logger.DebugInterpolated($"A{value1}B{(LiteralValue) "C"}D{value2}E");
+
+        if (logEventLevel < MinLogEventLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(1);
+            var logEvent = LogEvents.Single();
+            logEvent.MessageTemplate.Text.Should().Be("A{value1}BCD{value2}E");
+            logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
+                new MessageTemplateToken[] 
+                { 
+                    new TextToken("A", 0),
+                    new PropertyToken(nameof(value1), "{value1}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 1),
+                    new TextToken("B", 9),
+                    new TextToken("C", 10),
+                    new TextToken("D", 11),
+                    new PropertyToken(nameof(value2), "{value2}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 12),
+                    new TextToken("E", 20)                    
+                }, 
+                MessageTemplateTokenEquivalency);
+            logEvent.Properties.Count.Should().Be(2);
+            logEvent.Properties.Should().BeEquivalentTo(
+                new []
+                {
+                    value1.ToLogEventPropertyValue(),
+                    value2.ToLogEventPropertyValue()
+                },
+                PropertiesEquivalency);
+            logEvent.Level.Should().Be(LogEventLevel.Debug);
+            logEvent.Exception.Should().BeNull();
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("A5BCD7E");
+        }
+    }
+
+    [Test]
     public void DebugInterpolated_Literal_WithException()
     {
  
@@ -2118,6 +2466,122 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.Level.Should().Be(LogEventLevel.Debug);
             logEvent.Exception.Should().BeSameAs(exception);
             logEvent.RenderMessage().Should().Be($"Default: {Format(value)}, Stringified: {Format(value.ToString())}, Destructured: {Format(value)}");   
+        }
+    }
+
+    [Test]
+    public void DebugInterpolated_LiteralValue_WithException()
+    {
+ 
+        const LogEventLevel logEventLevel = LogEventLevel.Debug;
+        const string message = "Test";
+
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.DebugInterpolated(exception, $"{(LiteralValue) "Test"}");
+        Logger.Debug(exception, message);
+
+        if (logEventLevel < MinLogEventLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.MessageTemplate.Text.Should().Be(message);
+            logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
+                new[] 
+                { 
+                    new TextToken(message, 0) 
+                }, 
+                MessageTemplateTokenEquivalency);
+            logEvent.Properties.Count.Should().Be(0);
+            logEvent.Level.Should().Be(LogEventLevel.Debug);
+            logEvent.Exception.Should().BeSameAs(exception);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(message);
+        }
+    }
+
+    [Test]
+    public void DebugInterpolated_LiteralValueWithBraces_WithException()
+    {
+ 
+        const LogEventLevel logEventLevel = LogEventLevel.Debug;
+        const string message = "T{{es}}t";
+
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.DebugInterpolated(exception, $"{new LiteralValue("T{es}t")}");
+        Logger.Debug(exception, message);
+
+        if (logEventLevel < MinLogEventLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.MessageTemplate.Text.Should().Be("T{{es}}t");
+            logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
+                new[] 
+                { 
+                    new TextToken("T{es}t", 0) 
+                }, 
+                MessageTemplateTokenEquivalency);
+            logEvent.Properties.Count.Should().Be(0);
+            logEvent.Level.Should().Be(LogEventLevel.Debug);
+            logEvent.Exception.Should().BeSameAs(exception);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
+    [Test]
+    public void DebugInterpolated_MixedLiteralValue_WithException()
+    {
+        var value1 = 5;
+        var value2 = 7;
+
+ 
+        const LogEventLevel logEventLevel = LogEventLevel.Debug;
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.DebugInterpolated(exception, $"A{value1}B{(LiteralValue) "C"}D{value2}E");
+
+        if (logEventLevel < MinLogEventLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(1);
+            var logEvent = LogEvents.Single();
+            logEvent.MessageTemplate.Text.Should().Be("A{value1}BCD{value2}E");
+            logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
+                new MessageTemplateToken[] 
+                { 
+                    new TextToken("A", 0),
+                    new PropertyToken(nameof(value1), "{value1}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 1),
+                    new TextToken("B", 9),
+                    new TextToken("C", 10),
+                    new TextToken("D", 11),
+                    new PropertyToken(nameof(value2), "{value2}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 12),
+                    new TextToken("E", 20)                    
+                }, 
+                MessageTemplateTokenEquivalency);
+            logEvent.Properties.Count.Should().Be(2);
+            logEvent.Properties.Should().BeEquivalentTo(
+                new []
+                {
+                    value1.ToLogEventPropertyValue(),
+                    value2.ToLogEventPropertyValue()
+                },
+                PropertiesEquivalency);
+            logEvent.Level.Should().Be(LogEventLevel.Debug);
+            logEvent.Exception.Should().BeSameAs(exception);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("A5BCD7E");
         }
     }
 
@@ -2651,6 +3115,122 @@ public class LoggerExtensionsTests : BaseFixture
     }
 
     [Test]
+    public void InformationInterpolated_LiteralValue()
+    {
+ 
+        const LogEventLevel logEventLevel = LogEventLevel.Information;
+        const string message = "Test";
+
+        
+        Logger.InformationInterpolated($"{(LiteralValue) "Test"}");
+        Logger.Information(message);
+
+        if (logEventLevel < MinLogEventLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.MessageTemplate.Text.Should().Be(message);
+            logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
+                new[] 
+                { 
+                    new TextToken(message, 0) 
+                }, 
+                MessageTemplateTokenEquivalency);
+            logEvent.Properties.Count.Should().Be(0);
+            logEvent.Level.Should().Be(LogEventLevel.Information);
+            logEvent.Exception.Should().BeNull();
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(message);
+        }
+    }
+
+    [Test]
+    public void InformationInterpolated_LiteralValueWithBraces()
+    {
+ 
+        const LogEventLevel logEventLevel = LogEventLevel.Information;
+        const string message = "T{{es}}t";
+
+        
+        Logger.InformationInterpolated($"{new LiteralValue("T{es}t")}");
+        Logger.Information(message);
+
+        if (logEventLevel < MinLogEventLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.MessageTemplate.Text.Should().Be("T{{es}}t");
+            logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
+                new[] 
+                { 
+                    new TextToken("T{es}t", 0) 
+                }, 
+                MessageTemplateTokenEquivalency);
+            logEvent.Properties.Count.Should().Be(0);
+            logEvent.Level.Should().Be(LogEventLevel.Information);
+            logEvent.Exception.Should().BeNull();
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
+    [Test]
+    public void InformationInterpolated_MixedLiteralValue()
+    {
+        var value1 = 5;
+        var value2 = 7;
+
+ 
+        const LogEventLevel logEventLevel = LogEventLevel.Information;
+        
+        Logger.InformationInterpolated($"A{value1}B{(LiteralValue) "C"}D{value2}E");
+
+        if (logEventLevel < MinLogEventLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(1);
+            var logEvent = LogEvents.Single();
+            logEvent.MessageTemplate.Text.Should().Be("A{value1}BCD{value2}E");
+            logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
+                new MessageTemplateToken[] 
+                { 
+                    new TextToken("A", 0),
+                    new PropertyToken(nameof(value1), "{value1}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 1),
+                    new TextToken("B", 9),
+                    new TextToken("C", 10),
+                    new TextToken("D", 11),
+                    new PropertyToken(nameof(value2), "{value2}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 12),
+                    new TextToken("E", 20)                    
+                }, 
+                MessageTemplateTokenEquivalency);
+            logEvent.Properties.Count.Should().Be(2);
+            logEvent.Properties.Should().BeEquivalentTo(
+                new []
+                {
+                    value1.ToLogEventPropertyValue(),
+                    value2.ToLogEventPropertyValue()
+                },
+                PropertiesEquivalency);
+            logEvent.Level.Should().Be(LogEventLevel.Information);
+            logEvent.Exception.Should().BeNull();
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("A5BCD7E");
+        }
+    }
+
+    [Test]
     public void InformationInterpolated_Literal_WithException()
     {
  
@@ -3171,6 +3751,122 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.Level.Should().Be(LogEventLevel.Information);
             logEvent.Exception.Should().BeSameAs(exception);
             logEvent.RenderMessage().Should().Be($"Default: {Format(value)}, Stringified: {Format(value.ToString())}, Destructured: {Format(value)}");   
+        }
+    }
+
+    [Test]
+    public void InformationInterpolated_LiteralValue_WithException()
+    {
+ 
+        const LogEventLevel logEventLevel = LogEventLevel.Information;
+        const string message = "Test";
+
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.InformationInterpolated(exception, $"{(LiteralValue) "Test"}");
+        Logger.Information(exception, message);
+
+        if (logEventLevel < MinLogEventLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.MessageTemplate.Text.Should().Be(message);
+            logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
+                new[] 
+                { 
+                    new TextToken(message, 0) 
+                }, 
+                MessageTemplateTokenEquivalency);
+            logEvent.Properties.Count.Should().Be(0);
+            logEvent.Level.Should().Be(LogEventLevel.Information);
+            logEvent.Exception.Should().BeSameAs(exception);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(message);
+        }
+    }
+
+    [Test]
+    public void InformationInterpolated_LiteralValueWithBraces_WithException()
+    {
+ 
+        const LogEventLevel logEventLevel = LogEventLevel.Information;
+        const string message = "T{{es}}t";
+
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.InformationInterpolated(exception, $"{new LiteralValue("T{es}t")}");
+        Logger.Information(exception, message);
+
+        if (logEventLevel < MinLogEventLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.MessageTemplate.Text.Should().Be("T{{es}}t");
+            logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
+                new[] 
+                { 
+                    new TextToken("T{es}t", 0) 
+                }, 
+                MessageTemplateTokenEquivalency);
+            logEvent.Properties.Count.Should().Be(0);
+            logEvent.Level.Should().Be(LogEventLevel.Information);
+            logEvent.Exception.Should().BeSameAs(exception);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
+    [Test]
+    public void InformationInterpolated_MixedLiteralValue_WithException()
+    {
+        var value1 = 5;
+        var value2 = 7;
+
+ 
+        const LogEventLevel logEventLevel = LogEventLevel.Information;
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.InformationInterpolated(exception, $"A{value1}B{(LiteralValue) "C"}D{value2}E");
+
+        if (logEventLevel < MinLogEventLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(1);
+            var logEvent = LogEvents.Single();
+            logEvent.MessageTemplate.Text.Should().Be("A{value1}BCD{value2}E");
+            logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
+                new MessageTemplateToken[] 
+                { 
+                    new TextToken("A", 0),
+                    new PropertyToken(nameof(value1), "{value1}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 1),
+                    new TextToken("B", 9),
+                    new TextToken("C", 10),
+                    new TextToken("D", 11),
+                    new PropertyToken(nameof(value2), "{value2}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 12),
+                    new TextToken("E", 20)                    
+                }, 
+                MessageTemplateTokenEquivalency);
+            logEvent.Properties.Count.Should().Be(2);
+            logEvent.Properties.Should().BeEquivalentTo(
+                new []
+                {
+                    value1.ToLogEventPropertyValue(),
+                    value2.ToLogEventPropertyValue()
+                },
+                PropertiesEquivalency);
+            logEvent.Level.Should().Be(LogEventLevel.Information);
+            logEvent.Exception.Should().BeSameAs(exception);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("A5BCD7E");
         }
     }
 
@@ -3704,6 +4400,122 @@ public class LoggerExtensionsTests : BaseFixture
     }
 
     [Test]
+    public void WarningInterpolated_LiteralValue()
+    {
+ 
+        const LogEventLevel logEventLevel = LogEventLevel.Warning;
+        const string message = "Test";
+
+        
+        Logger.WarningInterpolated($"{(LiteralValue) "Test"}");
+        Logger.Warning(message);
+
+        if (logEventLevel < MinLogEventLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.MessageTemplate.Text.Should().Be(message);
+            logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
+                new[] 
+                { 
+                    new TextToken(message, 0) 
+                }, 
+                MessageTemplateTokenEquivalency);
+            logEvent.Properties.Count.Should().Be(0);
+            logEvent.Level.Should().Be(LogEventLevel.Warning);
+            logEvent.Exception.Should().BeNull();
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(message);
+        }
+    }
+
+    [Test]
+    public void WarningInterpolated_LiteralValueWithBraces()
+    {
+ 
+        const LogEventLevel logEventLevel = LogEventLevel.Warning;
+        const string message = "T{{es}}t";
+
+        
+        Logger.WarningInterpolated($"{new LiteralValue("T{es}t")}");
+        Logger.Warning(message);
+
+        if (logEventLevel < MinLogEventLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.MessageTemplate.Text.Should().Be("T{{es}}t");
+            logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
+                new[] 
+                { 
+                    new TextToken("T{es}t", 0) 
+                }, 
+                MessageTemplateTokenEquivalency);
+            logEvent.Properties.Count.Should().Be(0);
+            logEvent.Level.Should().Be(LogEventLevel.Warning);
+            logEvent.Exception.Should().BeNull();
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
+    [Test]
+    public void WarningInterpolated_MixedLiteralValue()
+    {
+        var value1 = 5;
+        var value2 = 7;
+
+ 
+        const LogEventLevel logEventLevel = LogEventLevel.Warning;
+        
+        Logger.WarningInterpolated($"A{value1}B{(LiteralValue) "C"}D{value2}E");
+
+        if (logEventLevel < MinLogEventLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(1);
+            var logEvent = LogEvents.Single();
+            logEvent.MessageTemplate.Text.Should().Be("A{value1}BCD{value2}E");
+            logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
+                new MessageTemplateToken[] 
+                { 
+                    new TextToken("A", 0),
+                    new PropertyToken(nameof(value1), "{value1}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 1),
+                    new TextToken("B", 9),
+                    new TextToken("C", 10),
+                    new TextToken("D", 11),
+                    new PropertyToken(nameof(value2), "{value2}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 12),
+                    new TextToken("E", 20)                    
+                }, 
+                MessageTemplateTokenEquivalency);
+            logEvent.Properties.Count.Should().Be(2);
+            logEvent.Properties.Should().BeEquivalentTo(
+                new []
+                {
+                    value1.ToLogEventPropertyValue(),
+                    value2.ToLogEventPropertyValue()
+                },
+                PropertiesEquivalency);
+            logEvent.Level.Should().Be(LogEventLevel.Warning);
+            logEvent.Exception.Should().BeNull();
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("A5BCD7E");
+        }
+    }
+
+    [Test]
     public void WarningInterpolated_Literal_WithException()
     {
  
@@ -4224,6 +5036,122 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.Level.Should().Be(LogEventLevel.Warning);
             logEvent.Exception.Should().BeSameAs(exception);
             logEvent.RenderMessage().Should().Be($"Default: {Format(value)}, Stringified: {Format(value.ToString())}, Destructured: {Format(value)}");   
+        }
+    }
+
+    [Test]
+    public void WarningInterpolated_LiteralValue_WithException()
+    {
+ 
+        const LogEventLevel logEventLevel = LogEventLevel.Warning;
+        const string message = "Test";
+
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.WarningInterpolated(exception, $"{(LiteralValue) "Test"}");
+        Logger.Warning(exception, message);
+
+        if (logEventLevel < MinLogEventLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.MessageTemplate.Text.Should().Be(message);
+            logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
+                new[] 
+                { 
+                    new TextToken(message, 0) 
+                }, 
+                MessageTemplateTokenEquivalency);
+            logEvent.Properties.Count.Should().Be(0);
+            logEvent.Level.Should().Be(LogEventLevel.Warning);
+            logEvent.Exception.Should().BeSameAs(exception);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(message);
+        }
+    }
+
+    [Test]
+    public void WarningInterpolated_LiteralValueWithBraces_WithException()
+    {
+ 
+        const LogEventLevel logEventLevel = LogEventLevel.Warning;
+        const string message = "T{{es}}t";
+
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.WarningInterpolated(exception, $"{new LiteralValue("T{es}t")}");
+        Logger.Warning(exception, message);
+
+        if (logEventLevel < MinLogEventLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.MessageTemplate.Text.Should().Be("T{{es}}t");
+            logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
+                new[] 
+                { 
+                    new TextToken("T{es}t", 0) 
+                }, 
+                MessageTemplateTokenEquivalency);
+            logEvent.Properties.Count.Should().Be(0);
+            logEvent.Level.Should().Be(LogEventLevel.Warning);
+            logEvent.Exception.Should().BeSameAs(exception);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
+    [Test]
+    public void WarningInterpolated_MixedLiteralValue_WithException()
+    {
+        var value1 = 5;
+        var value2 = 7;
+
+ 
+        const LogEventLevel logEventLevel = LogEventLevel.Warning;
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.WarningInterpolated(exception, $"A{value1}B{(LiteralValue) "C"}D{value2}E");
+
+        if (logEventLevel < MinLogEventLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(1);
+            var logEvent = LogEvents.Single();
+            logEvent.MessageTemplate.Text.Should().Be("A{value1}BCD{value2}E");
+            logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
+                new MessageTemplateToken[] 
+                { 
+                    new TextToken("A", 0),
+                    new PropertyToken(nameof(value1), "{value1}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 1),
+                    new TextToken("B", 9),
+                    new TextToken("C", 10),
+                    new TextToken("D", 11),
+                    new PropertyToken(nameof(value2), "{value2}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 12),
+                    new TextToken("E", 20)                    
+                }, 
+                MessageTemplateTokenEquivalency);
+            logEvent.Properties.Count.Should().Be(2);
+            logEvent.Properties.Should().BeEquivalentTo(
+                new []
+                {
+                    value1.ToLogEventPropertyValue(),
+                    value2.ToLogEventPropertyValue()
+                },
+                PropertiesEquivalency);
+            logEvent.Level.Should().Be(LogEventLevel.Warning);
+            logEvent.Exception.Should().BeSameAs(exception);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("A5BCD7E");
         }
     }
 
@@ -4757,6 +5685,122 @@ public class LoggerExtensionsTests : BaseFixture
     }
 
     [Test]
+    public void ErrorInterpolated_LiteralValue()
+    {
+ 
+        const LogEventLevel logEventLevel = LogEventLevel.Error;
+        const string message = "Test";
+
+        
+        Logger.ErrorInterpolated($"{(LiteralValue) "Test"}");
+        Logger.Error(message);
+
+        if (logEventLevel < MinLogEventLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.MessageTemplate.Text.Should().Be(message);
+            logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
+                new[] 
+                { 
+                    new TextToken(message, 0) 
+                }, 
+                MessageTemplateTokenEquivalency);
+            logEvent.Properties.Count.Should().Be(0);
+            logEvent.Level.Should().Be(LogEventLevel.Error);
+            logEvent.Exception.Should().BeNull();
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(message);
+        }
+    }
+
+    [Test]
+    public void ErrorInterpolated_LiteralValueWithBraces()
+    {
+ 
+        const LogEventLevel logEventLevel = LogEventLevel.Error;
+        const string message = "T{{es}}t";
+
+        
+        Logger.ErrorInterpolated($"{new LiteralValue("T{es}t")}");
+        Logger.Error(message);
+
+        if (logEventLevel < MinLogEventLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.MessageTemplate.Text.Should().Be("T{{es}}t");
+            logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
+                new[] 
+                { 
+                    new TextToken("T{es}t", 0) 
+                }, 
+                MessageTemplateTokenEquivalency);
+            logEvent.Properties.Count.Should().Be(0);
+            logEvent.Level.Should().Be(LogEventLevel.Error);
+            logEvent.Exception.Should().BeNull();
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
+    [Test]
+    public void ErrorInterpolated_MixedLiteralValue()
+    {
+        var value1 = 5;
+        var value2 = 7;
+
+ 
+        const LogEventLevel logEventLevel = LogEventLevel.Error;
+        
+        Logger.ErrorInterpolated($"A{value1}B{(LiteralValue) "C"}D{value2}E");
+
+        if (logEventLevel < MinLogEventLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(1);
+            var logEvent = LogEvents.Single();
+            logEvent.MessageTemplate.Text.Should().Be("A{value1}BCD{value2}E");
+            logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
+                new MessageTemplateToken[] 
+                { 
+                    new TextToken("A", 0),
+                    new PropertyToken(nameof(value1), "{value1}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 1),
+                    new TextToken("B", 9),
+                    new TextToken("C", 10),
+                    new TextToken("D", 11),
+                    new PropertyToken(nameof(value2), "{value2}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 12),
+                    new TextToken("E", 20)                    
+                }, 
+                MessageTemplateTokenEquivalency);
+            logEvent.Properties.Count.Should().Be(2);
+            logEvent.Properties.Should().BeEquivalentTo(
+                new []
+                {
+                    value1.ToLogEventPropertyValue(),
+                    value2.ToLogEventPropertyValue()
+                },
+                PropertiesEquivalency);
+            logEvent.Level.Should().Be(LogEventLevel.Error);
+            logEvent.Exception.Should().BeNull();
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("A5BCD7E");
+        }
+    }
+
+    [Test]
     public void ErrorInterpolated_Literal_WithException()
     {
  
@@ -5277,6 +6321,122 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.Level.Should().Be(LogEventLevel.Error);
             logEvent.Exception.Should().BeSameAs(exception);
             logEvent.RenderMessage().Should().Be($"Default: {Format(value)}, Stringified: {Format(value.ToString())}, Destructured: {Format(value)}");   
+        }
+    }
+
+    [Test]
+    public void ErrorInterpolated_LiteralValue_WithException()
+    {
+ 
+        const LogEventLevel logEventLevel = LogEventLevel.Error;
+        const string message = "Test";
+
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.ErrorInterpolated(exception, $"{(LiteralValue) "Test"}");
+        Logger.Error(exception, message);
+
+        if (logEventLevel < MinLogEventLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.MessageTemplate.Text.Should().Be(message);
+            logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
+                new[] 
+                { 
+                    new TextToken(message, 0) 
+                }, 
+                MessageTemplateTokenEquivalency);
+            logEvent.Properties.Count.Should().Be(0);
+            logEvent.Level.Should().Be(LogEventLevel.Error);
+            logEvent.Exception.Should().BeSameAs(exception);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(message);
+        }
+    }
+
+    [Test]
+    public void ErrorInterpolated_LiteralValueWithBraces_WithException()
+    {
+ 
+        const LogEventLevel logEventLevel = LogEventLevel.Error;
+        const string message = "T{{es}}t";
+
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.ErrorInterpolated(exception, $"{new LiteralValue("T{es}t")}");
+        Logger.Error(exception, message);
+
+        if (logEventLevel < MinLogEventLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.MessageTemplate.Text.Should().Be("T{{es}}t");
+            logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
+                new[] 
+                { 
+                    new TextToken("T{es}t", 0) 
+                }, 
+                MessageTemplateTokenEquivalency);
+            logEvent.Properties.Count.Should().Be(0);
+            logEvent.Level.Should().Be(LogEventLevel.Error);
+            logEvent.Exception.Should().BeSameAs(exception);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
+    [Test]
+    public void ErrorInterpolated_MixedLiteralValue_WithException()
+    {
+        var value1 = 5;
+        var value2 = 7;
+
+ 
+        const LogEventLevel logEventLevel = LogEventLevel.Error;
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.ErrorInterpolated(exception, $"A{value1}B{(LiteralValue) "C"}D{value2}E");
+
+        if (logEventLevel < MinLogEventLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(1);
+            var logEvent = LogEvents.Single();
+            logEvent.MessageTemplate.Text.Should().Be("A{value1}BCD{value2}E");
+            logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
+                new MessageTemplateToken[] 
+                { 
+                    new TextToken("A", 0),
+                    new PropertyToken(nameof(value1), "{value1}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 1),
+                    new TextToken("B", 9),
+                    new TextToken("C", 10),
+                    new TextToken("D", 11),
+                    new PropertyToken(nameof(value2), "{value2}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 12),
+                    new TextToken("E", 20)                    
+                }, 
+                MessageTemplateTokenEquivalency);
+            logEvent.Properties.Count.Should().Be(2);
+            logEvent.Properties.Should().BeEquivalentTo(
+                new []
+                {
+                    value1.ToLogEventPropertyValue(),
+                    value2.ToLogEventPropertyValue()
+                },
+                PropertiesEquivalency);
+            logEvent.Level.Should().Be(LogEventLevel.Error);
+            logEvent.Exception.Should().BeSameAs(exception);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("A5BCD7E");
         }
     }
 
@@ -5810,6 +6970,122 @@ public class LoggerExtensionsTests : BaseFixture
     }
 
     [Test]
+    public void FatalInterpolated_LiteralValue()
+    {
+ 
+        const LogEventLevel logEventLevel = LogEventLevel.Fatal;
+        const string message = "Test";
+
+        
+        Logger.FatalInterpolated($"{(LiteralValue) "Test"}");
+        Logger.Fatal(message);
+
+        if (logEventLevel < MinLogEventLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.MessageTemplate.Text.Should().Be(message);
+            logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
+                new[] 
+                { 
+                    new TextToken(message, 0) 
+                }, 
+                MessageTemplateTokenEquivalency);
+            logEvent.Properties.Count.Should().Be(0);
+            logEvent.Level.Should().Be(LogEventLevel.Fatal);
+            logEvent.Exception.Should().BeNull();
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(message);
+        }
+    }
+
+    [Test]
+    public void FatalInterpolated_LiteralValueWithBraces()
+    {
+ 
+        const LogEventLevel logEventLevel = LogEventLevel.Fatal;
+        const string message = "T{{es}}t";
+
+        
+        Logger.FatalInterpolated($"{new LiteralValue("T{es}t")}");
+        Logger.Fatal(message);
+
+        if (logEventLevel < MinLogEventLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.MessageTemplate.Text.Should().Be("T{{es}}t");
+            logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
+                new[] 
+                { 
+                    new TextToken("T{es}t", 0) 
+                }, 
+                MessageTemplateTokenEquivalency);
+            logEvent.Properties.Count.Should().Be(0);
+            logEvent.Level.Should().Be(LogEventLevel.Fatal);
+            logEvent.Exception.Should().BeNull();
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
+    [Test]
+    public void FatalInterpolated_MixedLiteralValue()
+    {
+        var value1 = 5;
+        var value2 = 7;
+
+ 
+        const LogEventLevel logEventLevel = LogEventLevel.Fatal;
+        
+        Logger.FatalInterpolated($"A{value1}B{(LiteralValue) "C"}D{value2}E");
+
+        if (logEventLevel < MinLogEventLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(1);
+            var logEvent = LogEvents.Single();
+            logEvent.MessageTemplate.Text.Should().Be("A{value1}BCD{value2}E");
+            logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
+                new MessageTemplateToken[] 
+                { 
+                    new TextToken("A", 0),
+                    new PropertyToken(nameof(value1), "{value1}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 1),
+                    new TextToken("B", 9),
+                    new TextToken("C", 10),
+                    new TextToken("D", 11),
+                    new PropertyToken(nameof(value2), "{value2}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 12),
+                    new TextToken("E", 20)                    
+                }, 
+                MessageTemplateTokenEquivalency);
+            logEvent.Properties.Count.Should().Be(2);
+            logEvent.Properties.Should().BeEquivalentTo(
+                new []
+                {
+                    value1.ToLogEventPropertyValue(),
+                    value2.ToLogEventPropertyValue()
+                },
+                PropertiesEquivalency);
+            logEvent.Level.Should().Be(LogEventLevel.Fatal);
+            logEvent.Exception.Should().BeNull();
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("A5BCD7E");
+        }
+    }
+
+    [Test]
     public void FatalInterpolated_Literal_WithException()
     {
  
@@ -6333,6 +7609,122 @@ public class LoggerExtensionsTests : BaseFixture
         }
     }
 
+    [Test]
+    public void FatalInterpolated_LiteralValue_WithException()
+    {
+ 
+        const LogEventLevel logEventLevel = LogEventLevel.Fatal;
+        const string message = "Test";
+
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.FatalInterpolated(exception, $"{(LiteralValue) "Test"}");
+        Logger.Fatal(exception, message);
+
+        if (logEventLevel < MinLogEventLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.MessageTemplate.Text.Should().Be(message);
+            logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
+                new[] 
+                { 
+                    new TextToken(message, 0) 
+                }, 
+                MessageTemplateTokenEquivalency);
+            logEvent.Properties.Count.Should().Be(0);
+            logEvent.Level.Should().Be(LogEventLevel.Fatal);
+            logEvent.Exception.Should().BeSameAs(exception);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(message);
+        }
+    }
+
+    [Test]
+    public void FatalInterpolated_LiteralValueWithBraces_WithException()
+    {
+ 
+        const LogEventLevel logEventLevel = LogEventLevel.Fatal;
+        const string message = "T{{es}}t";
+
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.FatalInterpolated(exception, $"{new LiteralValue("T{es}t")}");
+        Logger.Fatal(exception, message);
+
+        if (logEventLevel < MinLogEventLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.MessageTemplate.Text.Should().Be("T{{es}}t");
+            logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
+                new[] 
+                { 
+                    new TextToken("T{es}t", 0) 
+                }, 
+                MessageTemplateTokenEquivalency);
+            logEvent.Properties.Count.Should().Be(0);
+            logEvent.Level.Should().Be(LogEventLevel.Fatal);
+            logEvent.Exception.Should().BeSameAs(exception);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
+    [Test]
+    public void FatalInterpolated_MixedLiteralValue_WithException()
+    {
+        var value1 = 5;
+        var value2 = 7;
+
+ 
+        const LogEventLevel logEventLevel = LogEventLevel.Fatal;
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.FatalInterpolated(exception, $"A{value1}B{(LiteralValue) "C"}D{value2}E");
+
+        if (logEventLevel < MinLogEventLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(1);
+            var logEvent = LogEvents.Single();
+            logEvent.MessageTemplate.Text.Should().Be("A{value1}BCD{value2}E");
+            logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
+                new MessageTemplateToken[] 
+                { 
+                    new TextToken("A", 0),
+                    new PropertyToken(nameof(value1), "{value1}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 1),
+                    new TextToken("B", 9),
+                    new TextToken("C", 10),
+                    new TextToken("D", 11),
+                    new PropertyToken(nameof(value2), "{value2}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 12),
+                    new TextToken("E", 20)                    
+                }, 
+                MessageTemplateTokenEquivalency);
+            logEvent.Properties.Count.Should().Be(2);
+            logEvent.Properties.Should().BeEquivalentTo(
+                new []
+                {
+                    value1.ToLogEventPropertyValue(),
+                    value2.ToLogEventPropertyValue()
+                },
+                PropertiesEquivalency);
+            logEvent.Level.Should().Be(LogEventLevel.Fatal);
+            logEvent.Exception.Should().BeSameAs(exception);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("A5BCD7E");
+        }
+    }
+
 
     #endregion
 
@@ -6839,6 +8231,116 @@ public class LoggerExtensionsTests : BaseFixture
     }
 
     [Test]
+    public void WriteInterpolated_LiteralValue([ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel)
+    {
+        const string message = "Test";
+
+        
+        Logger.WriteInterpolated(logEventLevel, $"{(LiteralValue) "Test"}");
+        Logger.Write(logEventLevel, message);
+
+        if (logEventLevel < MinLogEventLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.MessageTemplate.Text.Should().Be(message);
+            logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
+                new[] 
+                { 
+                    new TextToken(message, 0) 
+                }, 
+                MessageTemplateTokenEquivalency);
+            logEvent.Properties.Count.Should().Be(0);
+            logEvent.Level.Should().Be(logEventLevel);
+            logEvent.Exception.Should().BeNull();
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(message);
+        }
+    }
+
+    [Test]
+    public void WriteInterpolated_LiteralValueWithBraces([ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel)
+    {
+        const string message = "T{{es}}t";
+
+        
+        Logger.WriteInterpolated(logEventLevel, $"{new LiteralValue("T{es}t")}");
+        Logger.Write(logEventLevel, message);
+
+        if (logEventLevel < MinLogEventLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.MessageTemplate.Text.Should().Be("T{{es}}t");
+            logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
+                new[] 
+                { 
+                    new TextToken("T{es}t", 0) 
+                }, 
+                MessageTemplateTokenEquivalency);
+            logEvent.Properties.Count.Should().Be(0);
+            logEvent.Level.Should().Be(logEventLevel);
+            logEvent.Exception.Should().BeNull();
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
+    [Test]
+    public void WriteInterpolated_MixedLiteralValue([ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel)
+    {
+        var value1 = 5;
+        var value2 = 7;
+
+        
+        Logger.WriteInterpolated(logEventLevel, $"A{value1}B{(LiteralValue) "C"}D{value2}E");
+
+        if (logEventLevel < MinLogEventLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(1);
+            var logEvent = LogEvents.Single();
+            logEvent.MessageTemplate.Text.Should().Be("A{value1}BCD{value2}E");
+            logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
+                new MessageTemplateToken[] 
+                { 
+                    new TextToken("A", 0),
+                    new PropertyToken(nameof(value1), "{value1}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 1),
+                    new TextToken("B", 9),
+                    new TextToken("C", 10),
+                    new TextToken("D", 11),
+                    new PropertyToken(nameof(value2), "{value2}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 12),
+                    new TextToken("E", 20)                    
+                }, 
+                MessageTemplateTokenEquivalency);
+            logEvent.Properties.Count.Should().Be(2);
+            logEvent.Properties.Should().BeEquivalentTo(
+                new []
+                {
+                    value1.ToLogEventPropertyValue(),
+                    value2.ToLogEventPropertyValue()
+                },
+                PropertiesEquivalency);
+            logEvent.Level.Should().Be(logEventLevel);
+            logEvent.Exception.Should().BeNull();
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("A5BCD7E");
+        }
+    }
+
+    [Test]
     public void WriteInterpolated_Literal_WithException([ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel)
     {
         const string message = "Test";
@@ -7335,6 +8837,116 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.Level.Should().Be(logEventLevel);
             logEvent.Exception.Should().BeSameAs(exception);
             logEvent.RenderMessage().Should().Be($"Default: {Format(value)}, Stringified: {Format(value.ToString())}, Destructured: {Format(value)}");   
+        }
+    }
+
+    [Test]
+    public void WriteInterpolated_LiteralValue_WithException([ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel)
+    {
+        const string message = "Test";
+
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.WriteInterpolated(logEventLevel, exception, $"{(LiteralValue) "Test"}");
+        Logger.Write(logEventLevel, exception, message);
+
+        if (logEventLevel < MinLogEventLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.MessageTemplate.Text.Should().Be(message);
+            logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
+                new[] 
+                { 
+                    new TextToken(message, 0) 
+                }, 
+                MessageTemplateTokenEquivalency);
+            logEvent.Properties.Count.Should().Be(0);
+            logEvent.Level.Should().Be(logEventLevel);
+            logEvent.Exception.Should().BeSameAs(exception);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(message);
+        }
+    }
+
+    [Test]
+    public void WriteInterpolated_LiteralValueWithBraces_WithException([ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel)
+    {
+        const string message = "T{{es}}t";
+
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.WriteInterpolated(logEventLevel, exception, $"{new LiteralValue("T{es}t")}");
+        Logger.Write(logEventLevel, exception, message);
+
+        if (logEventLevel < MinLogEventLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.MessageTemplate.Text.Should().Be("T{{es}}t");
+            logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
+                new[] 
+                { 
+                    new TextToken("T{es}t", 0) 
+                }, 
+                MessageTemplateTokenEquivalency);
+            logEvent.Properties.Count.Should().Be(0);
+            logEvent.Level.Should().Be(logEventLevel);
+            logEvent.Exception.Should().BeSameAs(exception);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
+    [Test]
+    public void WriteInterpolated_MixedLiteralValue_WithException([ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel)
+    {
+        var value1 = 5;
+        var value2 = 7;
+
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.WriteInterpolated(logEventLevel, exception, $"A{value1}B{(LiteralValue) "C"}D{value2}E");
+
+        if (logEventLevel < MinLogEventLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(1);
+            var logEvent = LogEvents.Single();
+            logEvent.MessageTemplate.Text.Should().Be("A{value1}BCD{value2}E");
+            logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
+                new MessageTemplateToken[] 
+                { 
+                    new TextToken("A", 0),
+                    new PropertyToken(nameof(value1), "{value1}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 1),
+                    new TextToken("B", 9),
+                    new TextToken("C", 10),
+                    new TextToken("D", 11),
+                    new PropertyToken(nameof(value2), "{value2}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 12),
+                    new TextToken("E", 20)                    
+                }, 
+                MessageTemplateTokenEquivalency);
+            logEvent.Properties.Count.Should().Be(2);
+            logEvent.Properties.Should().BeEquivalentTo(
+                new []
+                {
+                    value1.ToLogEventPropertyValue(),
+                    value2.ToLogEventPropertyValue()
+                },
+                PropertiesEquivalency);
+            logEvent.Level.Should().Be(logEventLevel);
+            logEvent.Exception.Should().BeSameAs(exception);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("A5BCD7E");
         }
     }
 

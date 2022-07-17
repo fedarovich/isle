@@ -318,6 +318,36 @@ public class TraceLogInterpolatedStringHandlerTests : BaseFixture
     }
 
     #endregion
+
+    #region AppendFormatted with LiteralValue
+
+    [Test]
+    public void AppendFormattedLiteralValue([ValueSource(nameof(Literals))] string? literal)
+    {
+        Assume.That(logLevel >= MinLogLevel);
+
+        var handler = new TraceLogInterpolatedStringHandler(0, 1, Logger,  out _);
+        handler.AppendFormatted((LiteralValue) literal);
+        var values = handler.GetFormattedLogValuesAndReset();
+        values.Count.Should().Be(1);
+        values[0].Should().Be(new KeyValuePair<string, object>("{OriginalFormat}", literal ?? ""));
+        values.ToString().Should().Be(literal ?? "");
+    }
+
+    [Test]
+    public void AppendFormattedLiteralValueWithBraces()
+    {
+        Assume.That(logLevel >= MinLogLevel);
+
+        var handler = new TraceLogInterpolatedStringHandler(0, 1, Logger,  out _);
+        handler.AppendFormatted(new LiteralValue("A{B}C"));
+        var values = handler.GetFormattedLogValuesAndReset();
+        values.Count.Should().Be(1);
+        values[0].Should().Be(new KeyValuePair<string, object>("{OriginalFormat}", "A{{B}}C"));
+        values.ToString().Should().Be("A{B}C");
+    }
+
+    #endregion
 }
 
 
@@ -628,6 +658,36 @@ public class DebugLogInterpolatedStringHandlerTests : BaseFixture
                 new KeyValuePair<string, object>("{OriginalFormat}", "{@value," + alignment + ":" + format + "}")
             });
         values.ToString().Should().Be(value.ToString());
+    }
+
+    #endregion
+
+    #region AppendFormatted with LiteralValue
+
+    [Test]
+    public void AppendFormattedLiteralValue([ValueSource(nameof(Literals))] string? literal)
+    {
+        Assume.That(logLevel >= MinLogLevel);
+
+        var handler = new DebugLogInterpolatedStringHandler(0, 1, Logger,  out _);
+        handler.AppendFormatted((LiteralValue) literal);
+        var values = handler.GetFormattedLogValuesAndReset();
+        values.Count.Should().Be(1);
+        values[0].Should().Be(new KeyValuePair<string, object>("{OriginalFormat}", literal ?? ""));
+        values.ToString().Should().Be(literal ?? "");
+    }
+
+    [Test]
+    public void AppendFormattedLiteralValueWithBraces()
+    {
+        Assume.That(logLevel >= MinLogLevel);
+
+        var handler = new DebugLogInterpolatedStringHandler(0, 1, Logger,  out _);
+        handler.AppendFormatted(new LiteralValue("A{B}C"));
+        var values = handler.GetFormattedLogValuesAndReset();
+        values.Count.Should().Be(1);
+        values[0].Should().Be(new KeyValuePair<string, object>("{OriginalFormat}", "A{{B}}C"));
+        values.ToString().Should().Be("A{B}C");
     }
 
     #endregion
@@ -944,6 +1004,36 @@ public class InformationLogInterpolatedStringHandlerTests : BaseFixture
     }
 
     #endregion
+
+    #region AppendFormatted with LiteralValue
+
+    [Test]
+    public void AppendFormattedLiteralValue([ValueSource(nameof(Literals))] string? literal)
+    {
+        Assume.That(logLevel >= MinLogLevel);
+
+        var handler = new InformationLogInterpolatedStringHandler(0, 1, Logger,  out _);
+        handler.AppendFormatted((LiteralValue) literal);
+        var values = handler.GetFormattedLogValuesAndReset();
+        values.Count.Should().Be(1);
+        values[0].Should().Be(new KeyValuePair<string, object>("{OriginalFormat}", literal ?? ""));
+        values.ToString().Should().Be(literal ?? "");
+    }
+
+    [Test]
+    public void AppendFormattedLiteralValueWithBraces()
+    {
+        Assume.That(logLevel >= MinLogLevel);
+
+        var handler = new InformationLogInterpolatedStringHandler(0, 1, Logger,  out _);
+        handler.AppendFormatted(new LiteralValue("A{B}C"));
+        var values = handler.GetFormattedLogValuesAndReset();
+        values.Count.Should().Be(1);
+        values[0].Should().Be(new KeyValuePair<string, object>("{OriginalFormat}", "A{{B}}C"));
+        values.ToString().Should().Be("A{B}C");
+    }
+
+    #endregion
 }
 
 
@@ -1254,6 +1344,36 @@ public class WarningLogInterpolatedStringHandlerTests : BaseFixture
                 new KeyValuePair<string, object>("{OriginalFormat}", "{@value," + alignment + ":" + format + "}")
             });
         values.ToString().Should().Be(value.ToString());
+    }
+
+    #endregion
+
+    #region AppendFormatted with LiteralValue
+
+    [Test]
+    public void AppendFormattedLiteralValue([ValueSource(nameof(Literals))] string? literal)
+    {
+        Assume.That(logLevel >= MinLogLevel);
+
+        var handler = new WarningLogInterpolatedStringHandler(0, 1, Logger,  out _);
+        handler.AppendFormatted((LiteralValue) literal);
+        var values = handler.GetFormattedLogValuesAndReset();
+        values.Count.Should().Be(1);
+        values[0].Should().Be(new KeyValuePair<string, object>("{OriginalFormat}", literal ?? ""));
+        values.ToString().Should().Be(literal ?? "");
+    }
+
+    [Test]
+    public void AppendFormattedLiteralValueWithBraces()
+    {
+        Assume.That(logLevel >= MinLogLevel);
+
+        var handler = new WarningLogInterpolatedStringHandler(0, 1, Logger,  out _);
+        handler.AppendFormatted(new LiteralValue("A{B}C"));
+        var values = handler.GetFormattedLogValuesAndReset();
+        values.Count.Should().Be(1);
+        values[0].Should().Be(new KeyValuePair<string, object>("{OriginalFormat}", "A{{B}}C"));
+        values.ToString().Should().Be("A{B}C");
     }
 
     #endregion
@@ -1570,6 +1690,36 @@ public class ErrorLogInterpolatedStringHandlerTests : BaseFixture
     }
 
     #endregion
+
+    #region AppendFormatted with LiteralValue
+
+    [Test]
+    public void AppendFormattedLiteralValue([ValueSource(nameof(Literals))] string? literal)
+    {
+        Assume.That(logLevel >= MinLogLevel);
+
+        var handler = new ErrorLogInterpolatedStringHandler(0, 1, Logger,  out _);
+        handler.AppendFormatted((LiteralValue) literal);
+        var values = handler.GetFormattedLogValuesAndReset();
+        values.Count.Should().Be(1);
+        values[0].Should().Be(new KeyValuePair<string, object>("{OriginalFormat}", literal ?? ""));
+        values.ToString().Should().Be(literal ?? "");
+    }
+
+    [Test]
+    public void AppendFormattedLiteralValueWithBraces()
+    {
+        Assume.That(logLevel >= MinLogLevel);
+
+        var handler = new ErrorLogInterpolatedStringHandler(0, 1, Logger,  out _);
+        handler.AppendFormatted(new LiteralValue("A{B}C"));
+        var values = handler.GetFormattedLogValuesAndReset();
+        values.Count.Should().Be(1);
+        values[0].Should().Be(new KeyValuePair<string, object>("{OriginalFormat}", "A{{B}}C"));
+        values.ToString().Should().Be("A{B}C");
+    }
+
+    #endregion
 }
 
 
@@ -1883,6 +2033,36 @@ public class CriticalLogInterpolatedStringHandlerTests : BaseFixture
     }
 
     #endregion
+
+    #region AppendFormatted with LiteralValue
+
+    [Test]
+    public void AppendFormattedLiteralValue([ValueSource(nameof(Literals))] string? literal)
+    {
+        Assume.That(logLevel >= MinLogLevel);
+
+        var handler = new CriticalLogInterpolatedStringHandler(0, 1, Logger,  out _);
+        handler.AppendFormatted((LiteralValue) literal);
+        var values = handler.GetFormattedLogValuesAndReset();
+        values.Count.Should().Be(1);
+        values[0].Should().Be(new KeyValuePair<string, object>("{OriginalFormat}", literal ?? ""));
+        values.ToString().Should().Be(literal ?? "");
+    }
+
+    [Test]
+    public void AppendFormattedLiteralValueWithBraces()
+    {
+        Assume.That(logLevel >= MinLogLevel);
+
+        var handler = new CriticalLogInterpolatedStringHandler(0, 1, Logger,  out _);
+        handler.AppendFormatted(new LiteralValue("A{B}C"));
+        var values = handler.GetFormattedLogValuesAndReset();
+        values.Count.Should().Be(1);
+        values[0].Should().Be(new KeyValuePair<string, object>("{OriginalFormat}", "A{{B}}C"));
+        values.ToString().Should().Be("A{B}C");
+    }
+
+    #endregion
 }
 
 
@@ -2192,6 +2372,36 @@ public class LogInterpolatedStringHandlerTests : BaseFixture
                 new KeyValuePair<string, object>("{OriginalFormat}", "{@value," + alignment + ":" + format + "}")
             });
         values.ToString().Should().Be(value.ToString());
+    }
+
+    #endregion
+
+    #region AppendFormatted with LiteralValue
+
+    [Test]
+    public void AppendFormattedLiteralValue( [ValueSource(nameof(LogLevels))] LogLevel logLevel, [ValueSource(nameof(Literals))] string? literal)
+    {
+        Assume.That(logLevel >= MinLogLevel);
+
+        var handler = new LogInterpolatedStringHandler(0, 1, Logger,  logLevel,  out _);
+        handler.AppendFormatted((LiteralValue) literal);
+        var values = handler.GetFormattedLogValuesAndReset();
+        values.Count.Should().Be(1);
+        values[0].Should().Be(new KeyValuePair<string, object>("{OriginalFormat}", literal ?? ""));
+        values.ToString().Should().Be(literal ?? "");
+    }
+
+    [Test]
+    public void AppendFormattedLiteralValueWithBraces( [ValueSource(nameof(LogLevels))] LogLevel logLevel )
+    {
+        Assume.That(logLevel >= MinLogLevel);
+
+        var handler = new LogInterpolatedStringHandler(0, 1, Logger,  logLevel,  out _);
+        handler.AppendFormatted(new LiteralValue("A{B}C"));
+        var values = handler.GetFormattedLogValuesAndReset();
+        values.Count.Should().Be(1);
+        values[0].Should().Be(new KeyValuePair<string, object>("{OriginalFormat}", "A{{B}}C"));
+        values.ToString().Should().Be("A{B}C");
     }
 
     #endregion

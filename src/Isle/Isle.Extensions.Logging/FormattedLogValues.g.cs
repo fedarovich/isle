@@ -8,11 +8,26 @@ internal sealed class FormattedLogValues0 : FormattedLogValuesBase
 {
     private ValuesPlaceholder _values;
 
-    internal override Span<KeyValuePair<string, object?>> Values => MemoryMarshal.CreateSpan(ref _values.OriginalFormat, 1);
+    internal FormattedLogValues0() : base(1)
+    {
+    }
+
+    internal override Span<KeyValuePair<string, object?>> Values => MemoryMarshal.CreateSpan(ref _values.OriginalFormat, Count);
     
     public override IEnumerator<KeyValuePair<string, object?>> GetEnumerator()
     {
-        yield return _values.OriginalFormat;
+        return Count == 1 ? GetEnumeratorFast() : GetEnumeratorSlow();
+
+        IEnumerator<KeyValuePair<string, object?>> GetEnumeratorFast()
+        {
+            yield return _values.OriginalFormat;
+        }
+
+        IEnumerator<KeyValuePair<string, object?>> GetEnumeratorSlow()
+        {
+            if (Count == 0) yield break;
+            yield return _values.OriginalFormat;
+        }
     }
 
     private struct ValuesPlaceholder
@@ -28,12 +43,29 @@ internal sealed class FormattedLogValues1 : FormattedLogValuesBase
 {
     private ValuesPlaceholder _values;
 
-    internal override Span<KeyValuePair<string, object?>> Values => MemoryMarshal.CreateSpan(ref _values.Value0, 2);
+    internal FormattedLogValues1() : base(2)
+    {
+    }
+
+    internal override Span<KeyValuePair<string, object?>> Values => MemoryMarshal.CreateSpan(ref _values.Value0, Count);
     
     public override IEnumerator<KeyValuePair<string, object?>> GetEnumerator()
     {
-        yield return _values.Value0;
-        yield return _values.OriginalFormat;
+        return Count == 2 ? GetEnumeratorFast() : GetEnumeratorSlow();
+
+        IEnumerator<KeyValuePair<string, object?>> GetEnumeratorFast()
+        {
+            yield return _values.Value0;
+            yield return _values.OriginalFormat;
+        }
+
+        IEnumerator<KeyValuePair<string, object?>> GetEnumeratorSlow()
+        {
+            if (Count == 0) yield break;
+            yield return _values.Value0;
+            if (Count == 1) yield break;
+            yield return _values.OriginalFormat;
+        }
     }
 
     private struct ValuesPlaceholder
@@ -50,13 +82,32 @@ internal sealed class FormattedLogValues2 : FormattedLogValuesBase
 {
     private ValuesPlaceholder _values;
 
-    internal override Span<KeyValuePair<string, object?>> Values => MemoryMarshal.CreateSpan(ref _values.Value0, 3);
+    internal FormattedLogValues2() : base(3)
+    {
+    }
+
+    internal override Span<KeyValuePair<string, object?>> Values => MemoryMarshal.CreateSpan(ref _values.Value0, Count);
     
     public override IEnumerator<KeyValuePair<string, object?>> GetEnumerator()
     {
-        yield return _values.Value0;
-        yield return _values.Value1;
-        yield return _values.OriginalFormat;
+        return Count == 3 ? GetEnumeratorFast() : GetEnumeratorSlow();
+
+        IEnumerator<KeyValuePair<string, object?>> GetEnumeratorFast()
+        {
+            yield return _values.Value0;
+            yield return _values.Value1;
+            yield return _values.OriginalFormat;
+        }
+
+        IEnumerator<KeyValuePair<string, object?>> GetEnumeratorSlow()
+        {
+            if (Count == 0) yield break;
+            yield return _values.Value0;
+            if (Count == 1) yield break;
+            yield return _values.Value1;
+            if (Count == 2) yield break;
+            yield return _values.OriginalFormat;
+        }
     }
 
     private struct ValuesPlaceholder
@@ -74,14 +125,35 @@ internal sealed class FormattedLogValues3 : FormattedLogValuesBase
 {
     private ValuesPlaceholder _values;
 
-    internal override Span<KeyValuePair<string, object?>> Values => MemoryMarshal.CreateSpan(ref _values.Value0, 4);
+    internal FormattedLogValues3() : base(4)
+    {
+    }
+
+    internal override Span<KeyValuePair<string, object?>> Values => MemoryMarshal.CreateSpan(ref _values.Value0, Count);
     
     public override IEnumerator<KeyValuePair<string, object?>> GetEnumerator()
     {
-        yield return _values.Value0;
-        yield return _values.Value1;
-        yield return _values.Value2;
-        yield return _values.OriginalFormat;
+        return Count == 4 ? GetEnumeratorFast() : GetEnumeratorSlow();
+
+        IEnumerator<KeyValuePair<string, object?>> GetEnumeratorFast()
+        {
+            yield return _values.Value0;
+            yield return _values.Value1;
+            yield return _values.Value2;
+            yield return _values.OriginalFormat;
+        }
+
+        IEnumerator<KeyValuePair<string, object?>> GetEnumeratorSlow()
+        {
+            if (Count == 0) yield break;
+            yield return _values.Value0;
+            if (Count == 1) yield break;
+            yield return _values.Value1;
+            if (Count == 2) yield break;
+            yield return _values.Value2;
+            if (Count == 3) yield break;
+            yield return _values.OriginalFormat;
+        }
     }
 
     private struct ValuesPlaceholder
@@ -100,15 +172,38 @@ internal sealed class FormattedLogValues4 : FormattedLogValuesBase
 {
     private ValuesPlaceholder _values;
 
-    internal override Span<KeyValuePair<string, object?>> Values => MemoryMarshal.CreateSpan(ref _values.Value0, 5);
+    internal FormattedLogValues4() : base(5)
+    {
+    }
+
+    internal override Span<KeyValuePair<string, object?>> Values => MemoryMarshal.CreateSpan(ref _values.Value0, Count);
     
     public override IEnumerator<KeyValuePair<string, object?>> GetEnumerator()
     {
-        yield return _values.Value0;
-        yield return _values.Value1;
-        yield return _values.Value2;
-        yield return _values.Value3;
-        yield return _values.OriginalFormat;
+        return Count == 5 ? GetEnumeratorFast() : GetEnumeratorSlow();
+
+        IEnumerator<KeyValuePair<string, object?>> GetEnumeratorFast()
+        {
+            yield return _values.Value0;
+            yield return _values.Value1;
+            yield return _values.Value2;
+            yield return _values.Value3;
+            yield return _values.OriginalFormat;
+        }
+
+        IEnumerator<KeyValuePair<string, object?>> GetEnumeratorSlow()
+        {
+            if (Count == 0) yield break;
+            yield return _values.Value0;
+            if (Count == 1) yield break;
+            yield return _values.Value1;
+            if (Count == 2) yield break;
+            yield return _values.Value2;
+            if (Count == 3) yield break;
+            yield return _values.Value3;
+            if (Count == 4) yield break;
+            yield return _values.OriginalFormat;
+        }
     }
 
     private struct ValuesPlaceholder
@@ -128,16 +223,41 @@ internal sealed class FormattedLogValues5 : FormattedLogValuesBase
 {
     private ValuesPlaceholder _values;
 
-    internal override Span<KeyValuePair<string, object?>> Values => MemoryMarshal.CreateSpan(ref _values.Value0, 6);
+    internal FormattedLogValues5() : base(6)
+    {
+    }
+
+    internal override Span<KeyValuePair<string, object?>> Values => MemoryMarshal.CreateSpan(ref _values.Value0, Count);
     
     public override IEnumerator<KeyValuePair<string, object?>> GetEnumerator()
     {
-        yield return _values.Value0;
-        yield return _values.Value1;
-        yield return _values.Value2;
-        yield return _values.Value3;
-        yield return _values.Value4;
-        yield return _values.OriginalFormat;
+        return Count == 6 ? GetEnumeratorFast() : GetEnumeratorSlow();
+
+        IEnumerator<KeyValuePair<string, object?>> GetEnumeratorFast()
+        {
+            yield return _values.Value0;
+            yield return _values.Value1;
+            yield return _values.Value2;
+            yield return _values.Value3;
+            yield return _values.Value4;
+            yield return _values.OriginalFormat;
+        }
+
+        IEnumerator<KeyValuePair<string, object?>> GetEnumeratorSlow()
+        {
+            if (Count == 0) yield break;
+            yield return _values.Value0;
+            if (Count == 1) yield break;
+            yield return _values.Value1;
+            if (Count == 2) yield break;
+            yield return _values.Value2;
+            if (Count == 3) yield break;
+            yield return _values.Value3;
+            if (Count == 4) yield break;
+            yield return _values.Value4;
+            if (Count == 5) yield break;
+            yield return _values.OriginalFormat;
+        }
     }
 
     private struct ValuesPlaceholder
@@ -158,17 +278,44 @@ internal sealed class FormattedLogValues6 : FormattedLogValuesBase
 {
     private ValuesPlaceholder _values;
 
-    internal override Span<KeyValuePair<string, object?>> Values => MemoryMarshal.CreateSpan(ref _values.Value0, 7);
+    internal FormattedLogValues6() : base(7)
+    {
+    }
+
+    internal override Span<KeyValuePair<string, object?>> Values => MemoryMarshal.CreateSpan(ref _values.Value0, Count);
     
     public override IEnumerator<KeyValuePair<string, object?>> GetEnumerator()
     {
-        yield return _values.Value0;
-        yield return _values.Value1;
-        yield return _values.Value2;
-        yield return _values.Value3;
-        yield return _values.Value4;
-        yield return _values.Value5;
-        yield return _values.OriginalFormat;
+        return Count == 7 ? GetEnumeratorFast() : GetEnumeratorSlow();
+
+        IEnumerator<KeyValuePair<string, object?>> GetEnumeratorFast()
+        {
+            yield return _values.Value0;
+            yield return _values.Value1;
+            yield return _values.Value2;
+            yield return _values.Value3;
+            yield return _values.Value4;
+            yield return _values.Value5;
+            yield return _values.OriginalFormat;
+        }
+
+        IEnumerator<KeyValuePair<string, object?>> GetEnumeratorSlow()
+        {
+            if (Count == 0) yield break;
+            yield return _values.Value0;
+            if (Count == 1) yield break;
+            yield return _values.Value1;
+            if (Count == 2) yield break;
+            yield return _values.Value2;
+            if (Count == 3) yield break;
+            yield return _values.Value3;
+            if (Count == 4) yield break;
+            yield return _values.Value4;
+            if (Count == 5) yield break;
+            yield return _values.Value5;
+            if (Count == 6) yield break;
+            yield return _values.OriginalFormat;
+        }
     }
 
     private struct ValuesPlaceholder
@@ -190,18 +337,47 @@ internal sealed class FormattedLogValues7 : FormattedLogValuesBase
 {
     private ValuesPlaceholder _values;
 
-    internal override Span<KeyValuePair<string, object?>> Values => MemoryMarshal.CreateSpan(ref _values.Value0, 8);
+    internal FormattedLogValues7() : base(8)
+    {
+    }
+
+    internal override Span<KeyValuePair<string, object?>> Values => MemoryMarshal.CreateSpan(ref _values.Value0, Count);
     
     public override IEnumerator<KeyValuePair<string, object?>> GetEnumerator()
     {
-        yield return _values.Value0;
-        yield return _values.Value1;
-        yield return _values.Value2;
-        yield return _values.Value3;
-        yield return _values.Value4;
-        yield return _values.Value5;
-        yield return _values.Value6;
-        yield return _values.OriginalFormat;
+        return Count == 8 ? GetEnumeratorFast() : GetEnumeratorSlow();
+
+        IEnumerator<KeyValuePair<string, object?>> GetEnumeratorFast()
+        {
+            yield return _values.Value0;
+            yield return _values.Value1;
+            yield return _values.Value2;
+            yield return _values.Value3;
+            yield return _values.Value4;
+            yield return _values.Value5;
+            yield return _values.Value6;
+            yield return _values.OriginalFormat;
+        }
+
+        IEnumerator<KeyValuePair<string, object?>> GetEnumeratorSlow()
+        {
+            if (Count == 0) yield break;
+            yield return _values.Value0;
+            if (Count == 1) yield break;
+            yield return _values.Value1;
+            if (Count == 2) yield break;
+            yield return _values.Value2;
+            if (Count == 3) yield break;
+            yield return _values.Value3;
+            if (Count == 4) yield break;
+            yield return _values.Value4;
+            if (Count == 5) yield break;
+            yield return _values.Value5;
+            if (Count == 6) yield break;
+            yield return _values.Value6;
+            if (Count == 7) yield break;
+            yield return _values.OriginalFormat;
+        }
     }
 
     private struct ValuesPlaceholder

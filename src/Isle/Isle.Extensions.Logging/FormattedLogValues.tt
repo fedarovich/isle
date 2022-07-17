@@ -15,14 +15,33 @@ internal sealed class FormattedLogValues<#= n #> : FormattedLogValuesBase
 {
     private ValuesPlaceholder _values;
 
-    internal override Span<KeyValuePair<string, object?>> Values => MemoryMarshal.CreateSpan(ref _values.<#= n > 0 ? "Value0" : "OriginalFormat" #>, <#= (n + 1) #>);
+    internal FormattedLogValues<#= n #>() : base(<#= (n + 1) #>)
+    {
+    }
+
+    internal override Span<KeyValuePair<string, object?>> Values => MemoryMarshal.CreateSpan(ref _values.<#= n > 0 ? "Value0" : "OriginalFormat" #>, Count);
     
     public override IEnumerator<KeyValuePair<string, object?>> GetEnumerator()
     {
+        return Count == <#= (n + 1) #> ? GetEnumeratorFast() : GetEnumeratorSlow();
+
+        IEnumerator<KeyValuePair<string, object?>> GetEnumeratorFast()
+        {
 <# for (int i = 0; i < n; i++) { #>
-        yield return _values.Value<#= i #>;
+            yield return _values.Value<#= i #>;
 <# } #>
-        yield return _values.OriginalFormat;
+            yield return _values.OriginalFormat;
+        }
+
+        IEnumerator<KeyValuePair<string, object?>> GetEnumeratorSlow()
+        {
+<# for (int i = 0; i < n; i++) { #>
+            if (Count == <#= i #>) yield break;
+            yield return _values.Value<#= i #>;
+<# } #>
+            if (Count == <#= n #>) yield break;
+            yield return _values.OriginalFormat;
+        }
     }
 
     private struct ValuesPlaceholder

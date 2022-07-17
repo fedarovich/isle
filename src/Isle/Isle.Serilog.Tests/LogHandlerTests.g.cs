@@ -332,6 +332,33 @@ public class VerboseLogInterpolatedStringHandlerTests : BaseFixture
         logEvent.RenderMessage().Should().Be(Format(value, alignment, format));
     }
 
+    [Test]
+    public void AppendLiteralValue([ValueSource(nameof(Literals))] string? literal)
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var handler = new VerboseLogInterpolatedStringHandler(3, 0, Logger,  out _);
+        handler.AppendFormatted(new LiteralValue(literal));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be(literal ?? "");
+        logEvent.Properties.Count.Should().Be(0);
+        logEvent.RenderMessage().Should().Be(literal ?? "");
+    }
+
+    [Test]
+    public void AppendLiteralValueWithBraces()
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var handler = new VerboseLogInterpolatedStringHandler(3, 0, Logger,  out _);
+        handler.AppendFormatted((LiteralValue) "A{B}C");
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("A{{B}}C");
+        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C", 0));
+        logEvent.Properties.Count.Should().Be(0);
+        logEvent.RenderMessage().Should().Be("A{B}C");
+    }
+
     #endregion
 
     #region AppendFormatted with explicit value representation
@@ -790,6 +817,33 @@ public class DebugLogInterpolatedStringHandlerTests : BaseFixture
             },
             PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment, format));
+    }
+
+    [Test]
+    public void AppendLiteralValue([ValueSource(nameof(Literals))] string? literal)
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var handler = new DebugLogInterpolatedStringHandler(3, 0, Logger,  out _);
+        handler.AppendFormatted(new LiteralValue(literal));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be(literal ?? "");
+        logEvent.Properties.Count.Should().Be(0);
+        logEvent.RenderMessage().Should().Be(literal ?? "");
+    }
+
+    [Test]
+    public void AppendLiteralValueWithBraces()
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var handler = new DebugLogInterpolatedStringHandler(3, 0, Logger,  out _);
+        handler.AppendFormatted((LiteralValue) "A{B}C");
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("A{{B}}C");
+        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C", 0));
+        logEvent.Properties.Count.Should().Be(0);
+        logEvent.RenderMessage().Should().Be("A{B}C");
     }
 
     #endregion
@@ -1252,6 +1306,33 @@ public class InformationLogInterpolatedStringHandlerTests : BaseFixture
         logEvent.RenderMessage().Should().Be(Format(value, alignment, format));
     }
 
+    [Test]
+    public void AppendLiteralValue([ValueSource(nameof(Literals))] string? literal)
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var handler = new InformationLogInterpolatedStringHandler(3, 0, Logger,  out _);
+        handler.AppendFormatted(new LiteralValue(literal));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be(literal ?? "");
+        logEvent.Properties.Count.Should().Be(0);
+        logEvent.RenderMessage().Should().Be(literal ?? "");
+    }
+
+    [Test]
+    public void AppendLiteralValueWithBraces()
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var handler = new InformationLogInterpolatedStringHandler(3, 0, Logger,  out _);
+        handler.AppendFormatted((LiteralValue) "A{B}C");
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("A{{B}}C");
+        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C", 0));
+        logEvent.Properties.Count.Should().Be(0);
+        logEvent.RenderMessage().Should().Be("A{B}C");
+    }
+
     #endregion
 
     #region AppendFormatted with explicit value representation
@@ -1710,6 +1791,33 @@ public class WarningLogInterpolatedStringHandlerTests : BaseFixture
             },
             PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment, format));
+    }
+
+    [Test]
+    public void AppendLiteralValue([ValueSource(nameof(Literals))] string? literal)
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var handler = new WarningLogInterpolatedStringHandler(3, 0, Logger,  out _);
+        handler.AppendFormatted(new LiteralValue(literal));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be(literal ?? "");
+        logEvent.Properties.Count.Should().Be(0);
+        logEvent.RenderMessage().Should().Be(literal ?? "");
+    }
+
+    [Test]
+    public void AppendLiteralValueWithBraces()
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var handler = new WarningLogInterpolatedStringHandler(3, 0, Logger,  out _);
+        handler.AppendFormatted((LiteralValue) "A{B}C");
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("A{{B}}C");
+        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C", 0));
+        logEvent.Properties.Count.Should().Be(0);
+        logEvent.RenderMessage().Should().Be("A{B}C");
     }
 
     #endregion
@@ -2172,6 +2280,33 @@ public class ErrorLogInterpolatedStringHandlerTests : BaseFixture
         logEvent.RenderMessage().Should().Be(Format(value, alignment, format));
     }
 
+    [Test]
+    public void AppendLiteralValue([ValueSource(nameof(Literals))] string? literal)
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var handler = new ErrorLogInterpolatedStringHandler(3, 0, Logger,  out _);
+        handler.AppendFormatted(new LiteralValue(literal));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be(literal ?? "");
+        logEvent.Properties.Count.Should().Be(0);
+        logEvent.RenderMessage().Should().Be(literal ?? "");
+    }
+
+    [Test]
+    public void AppendLiteralValueWithBraces()
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var handler = new ErrorLogInterpolatedStringHandler(3, 0, Logger,  out _);
+        handler.AppendFormatted((LiteralValue) "A{B}C");
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("A{{B}}C");
+        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C", 0));
+        logEvent.Properties.Count.Should().Be(0);
+        logEvent.RenderMessage().Should().Be("A{B}C");
+    }
+
     #endregion
 
     #region AppendFormatted with explicit value representation
@@ -2632,6 +2767,33 @@ public class FatalLogInterpolatedStringHandlerTests : BaseFixture
         logEvent.RenderMessage().Should().Be(Format(value, alignment, format));
     }
 
+    [Test]
+    public void AppendLiteralValue([ValueSource(nameof(Literals))] string? literal)
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var handler = new FatalLogInterpolatedStringHandler(3, 0, Logger,  out _);
+        handler.AppendFormatted(new LiteralValue(literal));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be(literal ?? "");
+        logEvent.Properties.Count.Should().Be(0);
+        logEvent.RenderMessage().Should().Be(literal ?? "");
+    }
+
+    [Test]
+    public void AppendLiteralValueWithBraces()
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var handler = new FatalLogInterpolatedStringHandler(3, 0, Logger,  out _);
+        handler.AppendFormatted((LiteralValue) "A{B}C");
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("A{{B}}C");
+        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C", 0));
+        logEvent.Properties.Count.Should().Be(0);
+        logEvent.RenderMessage().Should().Be("A{B}C");
+    }
+
     #endregion
 
     #region AppendFormatted with explicit value representation
@@ -3089,6 +3251,33 @@ public class LogInterpolatedStringHandlerTests : BaseFixture
             },
             PropertiesEquivalency);
         logEvent.RenderMessage().Should().Be(Format(value, alignment, format));
+    }
+
+    [Test]
+    public void AppendLiteralValue( [ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel, [ValueSource(nameof(Literals))] string? literal)
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var handler = new LogInterpolatedStringHandler(3, 0, Logger,  logEventLevel,  out _);
+        handler.AppendFormatted(new LiteralValue(literal));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be(literal ?? "");
+        logEvent.Properties.Count.Should().Be(0);
+        logEvent.RenderMessage().Should().Be(literal ?? "");
+    }
+
+    [Test]
+    public void AppendLiteralValueWithBraces( [ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel )
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var handler = new LogInterpolatedStringHandler(3, 0, Logger,  logEventLevel,  out _);
+        handler.AppendFormatted((LiteralValue) "A{B}C");
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("A{{B}}C");
+        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C", 0));
+        logEvent.Properties.Count.Should().Be(0);
+        logEvent.RenderMessage().Should().Be("A{B}C");
     }
 
     #endregion

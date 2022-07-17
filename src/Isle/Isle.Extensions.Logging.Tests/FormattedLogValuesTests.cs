@@ -13,6 +13,11 @@ public class FormattedLogValuesTests
 {
     private static readonly int[] FormattedCounts = Enumerable.Range(0, 9).ToArray();
 
+    private static readonly (int formattedCount, int trimmedCount)[] TrimmedCounts =
+        (from fc in Enumerable.Range(0, 9)
+         from c in Enumerable.Range(0, fc + 1)
+         select (fc, c)).ToArray();
+
     [Test]
     public void Create0() => FormattedLogValuesBase.Create(0).Should().BeOfType<FormattedLogValues0>().Which.Count.Should().Be(1);
 
@@ -70,13 +75,44 @@ public class FormattedLogValuesTests
     }
 
     [Test]
+    public void FillAndEnumerateTrimmed([ValueSource(nameof(TrimmedCounts))] (int formattedCount, int trimmedCount) count)
+    {
+        var (formattedCount, trimmedCount) = count;
+        var expectedValues = Enumerable.Range(0, trimmedCount + 1)
+            .Select(i => new KeyValuePair<string, object?>($"k{i}", $"v{i}"))
+            .ToList();
+
+        var values = FormattedLogValuesBase.Create(formattedCount);
+        values.Count = trimmedCount + 1;
+        values.Count.Should().Be(expectedValues.Count);
+        for (int i = 0; i < expectedValues.Count; i++)
+        {
+            values.Values[i] = expectedValues[i];
+        }
+
+        values.Values.ToArray().Should().BeEquivalentTo(expectedValues);
+        values.AsEnumerable().Should().BeEquivalentTo(expectedValues);
+
+        for (int i = 0; i < expectedValues.Count; i++)
+        {
+            values.Values[i].Should().Be(expectedValues[i]);
+        }
+
+        Action negIndex = () => _ = values[-1];
+        negIndex.Should().Throw<IndexOutOfRangeException>();
+
+        Action lenIndex = () => _ = values[values.Count];
+        lenIndex.Should().Throw<IndexOutOfRangeException>();
+    }
+
+    [Test]
     public void FormatNull()
     {
         var values = FormattedLogValuesBase.Create(2);
         values.Values[0] = new("x", null);
         values.Values[1] = new("y", new[] { "a", null, "b" });
         values.Values[2] = new(FormattedLogValuesBuilder.OriginalFormatName, "{x} {y}");
-        values.SetSegments(new [] { new Segment(null, 0), new Segment(" "), new Segment(null, 0) });
+        values.SetSegments(new[] { new Segment(null, 0), new Segment(" "), new Segment(null, 0) });
         values.ToString().Should().Be("(null) a, (null), b");
     }
 

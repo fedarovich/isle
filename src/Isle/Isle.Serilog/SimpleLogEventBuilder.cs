@@ -37,7 +37,7 @@ internal sealed class SimpleLogEventBuilder : LogEventBuilder
             level, 
             exception, 
             new MessageTemplate(StringBuilderCache.GetStringAndRelease(_messageTemplateBuilder), _tokens),
-            _properties);
+            _properties.Length == _propertyIndex ? _properties : _properties.Take(_propertyIndex));
         _tokens = null!;
         _properties = null!;
         _currentPosition = 0;

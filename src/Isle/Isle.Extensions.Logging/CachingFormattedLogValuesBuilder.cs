@@ -21,6 +21,7 @@ internal sealed class CachingFormattedLogValuesBuilder : FormattedLogValuesBuild
         var templateNode = _lastNode.GetTemplateNode();
         var result = _formattedLogValues;
         result.Values[_valueIndex] = new(OriginalFormatName, templateNode.MessageTemplate);
+        result.Count = _valueIndex + 1;
         result.SetSegments(templateNode.Segments);
         
         _lastNode = null!;

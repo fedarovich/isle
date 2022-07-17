@@ -335,6 +335,36 @@ public class <#= GetTestName(logLevel) #> : BaseFixture
     }
 
     #endregion
+
+    #region AppendFormatted with LiteralValue
+
+    [Test]
+    public void AppendFormattedLiteralValue(<#if (logLevel == null) { #> [ValueSource(nameof(LogLevels))] LogLevel logLevel, <# } #>[ValueSource(nameof(Literals))] string? literal)
+    {
+        Assume.That(logLevel >= MinLogLevel);
+
+        var handler = new <#= GetTypeName(logLevel) #>(0, 1, Logger, <#if (logLevel == null) { #> logLevel, <# } #> out _);
+        handler.AppendFormatted((LiteralValue) literal);
+        var values = handler.GetFormattedLogValuesAndReset();
+        values.Count.Should().Be(1);
+        values[0].Should().Be(new KeyValuePair<string, object>("{OriginalFormat}", literal ?? ""));
+        values.ToString().Should().Be(literal ?? "");
+    }
+
+    [Test]
+    public void AppendFormattedLiteralValueWithBraces(<#if (logLevel == null) { #> [ValueSource(nameof(LogLevels))] LogLevel logLevel <# } #>)
+    {
+        Assume.That(logLevel >= MinLogLevel);
+
+        var handler = new <#= GetTypeName(logLevel) #>(0, 1, Logger, <#if (logLevel == null) { #> logLevel, <# } #> out _);
+        handler.AppendFormatted(new LiteralValue("A{B}C"));
+        var values = handler.GetFormattedLogValuesAndReset();
+        values.Count.Should().Be(1);
+        values[0].Should().Be(new KeyValuePair<string, object>("{OriginalFormat}", "A{{B}}C"));
+        values.ToString().Should().Be("A{B}C");
+    }
+
+    #endregion
 }
 
 <# } #>

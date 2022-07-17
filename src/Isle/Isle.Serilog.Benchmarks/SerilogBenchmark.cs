@@ -27,7 +27,7 @@ public class SerilogBenchmark
         GlobalSetup();
     }
 
-    [GlobalSetup(Target = nameof(InterpolatedWithManualDestructuring))]
+    [GlobalSetup(Targets = new[] { nameof(InterpolatedWithManualDestructuring), nameof(InterpolatedWithLiteralValue) })]
     public void GlobalSetupWithManualDestructuring()
     {
         GlobalSetup();
@@ -81,5 +81,11 @@ public class SerilogBenchmark
     public void InterpolatedWithImplicitAutomaticDestructuring()
     {
         _logger.InformationInterpolated($"The area of rectangle {Rect} is Width * Height = {Area} and its perimeter is 2 * (Width + Height) = {Perimeter}.");
+    }
+
+    [Benchmark]
+    public void InterpolatedWithLiteralValue()
+    {
+        _logger.InformationInterpolated($"The area of rectangle {@Rect} is Width * Height = {Area} and its perimeter is 2 * (Width + Height) = {(LiteralValue) Perimeter.ToString()}.");
     }
 }

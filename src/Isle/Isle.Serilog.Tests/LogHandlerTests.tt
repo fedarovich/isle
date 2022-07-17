@@ -347,6 +347,33 @@ public class <#= GetTestName(logEventLevel) #> : BaseFixture
         logEvent.RenderMessage().Should().Be(Format(value, alignment, format));
     }
 
+    [Test]
+    public void AppendLiteralValue(<#if (logEventLevel == null) { #> [ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel, <# } #>[ValueSource(nameof(Literals))] string? literal)
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var handler = new <#= GetTypeName(logEventLevel) #>(3, 0, Logger, <#if (logEventLevel == null) { #> logEventLevel, <# } #> out _);
+        handler.AppendFormatted(new LiteralValue(literal));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be(literal ?? "");
+        logEvent.Properties.Count.Should().Be(0);
+        logEvent.RenderMessage().Should().Be(literal ?? "");
+    }
+
+    [Test]
+    public void AppendLiteralValueWithBraces(<#if (logEventLevel == null) { #> [ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel <# } #>)
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var handler = new <#= GetTypeName(logEventLevel) #>(3, 0, Logger, <#if (logEventLevel == null) { #> logEventLevel, <# } #> out _);
+        handler.AppendFormatted((LiteralValue) "A{B}C");
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("A{{B}}C");
+        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C", 0));
+        logEvent.Properties.Count.Should().Be(0);
+        logEvent.RenderMessage().Should().Be("A{B}C");
+    }
+
     #endregion
 
     #region AppendFormatted with explicit value representation

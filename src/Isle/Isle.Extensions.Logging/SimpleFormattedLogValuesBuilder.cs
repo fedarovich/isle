@@ -25,6 +25,7 @@ internal sealed class SimpleFormattedLogValuesBuilder : FormattedLogValuesBuilde
     {
         var result = _formattedLogValues;
         result.Values[_valueIndex] = new KeyValuePair<string, object?>(OriginalFormatName, StringBuilderCache.GetStringAndRelease(_originalFormatBuilder));
+        result.Count = _valueIndex + 1;
         result.SetSegments(_segments.AsMemory(0, _segmentIndex));
         
         _formattedLogValues = null!;

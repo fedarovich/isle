@@ -5,8 +5,6 @@
 <#@ import namespace="System.Collections.Generic" #>
 <#@ output extension=".g.cs" #>
 <#
-    const string Scope = "Scope";
-
 	string[] logLevels = { "Trace", "Debug", "Information", "Warning", "Error", "Critical", "" }; 
 
     string GetTestName(string name, string logLevel, bool withEventId, bool withException) => 
@@ -553,6 +551,94 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
                 LogEventEquivalency);
             logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(
                 $"Default: {Format(value)}, Stringified: {Format(value.ToString())}, Destructured: {Format(value)}");     
+        }
+    }
+
+    [Test]
+    public void <#= GetTestName("LiteralValue", logLevel, withEventId, withException) #>(<#if (logLevel == "") { #>[ValueSource(nameof(LogLevels))] LogLevel logLevel<# } #>)
+    {
+<#if (logLevel != "") { #> 
+        const LogLevel logLevel = LogLevel.<#= (logLevel) #>;
+<# } #>
+        const string message = "Test";
+
+        <#if (withEventId) { #>EventId eventId = 5;<# } #>
+
+        <#if (withException) { #>Exception exception = new InvalidOperationException("Test exception."); <# } #>
+
+        Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>$"{(LiteralValue) "Test"}");
+        Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    <#= withException ? "exception" : "default(Exception)" #>,
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+<#if (withEventId) { #>
+                        EventIdProperty(eventId)
+<# } #>
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(message);
+        }
+    }
+
+    [Test]
+    public void <#= GetTestName("LiteralValueWithBraces", logLevel, withEventId, withException) #>(<#if (logLevel == "") { #>[ValueSource(nameof(LogLevels))] LogLevel logLevel<# } #>)
+    {
+<#if (logLevel != "") { #> 
+        const LogLevel logLevel = LogLevel.<#= (logLevel) #>;
+<# } #>
+        const string message = "T{{es}}t";
+
+        <#if (withEventId) { #>EventId eventId = 5;<# } #>
+
+        <#if (withException) { #>Exception exception = new InvalidOperationException("Test exception."); <# } #>
+
+        Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>$"{(LiteralValue) "T{es}t"}");
+        Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    <#= withException ? "exception" : "default(Exception)" #>,
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+<#if (withEventId) { #>
+                        EventIdProperty(eventId)
+<# } #>
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
         }
     }
 

@@ -469,6 +469,82 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
         }
     }
 
+    [Test]
+    public void LogTrace_LiteralValue()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Trace;
+        const string message = "Test";
+
+        
+        
+        Logger.LogTrace($"{(LiteralValue) "Test"}");
+        Logger.LogTrace(message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    default(Exception),
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(message);
+        }
+    }
+
+    [Test]
+    public void LogTrace_LiteralValueWithBraces()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Trace;
+        const string message = "T{{es}}t";
+
+        
+        
+        Logger.LogTrace($"{(LiteralValue) "T{es}t"}");
+        Logger.LogTrace(message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    default(Exception),
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
 
     [Test]
     public void LogTrace_Literal_WithException()
@@ -915,6 +991,82 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
                 LogEventEquivalency);
             logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(
                 $"Default: {Format(value)}, Stringified: {Format(value.ToString())}, Destructured: {Format(value)}");     
+        }
+    }
+
+    [Test]
+    public void LogTrace_LiteralValue_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Trace;
+        const string message = "Test";
+
+        
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogTrace(exception, $"{(LiteralValue) "Test"}");
+        Logger.LogTrace(exception, message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    exception,
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(message);
+        }
+    }
+
+    [Test]
+    public void LogTrace_LiteralValueWithBraces_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Trace;
+        const string message = "T{{es}}t";
+
+        
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogTrace(exception, $"{(LiteralValue) "T{es}t"}");
+        Logger.LogTrace(exception, message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    exception,
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
         }
     }
 
@@ -1378,6 +1530,84 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
         }
     }
 
+    [Test]
+    public void LogTrace_LiteralValue_WithEventId()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Trace;
+        const string message = "Test";
+
+        EventId eventId = 5;
+        
+        Logger.LogTrace(eventId, $"{(LiteralValue) "Test"}");
+        Logger.LogTrace(eventId, message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    default(Exception),
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+                        EventIdProperty(eventId)
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(message);
+        }
+    }
+
+    [Test]
+    public void LogTrace_LiteralValueWithBraces_WithEventId()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Trace;
+        const string message = "T{{es}}t";
+
+        EventId eventId = 5;
+        
+        Logger.LogTrace(eventId, $"{(LiteralValue) "T{es}t"}");
+        Logger.LogTrace(eventId, message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    default(Exception),
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+                        EventIdProperty(eventId)
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
 
     [Test]
     public void LogTrace_Literal_WithEventId_WithException()
@@ -1838,6 +2068,84 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
         }
     }
 
+    [Test]
+    public void LogTrace_LiteralValue_WithEventId_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Trace;
+        const string message = "Test";
+
+        EventId eventId = 5;
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogTrace(eventId, exception, $"{(LiteralValue) "Test"}");
+        Logger.LogTrace(eventId, exception, message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    exception,
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+                        EventIdProperty(eventId)
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(message);
+        }
+    }
+
+    [Test]
+    public void LogTrace_LiteralValueWithBraces_WithEventId_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Trace;
+        const string message = "T{{es}}t";
+
+        EventId eventId = 5;
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogTrace(eventId, exception, $"{(LiteralValue) "T{es}t"}");
+        Logger.LogTrace(eventId, exception, message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    exception,
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+                        EventIdProperty(eventId)
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
 
     #endregion // LogTrace
 
@@ -2293,6 +2601,82 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
         }
     }
 
+    [Test]
+    public void LogDebug_LiteralValue()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Debug;
+        const string message = "Test";
+
+        
+        
+        Logger.LogDebug($"{(LiteralValue) "Test"}");
+        Logger.LogDebug(message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    default(Exception),
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(message);
+        }
+    }
+
+    [Test]
+    public void LogDebug_LiteralValueWithBraces()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Debug;
+        const string message = "T{{es}}t";
+
+        
+        
+        Logger.LogDebug($"{(LiteralValue) "T{es}t"}");
+        Logger.LogDebug(message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    default(Exception),
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
 
     [Test]
     public void LogDebug_Literal_WithException()
@@ -2739,6 +3123,82 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
                 LogEventEquivalency);
             logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(
                 $"Default: {Format(value)}, Stringified: {Format(value.ToString())}, Destructured: {Format(value)}");     
+        }
+    }
+
+    [Test]
+    public void LogDebug_LiteralValue_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Debug;
+        const string message = "Test";
+
+        
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogDebug(exception, $"{(LiteralValue) "Test"}");
+        Logger.LogDebug(exception, message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    exception,
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(message);
+        }
+    }
+
+    [Test]
+    public void LogDebug_LiteralValueWithBraces_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Debug;
+        const string message = "T{{es}}t";
+
+        
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogDebug(exception, $"{(LiteralValue) "T{es}t"}");
+        Logger.LogDebug(exception, message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    exception,
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
         }
     }
 
@@ -3202,6 +3662,84 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
         }
     }
 
+    [Test]
+    public void LogDebug_LiteralValue_WithEventId()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Debug;
+        const string message = "Test";
+
+        EventId eventId = 5;
+        
+        Logger.LogDebug(eventId, $"{(LiteralValue) "Test"}");
+        Logger.LogDebug(eventId, message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    default(Exception),
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+                        EventIdProperty(eventId)
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(message);
+        }
+    }
+
+    [Test]
+    public void LogDebug_LiteralValueWithBraces_WithEventId()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Debug;
+        const string message = "T{{es}}t";
+
+        EventId eventId = 5;
+        
+        Logger.LogDebug(eventId, $"{(LiteralValue) "T{es}t"}");
+        Logger.LogDebug(eventId, message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    default(Exception),
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+                        EventIdProperty(eventId)
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
 
     [Test]
     public void LogDebug_Literal_WithEventId_WithException()
@@ -3662,6 +4200,84 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
         }
     }
 
+    [Test]
+    public void LogDebug_LiteralValue_WithEventId_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Debug;
+        const string message = "Test";
+
+        EventId eventId = 5;
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogDebug(eventId, exception, $"{(LiteralValue) "Test"}");
+        Logger.LogDebug(eventId, exception, message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    exception,
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+                        EventIdProperty(eventId)
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(message);
+        }
+    }
+
+    [Test]
+    public void LogDebug_LiteralValueWithBraces_WithEventId_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Debug;
+        const string message = "T{{es}}t";
+
+        EventId eventId = 5;
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogDebug(eventId, exception, $"{(LiteralValue) "T{es}t"}");
+        Logger.LogDebug(eventId, exception, message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    exception,
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+                        EventIdProperty(eventId)
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
 
     #endregion // LogDebug
 
@@ -4117,6 +4733,82 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
         }
     }
 
+    [Test]
+    public void LogInformation_LiteralValue()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Information;
+        const string message = "Test";
+
+        
+        
+        Logger.LogInformation($"{(LiteralValue) "Test"}");
+        Logger.LogInformation(message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    default(Exception),
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(message);
+        }
+    }
+
+    [Test]
+    public void LogInformation_LiteralValueWithBraces()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Information;
+        const string message = "T{{es}}t";
+
+        
+        
+        Logger.LogInformation($"{(LiteralValue) "T{es}t"}");
+        Logger.LogInformation(message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    default(Exception),
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
 
     [Test]
     public void LogInformation_Literal_WithException()
@@ -4563,6 +5255,82 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
                 LogEventEquivalency);
             logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(
                 $"Default: {Format(value)}, Stringified: {Format(value.ToString())}, Destructured: {Format(value)}");     
+        }
+    }
+
+    [Test]
+    public void LogInformation_LiteralValue_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Information;
+        const string message = "Test";
+
+        
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogInformation(exception, $"{(LiteralValue) "Test"}");
+        Logger.LogInformation(exception, message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    exception,
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(message);
+        }
+    }
+
+    [Test]
+    public void LogInformation_LiteralValueWithBraces_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Information;
+        const string message = "T{{es}}t";
+
+        
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogInformation(exception, $"{(LiteralValue) "T{es}t"}");
+        Logger.LogInformation(exception, message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    exception,
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
         }
     }
 
@@ -5026,6 +5794,84 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
         }
     }
 
+    [Test]
+    public void LogInformation_LiteralValue_WithEventId()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Information;
+        const string message = "Test";
+
+        EventId eventId = 5;
+        
+        Logger.LogInformation(eventId, $"{(LiteralValue) "Test"}");
+        Logger.LogInformation(eventId, message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    default(Exception),
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+                        EventIdProperty(eventId)
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(message);
+        }
+    }
+
+    [Test]
+    public void LogInformation_LiteralValueWithBraces_WithEventId()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Information;
+        const string message = "T{{es}}t";
+
+        EventId eventId = 5;
+        
+        Logger.LogInformation(eventId, $"{(LiteralValue) "T{es}t"}");
+        Logger.LogInformation(eventId, message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    default(Exception),
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+                        EventIdProperty(eventId)
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
 
     [Test]
     public void LogInformation_Literal_WithEventId_WithException()
@@ -5486,6 +6332,84 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
         }
     }
 
+    [Test]
+    public void LogInformation_LiteralValue_WithEventId_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Information;
+        const string message = "Test";
+
+        EventId eventId = 5;
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogInformation(eventId, exception, $"{(LiteralValue) "Test"}");
+        Logger.LogInformation(eventId, exception, message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    exception,
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+                        EventIdProperty(eventId)
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(message);
+        }
+    }
+
+    [Test]
+    public void LogInformation_LiteralValueWithBraces_WithEventId_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Information;
+        const string message = "T{{es}}t";
+
+        EventId eventId = 5;
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogInformation(eventId, exception, $"{(LiteralValue) "T{es}t"}");
+        Logger.LogInformation(eventId, exception, message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    exception,
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+                        EventIdProperty(eventId)
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
 
     #endregion // LogInformation
 
@@ -5941,6 +6865,82 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
         }
     }
 
+    [Test]
+    public void LogWarning_LiteralValue()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Warning;
+        const string message = "Test";
+
+        
+        
+        Logger.LogWarning($"{(LiteralValue) "Test"}");
+        Logger.LogWarning(message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    default(Exception),
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(message);
+        }
+    }
+
+    [Test]
+    public void LogWarning_LiteralValueWithBraces()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Warning;
+        const string message = "T{{es}}t";
+
+        
+        
+        Logger.LogWarning($"{(LiteralValue) "T{es}t"}");
+        Logger.LogWarning(message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    default(Exception),
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
 
     [Test]
     public void LogWarning_Literal_WithException()
@@ -6387,6 +7387,82 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
                 LogEventEquivalency);
             logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(
                 $"Default: {Format(value)}, Stringified: {Format(value.ToString())}, Destructured: {Format(value)}");     
+        }
+    }
+
+    [Test]
+    public void LogWarning_LiteralValue_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Warning;
+        const string message = "Test";
+
+        
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogWarning(exception, $"{(LiteralValue) "Test"}");
+        Logger.LogWarning(exception, message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    exception,
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(message);
+        }
+    }
+
+    [Test]
+    public void LogWarning_LiteralValueWithBraces_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Warning;
+        const string message = "T{{es}}t";
+
+        
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogWarning(exception, $"{(LiteralValue) "T{es}t"}");
+        Logger.LogWarning(exception, message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    exception,
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
         }
     }
 
@@ -6850,6 +7926,84 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
         }
     }
 
+    [Test]
+    public void LogWarning_LiteralValue_WithEventId()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Warning;
+        const string message = "Test";
+
+        EventId eventId = 5;
+        
+        Logger.LogWarning(eventId, $"{(LiteralValue) "Test"}");
+        Logger.LogWarning(eventId, message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    default(Exception),
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+                        EventIdProperty(eventId)
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(message);
+        }
+    }
+
+    [Test]
+    public void LogWarning_LiteralValueWithBraces_WithEventId()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Warning;
+        const string message = "T{{es}}t";
+
+        EventId eventId = 5;
+        
+        Logger.LogWarning(eventId, $"{(LiteralValue) "T{es}t"}");
+        Logger.LogWarning(eventId, message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    default(Exception),
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+                        EventIdProperty(eventId)
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
 
     [Test]
     public void LogWarning_Literal_WithEventId_WithException()
@@ -7310,6 +8464,84 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
         }
     }
 
+    [Test]
+    public void LogWarning_LiteralValue_WithEventId_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Warning;
+        const string message = "Test";
+
+        EventId eventId = 5;
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogWarning(eventId, exception, $"{(LiteralValue) "Test"}");
+        Logger.LogWarning(eventId, exception, message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    exception,
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+                        EventIdProperty(eventId)
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(message);
+        }
+    }
+
+    [Test]
+    public void LogWarning_LiteralValueWithBraces_WithEventId_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Warning;
+        const string message = "T{{es}}t";
+
+        EventId eventId = 5;
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogWarning(eventId, exception, $"{(LiteralValue) "T{es}t"}");
+        Logger.LogWarning(eventId, exception, message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    exception,
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+                        EventIdProperty(eventId)
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
 
     #endregion // LogWarning
 
@@ -7765,6 +8997,82 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
         }
     }
 
+    [Test]
+    public void LogError_LiteralValue()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Error;
+        const string message = "Test";
+
+        
+        
+        Logger.LogError($"{(LiteralValue) "Test"}");
+        Logger.LogError(message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    default(Exception),
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(message);
+        }
+    }
+
+    [Test]
+    public void LogError_LiteralValueWithBraces()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Error;
+        const string message = "T{{es}}t";
+
+        
+        
+        Logger.LogError($"{(LiteralValue) "T{es}t"}");
+        Logger.LogError(message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    default(Exception),
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
 
     [Test]
     public void LogError_Literal_WithException()
@@ -8211,6 +9519,82 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
                 LogEventEquivalency);
             logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(
                 $"Default: {Format(value)}, Stringified: {Format(value.ToString())}, Destructured: {Format(value)}");     
+        }
+    }
+
+    [Test]
+    public void LogError_LiteralValue_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Error;
+        const string message = "Test";
+
+        
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogError(exception, $"{(LiteralValue) "Test"}");
+        Logger.LogError(exception, message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    exception,
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(message);
+        }
+    }
+
+    [Test]
+    public void LogError_LiteralValueWithBraces_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Error;
+        const string message = "T{{es}}t";
+
+        
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogError(exception, $"{(LiteralValue) "T{es}t"}");
+        Logger.LogError(exception, message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    exception,
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
         }
     }
 
@@ -8674,6 +10058,84 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
         }
     }
 
+    [Test]
+    public void LogError_LiteralValue_WithEventId()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Error;
+        const string message = "Test";
+
+        EventId eventId = 5;
+        
+        Logger.LogError(eventId, $"{(LiteralValue) "Test"}");
+        Logger.LogError(eventId, message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    default(Exception),
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+                        EventIdProperty(eventId)
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(message);
+        }
+    }
+
+    [Test]
+    public void LogError_LiteralValueWithBraces_WithEventId()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Error;
+        const string message = "T{{es}}t";
+
+        EventId eventId = 5;
+        
+        Logger.LogError(eventId, $"{(LiteralValue) "T{es}t"}");
+        Logger.LogError(eventId, message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    default(Exception),
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+                        EventIdProperty(eventId)
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
 
     [Test]
     public void LogError_Literal_WithEventId_WithException()
@@ -9134,6 +10596,84 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
         }
     }
 
+    [Test]
+    public void LogError_LiteralValue_WithEventId_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Error;
+        const string message = "Test";
+
+        EventId eventId = 5;
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogError(eventId, exception, $"{(LiteralValue) "Test"}");
+        Logger.LogError(eventId, exception, message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    exception,
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+                        EventIdProperty(eventId)
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(message);
+        }
+    }
+
+    [Test]
+    public void LogError_LiteralValueWithBraces_WithEventId_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Error;
+        const string message = "T{{es}}t";
+
+        EventId eventId = 5;
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogError(eventId, exception, $"{(LiteralValue) "T{es}t"}");
+        Logger.LogError(eventId, exception, message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    exception,
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+                        EventIdProperty(eventId)
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
 
     #endregion // LogError
 
@@ -9589,6 +11129,82 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
         }
     }
 
+    [Test]
+    public void LogCritical_LiteralValue()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Critical;
+        const string message = "Test";
+
+        
+        
+        Logger.LogCritical($"{(LiteralValue) "Test"}");
+        Logger.LogCritical(message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    default(Exception),
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(message);
+        }
+    }
+
+    [Test]
+    public void LogCritical_LiteralValueWithBraces()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Critical;
+        const string message = "T{{es}}t";
+
+        
+        
+        Logger.LogCritical($"{(LiteralValue) "T{es}t"}");
+        Logger.LogCritical(message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    default(Exception),
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
 
     [Test]
     public void LogCritical_Literal_WithException()
@@ -10035,6 +11651,82 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
                 LogEventEquivalency);
             logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(
                 $"Default: {Format(value)}, Stringified: {Format(value.ToString())}, Destructured: {Format(value)}");     
+        }
+    }
+
+    [Test]
+    public void LogCritical_LiteralValue_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Critical;
+        const string message = "Test";
+
+        
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogCritical(exception, $"{(LiteralValue) "Test"}");
+        Logger.LogCritical(exception, message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    exception,
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(message);
+        }
+    }
+
+    [Test]
+    public void LogCritical_LiteralValueWithBraces_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Critical;
+        const string message = "T{{es}}t";
+
+        
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogCritical(exception, $"{(LiteralValue) "T{es}t"}");
+        Logger.LogCritical(exception, message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    exception,
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
         }
     }
 
@@ -10498,6 +12190,84 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
         }
     }
 
+    [Test]
+    public void LogCritical_LiteralValue_WithEventId()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Critical;
+        const string message = "Test";
+
+        EventId eventId = 5;
+        
+        Logger.LogCritical(eventId, $"{(LiteralValue) "Test"}");
+        Logger.LogCritical(eventId, message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    default(Exception),
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+                        EventIdProperty(eventId)
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(message);
+        }
+    }
+
+    [Test]
+    public void LogCritical_LiteralValueWithBraces_WithEventId()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Critical;
+        const string message = "T{{es}}t";
+
+        EventId eventId = 5;
+        
+        Logger.LogCritical(eventId, $"{(LiteralValue) "T{es}t"}");
+        Logger.LogCritical(eventId, message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    default(Exception),
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+                        EventIdProperty(eventId)
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
 
     [Test]
     public void LogCritical_Literal_WithEventId_WithException()
@@ -10958,6 +12728,84 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
         }
     }
 
+    [Test]
+    public void LogCritical_LiteralValue_WithEventId_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Critical;
+        const string message = "Test";
+
+        EventId eventId = 5;
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogCritical(eventId, exception, $"{(LiteralValue) "Test"}");
+        Logger.LogCritical(eventId, exception, message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    exception,
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+                        EventIdProperty(eventId)
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(message);
+        }
+    }
+
+    [Test]
+    public void LogCritical_LiteralValueWithBraces_WithEventId_WithException()
+    {
+ 
+        const LogLevel logLevel = LogLevel.Critical;
+        const string message = "T{{es}}t";
+
+        EventId eventId = 5;
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogCritical(eventId, exception, $"{(LiteralValue) "T{es}t"}");
+        Logger.LogCritical(eventId, exception, message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    exception,
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+                        EventIdProperty(eventId)
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
 
     #endregion // LogCritical
 
@@ -11391,6 +13239,78 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
         }
     }
 
+    [Test]
+    public void Log_LiteralValue([ValueSource(nameof(LogLevels))] LogLevel logLevel)
+    {
+        const string message = "Test";
+
+        
+        
+        Logger.Log(logLevel, $"{(LiteralValue) "Test"}");
+        Logger.Log(logLevel, message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    default(Exception),
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(message);
+        }
+    }
+
+    [Test]
+    public void Log_LiteralValueWithBraces([ValueSource(nameof(LogLevels))] LogLevel logLevel)
+    {
+        const string message = "T{{es}}t";
+
+        
+        
+        Logger.Log(logLevel, $"{(LiteralValue) "T{es}t"}");
+        Logger.Log(logLevel, message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    default(Exception),
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
 
     [Test]
     public void Log_Literal_WithException([ValueSource(nameof(LogLevels))] LogLevel logLevel)
@@ -11815,6 +13735,78 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
                 LogEventEquivalency);
             logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(
                 $"Default: {Format(value)}, Stringified: {Format(value.ToString())}, Destructured: {Format(value)}");     
+        }
+    }
+
+    [Test]
+    public void Log_LiteralValue_WithException([ValueSource(nameof(LogLevels))] LogLevel logLevel)
+    {
+        const string message = "Test";
+
+        
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.Log(logLevel, exception, $"{(LiteralValue) "Test"}");
+        Logger.Log(logLevel, exception, message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    exception,
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(message);
+        }
+    }
+
+    [Test]
+    public void Log_LiteralValueWithBraces_WithException([ValueSource(nameof(LogLevels))] LogLevel logLevel)
+    {
+        const string message = "T{{es}}t";
+
+        
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.Log(logLevel, exception, $"{(LiteralValue) "T{es}t"}");
+        Logger.Log(logLevel, exception, message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    exception,
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
         }
     }
 
@@ -12256,6 +14248,80 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
         }
     }
 
+    [Test]
+    public void Log_LiteralValue_WithEventId([ValueSource(nameof(LogLevels))] LogLevel logLevel)
+    {
+        const string message = "Test";
+
+        EventId eventId = 5;
+        
+        Logger.Log(logLevel, eventId, $"{(LiteralValue) "Test"}");
+        Logger.Log(logLevel, eventId, message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    default(Exception),
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+                        EventIdProperty(eventId)
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(message);
+        }
+    }
+
+    [Test]
+    public void Log_LiteralValueWithBraces_WithEventId([ValueSource(nameof(LogLevels))] LogLevel logLevel)
+    {
+        const string message = "T{{es}}t";
+
+        EventId eventId = 5;
+        
+        Logger.Log(logLevel, eventId, $"{(LiteralValue) "T{es}t"}");
+        Logger.Log(logLevel, eventId, message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    default(Exception),
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+                        EventIdProperty(eventId)
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
 
     [Test]
     public void Log_Literal_WithEventId_WithException([ValueSource(nameof(LogLevels))] LogLevel logLevel)
@@ -12691,6 +14757,80 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
                 LogEventEquivalency);
             logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(
                 $"Default: {Format(value)}, Stringified: {Format(value.ToString())}, Destructured: {Format(value)}");     
+        }
+    }
+
+    [Test]
+    public void Log_LiteralValue_WithEventId_WithException([ValueSource(nameof(LogLevels))] LogLevel logLevel)
+    {
+        const string message = "Test";
+
+        EventId eventId = 5;
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.Log(logLevel, eventId, exception, $"{(LiteralValue) "Test"}");
+        Logger.Log(logLevel, eventId, exception, message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    exception,
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+                        EventIdProperty(eventId)
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be(message);
+        }
+    }
+
+    [Test]
+    public void Log_LiteralValueWithBraces_WithEventId_WithException([ValueSource(nameof(LogLevels))] LogLevel logLevel)
+    {
+        const string message = "T{{es}}t";
+
+        EventId eventId = 5;
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.Log(logLevel, eventId, exception, $"{(LiteralValue) "T{es}t"}");
+        Logger.Log(logLevel, eventId, exception, message);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    exception,
+                    Parser.Parse(message),
+                    new LogEventProperty[]
+                    {
+                        SourceContextProperty,
+                        EventIdProperty(eventId)
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
         }
     }
 

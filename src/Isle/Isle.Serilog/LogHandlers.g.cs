@@ -50,6 +50,15 @@ public ref partial struct VerboseLogInterpolatedStringHandler
     }
 
     /// <summary>
+    /// Appends a <see cref="LiteralValue" /> to the template string.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void AppendFormatted(LiteralValue literal)
+    {
+        _builder.AppendLiteral(literal.Value);
+    }
+
+    /// <summary>
     /// Appends a <paramref name="value" /> to the log message.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -118,6 +127,15 @@ public ref partial struct DebugLogInterpolatedStringHandler
     public void AppendLiteral(string? str)
     {
         _builder.AppendLiteral(str);
+    }
+
+    /// <summary>
+    /// Appends a <see cref="LiteralValue" /> to the template string.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void AppendFormatted(LiteralValue literal)
+    {
+        _builder.AppendLiteral(literal.Value);
     }
 
     /// <summary>
@@ -192,6 +210,15 @@ public ref partial struct InformationLogInterpolatedStringHandler
     }
 
     /// <summary>
+    /// Appends a <see cref="LiteralValue" /> to the template string.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void AppendFormatted(LiteralValue literal)
+    {
+        _builder.AppendLiteral(literal.Value);
+    }
+
+    /// <summary>
     /// Appends a <paramref name="value" /> to the log message.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -260,6 +287,15 @@ public ref partial struct WarningLogInterpolatedStringHandler
     public void AppendLiteral(string? str)
     {
         _builder.AppendLiteral(str);
+    }
+
+    /// <summary>
+    /// Appends a <see cref="LiteralValue" /> to the template string.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void AppendFormatted(LiteralValue literal)
+    {
+        _builder.AppendLiteral(literal.Value);
     }
 
     /// <summary>
@@ -334,6 +370,15 @@ public ref partial struct ErrorLogInterpolatedStringHandler
     }
 
     /// <summary>
+    /// Appends a <see cref="LiteralValue" /> to the template string.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void AppendFormatted(LiteralValue literal)
+    {
+        _builder.AppendLiteral(literal.Value);
+    }
+
+    /// <summary>
     /// Appends a <paramref name="value" /> to the log message.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -402,6 +447,15 @@ public ref partial struct FatalLogInterpolatedStringHandler
     public void AppendLiteral(string? str)
     {
         _builder.AppendLiteral(str);
+    }
+
+    /// <summary>
+    /// Appends a <see cref="LiteralValue" /> to the template string.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void AppendFormatted(LiteralValue literal)
+    {
+        _builder.AppendLiteral(literal.Value);
     }
 
     /// <summary>
@@ -476,6 +530,15 @@ public ref partial struct LogInterpolatedStringHandler
     public void AppendLiteral(string? str)
     {
         _builder.AppendLiteral(str);
+    }
+
+    /// <summary>
+    /// Appends a <see cref="LiteralValue" /> to the template string.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void AppendFormatted(LiteralValue literal)
+    {
+        _builder.AppendLiteral(literal.Value);
     }
 
     /// <summary>
