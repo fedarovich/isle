@@ -22,13 +22,19 @@ internal sealed class SimpleLogEventBuilder : LogEventBuilder
 
     public override bool IsCaching => false;
 
-    protected override void Initialize(int literalLength, int formattedCount, ILogger logger)
+
+
+    public void PublicInitialize(int literalLength, int formattedCount, ILogger logger)
     {
         _tokens = new List<MessageTemplateToken>(formattedCount * 2 + 1);
         _properties = new LogEventProperty[formattedCount];
         _messageTemplateBuilder = StringBuilderCache.Acquire(Math.Max(literalLength + formattedCount * 16, StringBuilderCache.MaxBuilderSize));
         _logger = logger;
     }
+
+    protected override void Initialize(int literalLength, int formattedCount, ILogger logger) =>
+        PublicInitialize(literalLength, formattedCount, logger);
+
 
     protected override LogEvent BuildAndReset(LogEventLevel level, Exception? exception = null)
     {
@@ -44,6 +50,25 @@ internal sealed class SimpleLogEventBuilder : LogEventBuilder
         _propertyIndex = 0;
         return logEvent;
     }
+
+    public MessageTemplate GetMessageTemplate() =>
+        new (StringBuilderCache.GetStringAndRelease(_messageTemplateBuilder), _tokens);
+
+    public LogEvent BuildAndReset(MessageTemplate messageTemplate, LogEventLevel level, Exception? exception = null) {
+        var logEvent = new LogEvent(
+            DateTimeOffset.Now,
+            level,
+            exception,
+            messageTemplate,
+            _properties.Length == _propertyIndex ? _properties : _properties.Take(_propertyIndex));
+        _tokens = null!;
+        _properties = null!;
+        _currentPosition = 0;
+        _propertyIndex = 0;
+        return logEvent;
+    }
+
+
 
     public override void AppendLiteral(string? literal)
     {

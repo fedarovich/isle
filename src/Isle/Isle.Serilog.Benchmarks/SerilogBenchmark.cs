@@ -27,7 +27,7 @@ public class SerilogBenchmark
         GlobalSetup();
     }
 
-    [GlobalSetup(Targets = new[] { nameof(InterpolatedWithManualDestructuring), nameof(InterpolatedWithLiteralValue) })]
+    [GlobalSetup(Targets = new[] { nameof(InterpolatedWithManualDestructuring), nameof(Interpolated2WithManualDestructuring) /*, nameof(InterpolatedWithLiteralValue) */})]
     public void GlobalSetupWithManualDestructuring()
     {
         GlobalSetup();
@@ -35,7 +35,7 @@ public class SerilogBenchmark
             .ConfigureSerilog(cfg => cfg.EnableMessageTemplateCaching = EnableCaching));
     }
 
-    [GlobalSetup(Targets = new[] { nameof(InterpolatedWithExplicitAutomaticDestructuring), nameof(InterpolatedWithImplicitAutomaticDestructuring) })]
+    [GlobalSetup(Targets = new[] { nameof(InterpolatedWithExplicitAutomaticDestructuring), nameof(Interpolated2WithExplicitAutomaticDestructuring), nameof(InterpolatedWithImplicitAutomaticDestructuring), nameof(Interpolated2WithImplicitAutomaticDestructuring) })]
     public void GlobalSetupWithAutoDestructuring()
     {
         GlobalSetup();
@@ -83,9 +83,30 @@ public class SerilogBenchmark
         _logger.InformationInterpolated($"The area of rectangle {Rect} is Width * Height = {Area} and its perimeter is 2 * (Width + Height) = {Perimeter}.");
     }
 
+    //[Benchmark]
+    //public void InterpolatedWithLiteralValue()
+    //{
+    //    _logger.InformationInterpolated2($"The area of rectangle {@Rect} is Width * Height = {Area} and its perimeter is 2 * (Width + Height) = {(LiteralValue) Perimeter.ToString()}.");
+    //}
+
     [Benchmark]
-    public void InterpolatedWithLiteralValue()
-    {
-        _logger.InformationInterpolated($"The area of rectangle {@Rect} is Width * Height = {Area} and its perimeter is 2 * (Width + Height) = {(LiteralValue) Perimeter.ToString()}.");
+    public void Interpolated2WithManualDestructuring() {
+        _logger.InformationInterpolated2($"The area of rectangle {@Rect} is Width * Height = {Area} and its perimeter is 2 * (Width + Height) = {Perimeter}.");
     }
+
+    [Benchmark]
+    public void Interpolated2WithExplicitAutomaticDestructuring() {
+        _logger.InformationInterpolated2($"The area of rectangle {@Rect} is Width * Height = {Area} and its perimeter is 2 * (Width + Height) = {Perimeter}.");
+    }
+
+    [Benchmark]
+    public void Interpolated2WithImplicitAutomaticDestructuring() {
+        _logger.InformationInterpolated2($"The area of rectangle {Rect} is Width * Height = {Area} and its perimeter is 2 * (Width + Height) = {Perimeter}.");
+    }
+
+    //[Benchmark]
+    //public void Interpolate2dWithLiteralValue() {
+    //    _logger.InformationInterpolated2($"The area of rectangle {@Rect} is Width * Height = {Area} and its perimeter is 2 * (Width + Height) = {(LiteralValue)Perimeter.ToString()}.");
+    //}
+
 }
