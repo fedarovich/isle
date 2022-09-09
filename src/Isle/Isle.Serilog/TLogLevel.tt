@@ -1,0 +1,74 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".g.cs" #>
+<#
+	string[] logEventLevels = { "Verbose", "Debug", "Information", "Warning", "Error", "Fatal" }; 
+	
+	string GetTypeName(string logEventLevel) => $"LogISH<LogLevel{logEventLevel}>";
+	
+	string GetMethodName(string logEventLevel) => $"{logEventLevel}Interpolated2";
+
+#>
+#nullable enable
+using System.Runtime.CompilerServices;
+using System.Text;
+using Serilog;
+using Serilog.Events;
+
+namespace Isle.Serilog;
+
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+
+<# foreach (var logEventLevel in logEventLevels) { #>
+
+public readonly struct LogLevel<#=logEventLevel#>: IHasLogLevel<LogLevel<#=logEventLevel#>> {
+    public static LogEventLevel GetLevel() => LogEventLevel.<#=logEventLevel#>;
+}
+
+<# } #>
+
+
+/// <summary>
+/// Provides extensions methods for <see cref="ILogger" /> to enable structured logging using interpolated strings.
+/// But now taking advantage of the abstract static GetLevel method on IHasLogLevel to avoid duplicate InterpolatedStringHandlers
+/// </summary>
+public static class TLoggerExtensions
+{
+    public static void Log<TLogLevel>(
+		this ILogger logger,
+		Exception? exception,
+		ref LogISH<TLogLevel> handler, 
+		[CallerArgumentExpression("handler")] string handlerExpr = "") 
+		where TLogLevel : IHasLogLevel<TLogLevel> 
+	{
+		if (handler.IsEnabled)
+		{
+			var logEvent = handler.GetLogEvent(logger, handlerExpr, exception);
+			logger.Write(logEvent);
+		}
+	}
+
+    public static void Log<TLogLevel>(this ILogger logger, ref LogISH<TLogLevel> handler, [CallerArgumentExpression("handler")] string handlerExpr = "") where TLogLevel : IHasLogLevel<TLogLevel>
+		=> Log(logger, null, ref handler, handlerExpr);
+
+<# foreach (var logEventLevel in logEventLevels) { #>
+<# foreach (var withException in new[] { false, true }) { #>
+	public static void <#= GetMethodName(logEventLevel) #>(
+		this ILogger logger,
+<# if (withException) { #>
+		Exception? exception,
+<# } #>
+		[InterpolatedStringHandlerArgument("logger"<#= logEventLevel == null ? ", \"logEventLevel\"" : "" #>)] ref <#= GetTypeName(logEventLevel) #> handler,
+		[CallerArgumentExpression("handler")] string handlerExpr = ""
+	) => Log( logger,<# if (withException) { #> exception,<# } #> ref handler, handlerExpr);
+
+<# } #>
+<# } #>
+
+
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+
+}

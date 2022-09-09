@@ -13,6 +13,8 @@
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<Description>Adds support of structured logging using interpolated strings in C# 10 to Serilog.</Description>
 	<GenerateDocumentationFile>True</GenerateDocumentationFile>
+	<LangVersion>preview</LangVersion>
+	<EnablePreviewFeatures>True</EnablePreviewFeatures>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,6 +23,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="TLogLevel.g.cs">
+      <DependentUpon>TLogLevel.tt</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </None>
     <None Include="LoggerExtensions.g.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -46,6 +53,10 @@
       <PackagePath>/</PackagePath>
       <Pack>True</Pack>
     </None>
+    <None Update="TLogLevel.tt">
+      <LastGenOutput>TLogLevel.g.cs</LastGenOutput>
+      <Generator>TextTemplatingFileGenerator</Generator>
+    </None>
     <None Update="LoggerExtensions.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>LoggerExtensions.g.cs</LastGenOutput>
@@ -70,6 +81,11 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>LogHandlers.tt</DependentUpon>
+    </Compile>
+    <Compile Update="TLogLevel.g.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>TLogLevel.tt</DependentUpon>
     </Compile>
   </ItemGroup>
 
