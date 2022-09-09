@@ -20,4 +20,12 @@
     <None Update="buildTransitive/**" Pack="True" PackagePath="/" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="$(AssemblyName).Tests" />
+    <InternalsVisibleTo Include="Isle.Extensions.Logging" />
+    <InternalsVisibleTo Include="Isle.Extensions.Logging.Tests" />
+    <InternalsVisibleTo Include="Isle.Serilog" />
+    <InternalsVisibleTo Include="Isle.Serilog.Tests" />
+  </ItemGroup>
+
 </Project>
