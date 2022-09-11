@@ -1,4 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Isle;
@@ -8,27 +9,21 @@ internal static class StringBuilderExtensions
     [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.AggressiveOptimization)]
     internal static void EscapeAndAppend(this StringBuilder stringBuilder, in ReadOnlySpan<char> strSpan)
     {
-        int start = 0;
-        for (int end = 0; end < strSpan.Length; end++)
+        ReadOnlySpan<char> span = strSpan;
+        while (true)
         {
-            var c = strSpan[end];
-            if (c is '{' or '}')
-            {
-                var length = end - start;
-                if (length > 0)
-                {
-                    stringBuilder.Append(strSpan.Slice(start, length));
-                }
+            int index = span.IndexOfAny('{', '}');
+            if (index < 0)
+                break;
 
-                stringBuilder.Append(c);
-                stringBuilder.Append(c);
-                start = end + 1;
-            }
+            int length = index + 1;
+            var slice = span.Slice(0, length);
+            stringBuilder.Append(slice);
+            ref char c = ref Unsafe.Add(ref MemoryMarshal.GetReference(span), index);
+            stringBuilder.Append(c);
+            span = span.Slice(length);
         }
 
-        if (start < strSpan.Length)
-        {
-            stringBuilder.Append(strSpan.Slice(start));
-        }
+        stringBuilder.Append(span);
     }
 }

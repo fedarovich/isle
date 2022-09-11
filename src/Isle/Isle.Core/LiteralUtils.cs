@@ -1,4 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Text;
 
 namespace Isle;
 
@@ -13,38 +15,27 @@ internal static class LiteralUtils
     }
 
     [SkipLocalsInit]
-    private static string BuildEscapedString(int firstBraceIndex, in ReadOnlySpan<char> strSpan)
+    private static string BuildEscapedString(int braceIndex, in ReadOnlySpan<char> strSpan)
     {
-        int remainingLength = strSpan.Length - firstBraceIndex;
+        int remainingLength = strSpan.Length - braceIndex;
         // Assume that the brace count does not exceed 12.5%.
-        int builderInitialCapacity = firstBraceIndex + remainingLength + Math.Max(remainingLength >> 3, 4);
+        int builderInitialCapacity = braceIndex + remainingLength + Math.Max(remainingLength >> 3, 4);
         var builder = builderInitialCapacity <= 1024
             ? new ValueStringBuilder(stackalloc char[builderInitialCapacity])
             : new ValueStringBuilder(builderInitialCapacity);
-        builder.Append(strSpan.Slice(0, firstBraceIndex));
-
-        int start = firstBraceIndex;
-        for (int end = firstBraceIndex; end < strSpan.Length; end++)
+        
+        ReadOnlySpan<char> span = strSpan;
+        do
         {
-            var c = strSpan[end];
-            if (c is '{' or '}')
-            {
-                var length = end - start;
-                if (length > 0)
-                {
-                    builder.Append(strSpan.Slice(start, length));
-                }
+            int length = braceIndex + 1;
+            var slice = span.Slice(0, length);
+            builder.Append(slice);
+            builder.Append(Unsafe.Add(ref MemoryMarshal.GetReference(span), braceIndex));
+            span = span.Slice(length);
+            braceIndex = span.IndexOfAny('{', '}');
+        } while (braceIndex >= 0);
 
-                builder.Append(c);
-                builder.Append(c);
-                start = end + 1;
-            }
-        }
-
-        if (start < strSpan.Length)
-        {
-            builder.Append(strSpan.Slice(start));
-        }
+        builder.Append(span);
 
         return builder.ToString();
     }
