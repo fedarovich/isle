@@ -59,7 +59,8 @@ internal sealed class SimpleLogEventBuilder : LogEventBuilder
 
     public override void AppendFormatted<T>(string name, T value, int alignment, string? format)
     {
-        name = IsleConfiguration.Current.ValueNameConverter(name);
+        var configuration = IsleConfiguration.Current;
+        name = configuration.ValueNameConverter(name);
         Destructuring destructuring;
         if (name.StartsWith(DestructureOperator))
         {
@@ -74,7 +75,7 @@ internal sealed class SimpleLogEventBuilder : LogEventBuilder
         else
         {
             destructuring = GetDestructuring(
-                IsleConfiguration.Current.ValueRepresentationPolicy.GetRepresentationOfType<T>());
+                configuration.ValueRepresentationPolicy.GetRepresentationOfType<T>());
         }
 
         if (name == string.Empty)

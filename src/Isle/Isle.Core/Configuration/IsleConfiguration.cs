@@ -1,4 +1,6 @@
-﻿using Isle.Extensions;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
+using Isle.Extensions;
 
 namespace Isle.Configuration;
 
@@ -16,9 +18,19 @@ public sealed class IsleConfiguration
     /// </summary>
     /// <exception cref="InvalidOperationException">ISLE has not been configured yet.</exception>
     /// <seealso cref="Configure"/>
-    public static IsleConfiguration Current =>
-        _current ?? throw new InvalidOperationException(
-            "Isle is not configured. Please, call IsleConfiguration.Configure before using Isle's logging methods.");
+    public static IsleConfiguration Current
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get
+        {
+            return _current ?? ThrowInvalidOperationException();
+
+            [DoesNotReturn]
+            [MethodImpl(MethodImplOptions.NoInlining)]
+            IsleConfiguration ThrowInvalidOperationException() => throw new InvalidOperationException(
+                "Isle is not configured. Please, call IsleConfiguration.Configure before using Isle's logging methods.");
+        }
+    }
 
     private IsleConfiguration(IsleConfigurationBuilder builder)
     {

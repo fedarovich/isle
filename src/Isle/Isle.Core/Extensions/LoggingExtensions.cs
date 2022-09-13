@@ -36,7 +36,8 @@ public static class LoggingExtensions
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static NamedLogValue Named<T>(this T value, string name)
     {
-        return Named(value, name, IsleConfiguration.Current.PreserveDefaultValueRepresentationForExplicitNames);
+        var configuration = IsleConfiguration.Current;
+        return Named(value, name, configuration.PreserveDefaultValueRepresentationForExplicitNames, configuration);
     }
 
     /// <summary>
@@ -54,13 +55,18 @@ public static class LoggingExtensions
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static NamedLogValue Named<T>(this T value, string name, bool preserveDefaultValueRepresentation)
     {
+        return Named(value, name, preserveDefaultValueRepresentation, IsleConfiguration.Current);
+    }
+
+    private static NamedLogValue Named<T>(T value, string name, bool preserveDefaultValueRepresentation, IsleConfiguration configuration)
+    {
         if (string.IsNullOrWhiteSpace(name))
             throw new ArgumentException("The name cannot be null or empty string.", nameof(name));
 
         string rawName = name;
         if (!preserveDefaultValueRepresentation && !name.StartsWith(DestructureOperator) && !name.StartsWith(StringifyOperator))
         {
-            var representation = IsleConfiguration.Current.ValueRepresentationPolicy.GetRepresentationOfType<T>();
+            var representation = configuration.ValueRepresentationPolicy.GetRepresentationOfType<T>();
             switch (representation)
             {
                 case ValueRepresentation.Destructure:
@@ -78,10 +84,11 @@ public static class LoggingExtensions
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static string GetNameFromCallerArgumentExpression<T>(this string expression)
     {
-        var name = IsleConfiguration.Current.ValueNameConverter(expression);
+        var configuration = IsleConfiguration.Current;
+        var name = configuration.ValueNameConverter(expression);
         if (!name.StartsWith(DestructureOperator) && !name.StartsWith(StringifyOperator))
         {
-            var representation = IsleConfiguration.Current.ValueRepresentationPolicy.GetRepresentationOfType<T>();
+            var representation = configuration.ValueRepresentationPolicy.GetRepresentationOfType<T>();
             switch (representation)
             {
                 case ValueRepresentation.Destructure:
