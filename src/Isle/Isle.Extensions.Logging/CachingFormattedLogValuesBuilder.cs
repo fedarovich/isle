@@ -39,6 +39,18 @@ internal sealed class CachingFormattedLogValuesBuilder : FormattedLogValuesBuild
         }
     }
 
+    public override void AppendLiteralValue(in LiteralValue literalValue)
+    {
+        if (literalValue.IsCacheable)
+        {
+            AppendLiteral(literalValue.Value);
+        }
+        else if (!string.IsNullOrEmpty(literalValue.Value))
+        {
+            _lastNode = _lastNode.CreateNotCachedLiteralNode(literalValue.Value);
+        }
+    }
+
     public override void AppendFormatted(string name, object? value, int alignment = 0, string? format = null)
     {
         _lastNode = (alignment == 0 && string.IsNullOrEmpty(format))

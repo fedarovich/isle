@@ -545,14 +545,14 @@ public class LoggerExtensionsTests : BaseFixture
     }
 
     [Test]
-    public void VerboseInterpolated_LiteralValue()
+    public void VerboseInterpolated_LiteralValue([Values] bool cacheable)
     {
  
         const LogEventLevel logEventLevel = LogEventLevel.Verbose;
         const string message = "Test";
 
         
-        Logger.VerboseInterpolated($"{(LiteralValue) "Test"}");
+        Logger.VerboseInterpolated($"{new LiteralValue("Test", cacheable)}");
         Logger.Verbose(message);
 
         if (logEventLevel < MinLogEventLevel)
@@ -580,14 +580,14 @@ public class LoggerExtensionsTests : BaseFixture
     }
 
     [Test]
-    public void VerboseInterpolated_LiteralValueWithBraces()
+    public void VerboseInterpolated_LiteralValueWithBraces([Values] bool cacheable)
     {
  
         const LogEventLevel logEventLevel = LogEventLevel.Verbose;
         const string message = "T{{es}}t";
 
         
-        Logger.VerboseInterpolated($"{new LiteralValue("T{es}t")}");
+        Logger.VerboseInterpolated($"{new LiteralValue("T{es}t", cacheable)}");
         Logger.Verbose(message);
 
         if (logEventLevel < MinLogEventLevel)
@@ -615,7 +615,7 @@ public class LoggerExtensionsTests : BaseFixture
     }
 
     [Test]
-    public void VerboseInterpolated_MixedLiteralValue()
+    public void VerboseInterpolated_MixedLiteralValue([Values] bool cacheable)
     {
         var value1 = 5;
         var value2 = 7;
@@ -623,7 +623,7 @@ public class LoggerExtensionsTests : BaseFixture
  
         const LogEventLevel logEventLevel = LogEventLevel.Verbose;
         
-        Logger.VerboseInterpolated($"A{value1}B{(LiteralValue) "C"}D{value2}E");
+        Logger.VerboseInterpolated($"A{value1}B{new LiteralValue("C", cacheable)}D{value2}E");
 
         if (logEventLevel < MinLogEventLevel)
         {
@@ -1185,14 +1185,14 @@ public class LoggerExtensionsTests : BaseFixture
     }
 
     [Test]
-    public void VerboseInterpolated_LiteralValue_WithException()
+    public void VerboseInterpolated_LiteralValue_WithException([Values] bool cacheable)
     {
  
         const LogEventLevel logEventLevel = LogEventLevel.Verbose;
         const string message = "Test";
 
         Exception exception = new InvalidOperationException("Test exception."); 
-        Logger.VerboseInterpolated(exception, $"{(LiteralValue) "Test"}");
+        Logger.VerboseInterpolated(exception, $"{new LiteralValue("Test", cacheable)}");
         Logger.Verbose(exception, message);
 
         if (logEventLevel < MinLogEventLevel)
@@ -1220,14 +1220,14 @@ public class LoggerExtensionsTests : BaseFixture
     }
 
     [Test]
-    public void VerboseInterpolated_LiteralValueWithBraces_WithException()
+    public void VerboseInterpolated_LiteralValueWithBraces_WithException([Values] bool cacheable)
     {
  
         const LogEventLevel logEventLevel = LogEventLevel.Verbose;
         const string message = "T{{es}}t";
 
         Exception exception = new InvalidOperationException("Test exception."); 
-        Logger.VerboseInterpolated(exception, $"{new LiteralValue("T{es}t")}");
+        Logger.VerboseInterpolated(exception, $"{new LiteralValue("T{es}t", cacheable)}");
         Logger.Verbose(exception, message);
 
         if (logEventLevel < MinLogEventLevel)
@@ -1255,7 +1255,7 @@ public class LoggerExtensionsTests : BaseFixture
     }
 
     [Test]
-    public void VerboseInterpolated_MixedLiteralValue_WithException()
+    public void VerboseInterpolated_MixedLiteralValue_WithException([Values] bool cacheable)
     {
         var value1 = 5;
         var value2 = 7;
@@ -1263,7 +1263,7 @@ public class LoggerExtensionsTests : BaseFixture
  
         const LogEventLevel logEventLevel = LogEventLevel.Verbose;
         Exception exception = new InvalidOperationException("Test exception."); 
-        Logger.VerboseInterpolated(exception, $"A{value1}B{(LiteralValue) "C"}D{value2}E");
+        Logger.VerboseInterpolated(exception, $"A{value1}B{new LiteralValue("C", cacheable)}D{value2}E");
 
         if (logEventLevel < MinLogEventLevel)
         {
@@ -1830,14 +1830,14 @@ public class LoggerExtensionsTests : BaseFixture
     }
 
     [Test]
-    public void DebugInterpolated_LiteralValue()
+    public void DebugInterpolated_LiteralValue([Values] bool cacheable)
     {
  
         const LogEventLevel logEventLevel = LogEventLevel.Debug;
         const string message = "Test";
 
         
-        Logger.DebugInterpolated($"{(LiteralValue) "Test"}");
+        Logger.DebugInterpolated($"{new LiteralValue("Test", cacheable)}");
         Logger.Debug(message);
 
         if (logEventLevel < MinLogEventLevel)
@@ -1865,14 +1865,14 @@ public class LoggerExtensionsTests : BaseFixture
     }
 
     [Test]
-    public void DebugInterpolated_LiteralValueWithBraces()
+    public void DebugInterpolated_LiteralValueWithBraces([Values] bool cacheable)
     {
  
         const LogEventLevel logEventLevel = LogEventLevel.Debug;
         const string message = "T{{es}}t";
 
         
-        Logger.DebugInterpolated($"{new LiteralValue("T{es}t")}");
+        Logger.DebugInterpolated($"{new LiteralValue("T{es}t", cacheable)}");
         Logger.Debug(message);
 
         if (logEventLevel < MinLogEventLevel)
@@ -1900,7 +1900,7 @@ public class LoggerExtensionsTests : BaseFixture
     }
 
     [Test]
-    public void DebugInterpolated_MixedLiteralValue()
+    public void DebugInterpolated_MixedLiteralValue([Values] bool cacheable)
     {
         var value1 = 5;
         var value2 = 7;
@@ -1908,7 +1908,7 @@ public class LoggerExtensionsTests : BaseFixture
  
         const LogEventLevel logEventLevel = LogEventLevel.Debug;
         
-        Logger.DebugInterpolated($"A{value1}B{(LiteralValue) "C"}D{value2}E");
+        Logger.DebugInterpolated($"A{value1}B{new LiteralValue("C", cacheable)}D{value2}E");
 
         if (logEventLevel < MinLogEventLevel)
         {
@@ -2470,14 +2470,14 @@ public class LoggerExtensionsTests : BaseFixture
     }
 
     [Test]
-    public void DebugInterpolated_LiteralValue_WithException()
+    public void DebugInterpolated_LiteralValue_WithException([Values] bool cacheable)
     {
  
         const LogEventLevel logEventLevel = LogEventLevel.Debug;
         const string message = "Test";
 
         Exception exception = new InvalidOperationException("Test exception."); 
-        Logger.DebugInterpolated(exception, $"{(LiteralValue) "Test"}");
+        Logger.DebugInterpolated(exception, $"{new LiteralValue("Test", cacheable)}");
         Logger.Debug(exception, message);
 
         if (logEventLevel < MinLogEventLevel)
@@ -2505,14 +2505,14 @@ public class LoggerExtensionsTests : BaseFixture
     }
 
     [Test]
-    public void DebugInterpolated_LiteralValueWithBraces_WithException()
+    public void DebugInterpolated_LiteralValueWithBraces_WithException([Values] bool cacheable)
     {
  
         const LogEventLevel logEventLevel = LogEventLevel.Debug;
         const string message = "T{{es}}t";
 
         Exception exception = new InvalidOperationException("Test exception."); 
-        Logger.DebugInterpolated(exception, $"{new LiteralValue("T{es}t")}");
+        Logger.DebugInterpolated(exception, $"{new LiteralValue("T{es}t", cacheable)}");
         Logger.Debug(exception, message);
 
         if (logEventLevel < MinLogEventLevel)
@@ -2540,7 +2540,7 @@ public class LoggerExtensionsTests : BaseFixture
     }
 
     [Test]
-    public void DebugInterpolated_MixedLiteralValue_WithException()
+    public void DebugInterpolated_MixedLiteralValue_WithException([Values] bool cacheable)
     {
         var value1 = 5;
         var value2 = 7;
@@ -2548,7 +2548,7 @@ public class LoggerExtensionsTests : BaseFixture
  
         const LogEventLevel logEventLevel = LogEventLevel.Debug;
         Exception exception = new InvalidOperationException("Test exception."); 
-        Logger.DebugInterpolated(exception, $"A{value1}B{(LiteralValue) "C"}D{value2}E");
+        Logger.DebugInterpolated(exception, $"A{value1}B{new LiteralValue("C", cacheable)}D{value2}E");
 
         if (logEventLevel < MinLogEventLevel)
         {
@@ -3115,14 +3115,14 @@ public class LoggerExtensionsTests : BaseFixture
     }
 
     [Test]
-    public void InformationInterpolated_LiteralValue()
+    public void InformationInterpolated_LiteralValue([Values] bool cacheable)
     {
  
         const LogEventLevel logEventLevel = LogEventLevel.Information;
         const string message = "Test";
 
         
-        Logger.InformationInterpolated($"{(LiteralValue) "Test"}");
+        Logger.InformationInterpolated($"{new LiteralValue("Test", cacheable)}");
         Logger.Information(message);
 
         if (logEventLevel < MinLogEventLevel)
@@ -3150,14 +3150,14 @@ public class LoggerExtensionsTests : BaseFixture
     }
 
     [Test]
-    public void InformationInterpolated_LiteralValueWithBraces()
+    public void InformationInterpolated_LiteralValueWithBraces([Values] bool cacheable)
     {
  
         const LogEventLevel logEventLevel = LogEventLevel.Information;
         const string message = "T{{es}}t";
 
         
-        Logger.InformationInterpolated($"{new LiteralValue("T{es}t")}");
+        Logger.InformationInterpolated($"{new LiteralValue("T{es}t", cacheable)}");
         Logger.Information(message);
 
         if (logEventLevel < MinLogEventLevel)
@@ -3185,7 +3185,7 @@ public class LoggerExtensionsTests : BaseFixture
     }
 
     [Test]
-    public void InformationInterpolated_MixedLiteralValue()
+    public void InformationInterpolated_MixedLiteralValue([Values] bool cacheable)
     {
         var value1 = 5;
         var value2 = 7;
@@ -3193,7 +3193,7 @@ public class LoggerExtensionsTests : BaseFixture
  
         const LogEventLevel logEventLevel = LogEventLevel.Information;
         
-        Logger.InformationInterpolated($"A{value1}B{(LiteralValue) "C"}D{value2}E");
+        Logger.InformationInterpolated($"A{value1}B{new LiteralValue("C", cacheable)}D{value2}E");
 
         if (logEventLevel < MinLogEventLevel)
         {
@@ -3755,14 +3755,14 @@ public class LoggerExtensionsTests : BaseFixture
     }
 
     [Test]
-    public void InformationInterpolated_LiteralValue_WithException()
+    public void InformationInterpolated_LiteralValue_WithException([Values] bool cacheable)
     {
  
         const LogEventLevel logEventLevel = LogEventLevel.Information;
         const string message = "Test";
 
         Exception exception = new InvalidOperationException("Test exception."); 
-        Logger.InformationInterpolated(exception, $"{(LiteralValue) "Test"}");
+        Logger.InformationInterpolated(exception, $"{new LiteralValue("Test", cacheable)}");
         Logger.Information(exception, message);
 
         if (logEventLevel < MinLogEventLevel)
@@ -3790,14 +3790,14 @@ public class LoggerExtensionsTests : BaseFixture
     }
 
     [Test]
-    public void InformationInterpolated_LiteralValueWithBraces_WithException()
+    public void InformationInterpolated_LiteralValueWithBraces_WithException([Values] bool cacheable)
     {
  
         const LogEventLevel logEventLevel = LogEventLevel.Information;
         const string message = "T{{es}}t";
 
         Exception exception = new InvalidOperationException("Test exception."); 
-        Logger.InformationInterpolated(exception, $"{new LiteralValue("T{es}t")}");
+        Logger.InformationInterpolated(exception, $"{new LiteralValue("T{es}t", cacheable)}");
         Logger.Information(exception, message);
 
         if (logEventLevel < MinLogEventLevel)
@@ -3825,7 +3825,7 @@ public class LoggerExtensionsTests : BaseFixture
     }
 
     [Test]
-    public void InformationInterpolated_MixedLiteralValue_WithException()
+    public void InformationInterpolated_MixedLiteralValue_WithException([Values] bool cacheable)
     {
         var value1 = 5;
         var value2 = 7;
@@ -3833,7 +3833,7 @@ public class LoggerExtensionsTests : BaseFixture
  
         const LogEventLevel logEventLevel = LogEventLevel.Information;
         Exception exception = new InvalidOperationException("Test exception."); 
-        Logger.InformationInterpolated(exception, $"A{value1}B{(LiteralValue) "C"}D{value2}E");
+        Logger.InformationInterpolated(exception, $"A{value1}B{new LiteralValue("C", cacheable)}D{value2}E");
 
         if (logEventLevel < MinLogEventLevel)
         {
@@ -4400,14 +4400,14 @@ public class LoggerExtensionsTests : BaseFixture
     }
 
     [Test]
-    public void WarningInterpolated_LiteralValue()
+    public void WarningInterpolated_LiteralValue([Values] bool cacheable)
     {
  
         const LogEventLevel logEventLevel = LogEventLevel.Warning;
         const string message = "Test";
 
         
-        Logger.WarningInterpolated($"{(LiteralValue) "Test"}");
+        Logger.WarningInterpolated($"{new LiteralValue("Test", cacheable)}");
         Logger.Warning(message);
 
         if (logEventLevel < MinLogEventLevel)
@@ -4435,14 +4435,14 @@ public class LoggerExtensionsTests : BaseFixture
     }
 
     [Test]
-    public void WarningInterpolated_LiteralValueWithBraces()
+    public void WarningInterpolated_LiteralValueWithBraces([Values] bool cacheable)
     {
  
         const LogEventLevel logEventLevel = LogEventLevel.Warning;
         const string message = "T{{es}}t";
 
         
-        Logger.WarningInterpolated($"{new LiteralValue("T{es}t")}");
+        Logger.WarningInterpolated($"{new LiteralValue("T{es}t", cacheable)}");
         Logger.Warning(message);
 
         if (logEventLevel < MinLogEventLevel)
@@ -4470,7 +4470,7 @@ public class LoggerExtensionsTests : BaseFixture
     }
 
     [Test]
-    public void WarningInterpolated_MixedLiteralValue()
+    public void WarningInterpolated_MixedLiteralValue([Values] bool cacheable)
     {
         var value1 = 5;
         var value2 = 7;
@@ -4478,7 +4478,7 @@ public class LoggerExtensionsTests : BaseFixture
  
         const LogEventLevel logEventLevel = LogEventLevel.Warning;
         
-        Logger.WarningInterpolated($"A{value1}B{(LiteralValue) "C"}D{value2}E");
+        Logger.WarningInterpolated($"A{value1}B{new LiteralValue("C", cacheable)}D{value2}E");
 
         if (logEventLevel < MinLogEventLevel)
         {
@@ -5040,14 +5040,14 @@ public class LoggerExtensionsTests : BaseFixture
     }
 
     [Test]
-    public void WarningInterpolated_LiteralValue_WithException()
+    public void WarningInterpolated_LiteralValue_WithException([Values] bool cacheable)
     {
  
         const LogEventLevel logEventLevel = LogEventLevel.Warning;
         const string message = "Test";
 
         Exception exception = new InvalidOperationException("Test exception."); 
-        Logger.WarningInterpolated(exception, $"{(LiteralValue) "Test"}");
+        Logger.WarningInterpolated(exception, $"{new LiteralValue("Test", cacheable)}");
         Logger.Warning(exception, message);
 
         if (logEventLevel < MinLogEventLevel)
@@ -5075,14 +5075,14 @@ public class LoggerExtensionsTests : BaseFixture
     }
 
     [Test]
-    public void WarningInterpolated_LiteralValueWithBraces_WithException()
+    public void WarningInterpolated_LiteralValueWithBraces_WithException([Values] bool cacheable)
     {
  
         const LogEventLevel logEventLevel = LogEventLevel.Warning;
         const string message = "T{{es}}t";
 
         Exception exception = new InvalidOperationException("Test exception."); 
-        Logger.WarningInterpolated(exception, $"{new LiteralValue("T{es}t")}");
+        Logger.WarningInterpolated(exception, $"{new LiteralValue("T{es}t", cacheable)}");
         Logger.Warning(exception, message);
 
         if (logEventLevel < MinLogEventLevel)
@@ -5110,7 +5110,7 @@ public class LoggerExtensionsTests : BaseFixture
     }
 
     [Test]
-    public void WarningInterpolated_MixedLiteralValue_WithException()
+    public void WarningInterpolated_MixedLiteralValue_WithException([Values] bool cacheable)
     {
         var value1 = 5;
         var value2 = 7;
@@ -5118,7 +5118,7 @@ public class LoggerExtensionsTests : BaseFixture
  
         const LogEventLevel logEventLevel = LogEventLevel.Warning;
         Exception exception = new InvalidOperationException("Test exception."); 
-        Logger.WarningInterpolated(exception, $"A{value1}B{(LiteralValue) "C"}D{value2}E");
+        Logger.WarningInterpolated(exception, $"A{value1}B{new LiteralValue("C", cacheable)}D{value2}E");
 
         if (logEventLevel < MinLogEventLevel)
         {
@@ -5685,14 +5685,14 @@ public class LoggerExtensionsTests : BaseFixture
     }
 
     [Test]
-    public void ErrorInterpolated_LiteralValue()
+    public void ErrorInterpolated_LiteralValue([Values] bool cacheable)
     {
  
         const LogEventLevel logEventLevel = LogEventLevel.Error;
         const string message = "Test";
 
         
-        Logger.ErrorInterpolated($"{(LiteralValue) "Test"}");
+        Logger.ErrorInterpolated($"{new LiteralValue("Test", cacheable)}");
         Logger.Error(message);
 
         if (logEventLevel < MinLogEventLevel)
@@ -5720,14 +5720,14 @@ public class LoggerExtensionsTests : BaseFixture
     }
 
     [Test]
-    public void ErrorInterpolated_LiteralValueWithBraces()
+    public void ErrorInterpolated_LiteralValueWithBraces([Values] bool cacheable)
     {
  
         const LogEventLevel logEventLevel = LogEventLevel.Error;
         const string message = "T{{es}}t";
 
         
-        Logger.ErrorInterpolated($"{new LiteralValue("T{es}t")}");
+        Logger.ErrorInterpolated($"{new LiteralValue("T{es}t", cacheable)}");
         Logger.Error(message);
 
         if (logEventLevel < MinLogEventLevel)
@@ -5755,7 +5755,7 @@ public class LoggerExtensionsTests : BaseFixture
     }
 
     [Test]
-    public void ErrorInterpolated_MixedLiteralValue()
+    public void ErrorInterpolated_MixedLiteralValue([Values] bool cacheable)
     {
         var value1 = 5;
         var value2 = 7;
@@ -5763,7 +5763,7 @@ public class LoggerExtensionsTests : BaseFixture
  
         const LogEventLevel logEventLevel = LogEventLevel.Error;
         
-        Logger.ErrorInterpolated($"A{value1}B{(LiteralValue) "C"}D{value2}E");
+        Logger.ErrorInterpolated($"A{value1}B{new LiteralValue("C", cacheable)}D{value2}E");
 
         if (logEventLevel < MinLogEventLevel)
         {
@@ -6325,14 +6325,14 @@ public class LoggerExtensionsTests : BaseFixture
     }
 
     [Test]
-    public void ErrorInterpolated_LiteralValue_WithException()
+    public void ErrorInterpolated_LiteralValue_WithException([Values] bool cacheable)
     {
  
         const LogEventLevel logEventLevel = LogEventLevel.Error;
         const string message = "Test";
 
         Exception exception = new InvalidOperationException("Test exception."); 
-        Logger.ErrorInterpolated(exception, $"{(LiteralValue) "Test"}");
+        Logger.ErrorInterpolated(exception, $"{new LiteralValue("Test", cacheable)}");
         Logger.Error(exception, message);
 
         if (logEventLevel < MinLogEventLevel)
@@ -6360,14 +6360,14 @@ public class LoggerExtensionsTests : BaseFixture
     }
 
     [Test]
-    public void ErrorInterpolated_LiteralValueWithBraces_WithException()
+    public void ErrorInterpolated_LiteralValueWithBraces_WithException([Values] bool cacheable)
     {
  
         const LogEventLevel logEventLevel = LogEventLevel.Error;
         const string message = "T{{es}}t";
 
         Exception exception = new InvalidOperationException("Test exception."); 
-        Logger.ErrorInterpolated(exception, $"{new LiteralValue("T{es}t")}");
+        Logger.ErrorInterpolated(exception, $"{new LiteralValue("T{es}t", cacheable)}");
         Logger.Error(exception, message);
 
         if (logEventLevel < MinLogEventLevel)
@@ -6395,7 +6395,7 @@ public class LoggerExtensionsTests : BaseFixture
     }
 
     [Test]
-    public void ErrorInterpolated_MixedLiteralValue_WithException()
+    public void ErrorInterpolated_MixedLiteralValue_WithException([Values] bool cacheable)
     {
         var value1 = 5;
         var value2 = 7;
@@ -6403,7 +6403,7 @@ public class LoggerExtensionsTests : BaseFixture
  
         const LogEventLevel logEventLevel = LogEventLevel.Error;
         Exception exception = new InvalidOperationException("Test exception."); 
-        Logger.ErrorInterpolated(exception, $"A{value1}B{(LiteralValue) "C"}D{value2}E");
+        Logger.ErrorInterpolated(exception, $"A{value1}B{new LiteralValue("C", cacheable)}D{value2}E");
 
         if (logEventLevel < MinLogEventLevel)
         {
@@ -6970,14 +6970,14 @@ public class LoggerExtensionsTests : BaseFixture
     }
 
     [Test]
-    public void FatalInterpolated_LiteralValue()
+    public void FatalInterpolated_LiteralValue([Values] bool cacheable)
     {
  
         const LogEventLevel logEventLevel = LogEventLevel.Fatal;
         const string message = "Test";
 
         
-        Logger.FatalInterpolated($"{(LiteralValue) "Test"}");
+        Logger.FatalInterpolated($"{new LiteralValue("Test", cacheable)}");
         Logger.Fatal(message);
 
         if (logEventLevel < MinLogEventLevel)
@@ -7005,14 +7005,14 @@ public class LoggerExtensionsTests : BaseFixture
     }
 
     [Test]
-    public void FatalInterpolated_LiteralValueWithBraces()
+    public void FatalInterpolated_LiteralValueWithBraces([Values] bool cacheable)
     {
  
         const LogEventLevel logEventLevel = LogEventLevel.Fatal;
         const string message = "T{{es}}t";
 
         
-        Logger.FatalInterpolated($"{new LiteralValue("T{es}t")}");
+        Logger.FatalInterpolated($"{new LiteralValue("T{es}t", cacheable)}");
         Logger.Fatal(message);
 
         if (logEventLevel < MinLogEventLevel)
@@ -7040,7 +7040,7 @@ public class LoggerExtensionsTests : BaseFixture
     }
 
     [Test]
-    public void FatalInterpolated_MixedLiteralValue()
+    public void FatalInterpolated_MixedLiteralValue([Values] bool cacheable)
     {
         var value1 = 5;
         var value2 = 7;
@@ -7048,7 +7048,7 @@ public class LoggerExtensionsTests : BaseFixture
  
         const LogEventLevel logEventLevel = LogEventLevel.Fatal;
         
-        Logger.FatalInterpolated($"A{value1}B{(LiteralValue) "C"}D{value2}E");
+        Logger.FatalInterpolated($"A{value1}B{new LiteralValue("C", cacheable)}D{value2}E");
 
         if (logEventLevel < MinLogEventLevel)
         {
@@ -7610,14 +7610,14 @@ public class LoggerExtensionsTests : BaseFixture
     }
 
     [Test]
-    public void FatalInterpolated_LiteralValue_WithException()
+    public void FatalInterpolated_LiteralValue_WithException([Values] bool cacheable)
     {
  
         const LogEventLevel logEventLevel = LogEventLevel.Fatal;
         const string message = "Test";
 
         Exception exception = new InvalidOperationException("Test exception."); 
-        Logger.FatalInterpolated(exception, $"{(LiteralValue) "Test"}");
+        Logger.FatalInterpolated(exception, $"{new LiteralValue("Test", cacheable)}");
         Logger.Fatal(exception, message);
 
         if (logEventLevel < MinLogEventLevel)
@@ -7645,14 +7645,14 @@ public class LoggerExtensionsTests : BaseFixture
     }
 
     [Test]
-    public void FatalInterpolated_LiteralValueWithBraces_WithException()
+    public void FatalInterpolated_LiteralValueWithBraces_WithException([Values] bool cacheable)
     {
  
         const LogEventLevel logEventLevel = LogEventLevel.Fatal;
         const string message = "T{{es}}t";
 
         Exception exception = new InvalidOperationException("Test exception."); 
-        Logger.FatalInterpolated(exception, $"{new LiteralValue("T{es}t")}");
+        Logger.FatalInterpolated(exception, $"{new LiteralValue("T{es}t", cacheable)}");
         Logger.Fatal(exception, message);
 
         if (logEventLevel < MinLogEventLevel)
@@ -7680,7 +7680,7 @@ public class LoggerExtensionsTests : BaseFixture
     }
 
     [Test]
-    public void FatalInterpolated_MixedLiteralValue_WithException()
+    public void FatalInterpolated_MixedLiteralValue_WithException([Values] bool cacheable)
     {
         var value1 = 5;
         var value2 = 7;
@@ -7688,7 +7688,7 @@ public class LoggerExtensionsTests : BaseFixture
  
         const LogEventLevel logEventLevel = LogEventLevel.Fatal;
         Exception exception = new InvalidOperationException("Test exception."); 
-        Logger.FatalInterpolated(exception, $"A{value1}B{(LiteralValue) "C"}D{value2}E");
+        Logger.FatalInterpolated(exception, $"A{value1}B{new LiteralValue("C", cacheable)}D{value2}E");
 
         if (logEventLevel < MinLogEventLevel)
         {
@@ -8231,12 +8231,12 @@ public class LoggerExtensionsTests : BaseFixture
     }
 
     [Test]
-    public void WriteInterpolated_LiteralValue([ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel)
+    public void WriteInterpolated_LiteralValue([ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel, [Values] bool cacheable)
     {
         const string message = "Test";
 
         
-        Logger.WriteInterpolated(logEventLevel, $"{(LiteralValue) "Test"}");
+        Logger.WriteInterpolated(logEventLevel, $"{new LiteralValue("Test", cacheable)}");
         Logger.Write(logEventLevel, message);
 
         if (logEventLevel < MinLogEventLevel)
@@ -8264,12 +8264,12 @@ public class LoggerExtensionsTests : BaseFixture
     }
 
     [Test]
-    public void WriteInterpolated_LiteralValueWithBraces([ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel)
+    public void WriteInterpolated_LiteralValueWithBraces([ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel, [Values] bool cacheable)
     {
         const string message = "T{{es}}t";
 
         
-        Logger.WriteInterpolated(logEventLevel, $"{new LiteralValue("T{es}t")}");
+        Logger.WriteInterpolated(logEventLevel, $"{new LiteralValue("T{es}t", cacheable)}");
         Logger.Write(logEventLevel, message);
 
         if (logEventLevel < MinLogEventLevel)
@@ -8297,13 +8297,13 @@ public class LoggerExtensionsTests : BaseFixture
     }
 
     [Test]
-    public void WriteInterpolated_MixedLiteralValue([ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel)
+    public void WriteInterpolated_MixedLiteralValue([ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel, [Values] bool cacheable)
     {
         var value1 = 5;
         var value2 = 7;
 
         
-        Logger.WriteInterpolated(logEventLevel, $"A{value1}B{(LiteralValue) "C"}D{value2}E");
+        Logger.WriteInterpolated(logEventLevel, $"A{value1}B{new LiteralValue("C", cacheable)}D{value2}E");
 
         if (logEventLevel < MinLogEventLevel)
         {
@@ -8841,12 +8841,12 @@ public class LoggerExtensionsTests : BaseFixture
     }
 
     [Test]
-    public void WriteInterpolated_LiteralValue_WithException([ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel)
+    public void WriteInterpolated_LiteralValue_WithException([ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel, [Values] bool cacheable)
     {
         const string message = "Test";
 
         Exception exception = new InvalidOperationException("Test exception."); 
-        Logger.WriteInterpolated(logEventLevel, exception, $"{(LiteralValue) "Test"}");
+        Logger.WriteInterpolated(logEventLevel, exception, $"{new LiteralValue("Test", cacheable)}");
         Logger.Write(logEventLevel, exception, message);
 
         if (logEventLevel < MinLogEventLevel)
@@ -8874,12 +8874,12 @@ public class LoggerExtensionsTests : BaseFixture
     }
 
     [Test]
-    public void WriteInterpolated_LiteralValueWithBraces_WithException([ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel)
+    public void WriteInterpolated_LiteralValueWithBraces_WithException([ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel, [Values] bool cacheable)
     {
         const string message = "T{{es}}t";
 
         Exception exception = new InvalidOperationException("Test exception."); 
-        Logger.WriteInterpolated(logEventLevel, exception, $"{new LiteralValue("T{es}t")}");
+        Logger.WriteInterpolated(logEventLevel, exception, $"{new LiteralValue("T{es}t", cacheable)}");
         Logger.Write(logEventLevel, exception, message);
 
         if (logEventLevel < MinLogEventLevel)
@@ -8907,13 +8907,13 @@ public class LoggerExtensionsTests : BaseFixture
     }
 
     [Test]
-    public void WriteInterpolated_MixedLiteralValue_WithException([ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel)
+    public void WriteInterpolated_MixedLiteralValue_WithException([ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel, [Values] bool cacheable)
     {
         var value1 = 5;
         var value2 = 7;
 
         Exception exception = new InvalidOperationException("Test exception."); 
-        Logger.WriteInterpolated(logEventLevel, exception, $"A{value1}B{(LiteralValue) "C"}D{value2}E");
+        Logger.WriteInterpolated(logEventLevel, exception, $"A{value1}B{new LiteralValue("C", cacheable)}D{value2}E");
 
         if (logEventLevel < MinLogEventLevel)
         {

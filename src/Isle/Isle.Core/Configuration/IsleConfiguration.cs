@@ -25,6 +25,7 @@ public sealed class IsleConfiguration
         ValueRepresentationPolicy = builder.ValueRepresentationPolicy ?? DefaultValueRepresentationPolicy.Instance;
         ValueNameConverter = builder.ValueNameConverter ?? (name => name);
         PreserveDefaultValueRepresentationForExplicitNames = builder.PreserveDefaultValueRepresentationForExplicitNames;
+        CacheLiteralValues = builder.CacheLiteralValues;
         _extensionHooks = builder.ExtensionHooks;
     }
 
@@ -45,7 +46,7 @@ public sealed class IsleConfiguration
     public Func<string, string> ValueNameConverter { get; }
 
     /// <summary>
-    /// Gets or sets the value indicating whether <see cref="LoggingExtensions.Named{T}(T,string)"/>
+    /// Gets the value indicating whether <see cref="LoggingExtensions.Named{T}(T,string)"/>
     /// will preserve the default value representation.
     /// </summary>
     /// <value>
@@ -59,6 +60,16 @@ public sealed class IsleConfiguration
     /// </para>
     /// </value>
     public bool PreserveDefaultValueRepresentationForExplicitNames { get; }
+
+    /// <summary>
+    /// Gets the value indicating whether <see cref="LiteralValue"/>s can be cached by default.
+    /// </summary>
+    /// <remarks>
+    /// CAUTION! Literal values may be cached only if they are compile-time or run-time constants.
+    /// If literal value caching is enabled, passing non-constant values as <see cref="LiteralValue"/>s
+    /// will cause memory leaks.
+    /// </remarks>
+    public bool CacheLiteralValues { get; }
 
     /// <summary>
     /// Configures ISLE.
@@ -122,5 +133,7 @@ public sealed class IsleConfiguration
         public void RegisterExtensionConfigurationHook(IIsleExtensionConfigurationHook hook) => ExtensionHooks.Add(hook);
         
         public bool PreserveDefaultValueRepresentationForExplicitNames { get; set; }
+        
+        public bool CacheLiteralValues { get; set; }
     }
 }

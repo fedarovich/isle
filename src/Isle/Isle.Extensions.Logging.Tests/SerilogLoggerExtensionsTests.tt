@@ -555,7 +555,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void <#= GetTestName("LiteralValue", logLevel, withEventId, withException) #>(<#if (logLevel == "") { #>[ValueSource(nameof(LogLevels))] LogLevel logLevel<# } #>)
+    public void <#= GetTestName("LiteralValue", logLevel, withEventId, withException) #>(<#if (logLevel == "") { #>[ValueSource(nameof(LogLevels))] LogLevel logLevel, <# } #>[Values] bool cacheable)
     {
 <#if (logLevel != "") { #> 
         const LogLevel logLevel = LogLevel.<#= (logLevel) #>;
@@ -566,7 +566,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
 
         <#if (withException) { #>Exception exception = new InvalidOperationException("Test exception."); <# } #>
 
-        Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>$"{(LiteralValue) "Test"}");
+        Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>$"{new LiteralValue("Test", cacheable)}");
         Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>message);
 
         if (logLevel < MinLogLevel)
@@ -599,7 +599,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void <#= GetTestName("LiteralValueWithBraces", logLevel, withEventId, withException) #>(<#if (logLevel == "") { #>[ValueSource(nameof(LogLevels))] LogLevel logLevel<# } #>)
+    public void <#= GetTestName("LiteralValueWithBraces", logLevel, withEventId, withException) #>(<#if (logLevel == "") { #>[ValueSource(nameof(LogLevels))] LogLevel logLevel, <# } #>[Values] bool cacheable)
     {
 <#if (logLevel != "") { #> 
         const LogLevel logLevel = LogLevel.<#= (logLevel) #>;
@@ -610,7 +610,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
 
         <#if (withException) { #>Exception exception = new InvalidOperationException("Test exception."); <# } #>
 
-        Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>$"{(LiteralValue) "T{es}t"}");
+        Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>$"{new LiteralValue("T{es}t", cacheable)}");
         Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>message);
 
         if (logLevel < MinLogLevel)
@@ -639,6 +639,55 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
                 ),
                 LogEventEquivalency);
             logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
+    [Test]
+    public void <#= GetTestName("MixedLiteralValue", logLevel, withEventId, withException) #>(<#if (logLevel == "") { #>[ValueSource(nameof(LogLevels))] LogLevel logLevel, <# } #>[Values] bool cacheable)
+    {
+var x = 1;
+        var y = 2;
+
+<#if (logLevel != "") { #> 
+        const LogLevel logLevel = LogLevel.<#= (logLevel) #>;
+<# } #>
+        <#if (withEventId) { #>EventId eventId = 5;<# } #>
+
+        <#if (withException) { #>Exception exception = new InvalidOperationException("Test exception."); <# } #>
+
+        Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>
+            $"A{x}B{new LiteralValue("C", cacheable)}D{y}E");
+        Logger.Log<#= (logLevel) #>(<#if (logLevel == "") { #>logLevel, <# } #><#if (withEventId) { #>eventId, <# } #><#if (withException) { #>exception, <# } #>
+            "A{x}BCD{y}E", x, y);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    <#= withException ? "exception" : "default(Exception)" #>,
+                    Parser.Parse("A{x}BCD{y}E"),
+                    new LogEventProperty[]
+                    {
+                        x.ToLogEventProperty(),
+                        y.ToLogEventProperty(),
+                        SourceContextProperty,
+<#if (withEventId) { #>
+                        EventIdProperty(eventId)
+<# } #>
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be($"A{x}BCD{y}E");
         }
     }
 

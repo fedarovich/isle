@@ -53,7 +53,7 @@ public ref partial struct TraceLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in LiteralValue literal)
     {
-        _builder.AppendLiteral(literal.Value);
+        _builder.AppendLiteralValue(literal);
     }
 
     /// <summary>
@@ -133,7 +133,7 @@ public ref partial struct DebugLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in LiteralValue literal)
     {
-        _builder.AppendLiteral(literal.Value);
+        _builder.AppendLiteralValue(literal);
     }
 
     /// <summary>
@@ -213,7 +213,7 @@ public ref partial struct InformationLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in LiteralValue literal)
     {
-        _builder.AppendLiteral(literal.Value);
+        _builder.AppendLiteralValue(literal);
     }
 
     /// <summary>
@@ -293,7 +293,7 @@ public ref partial struct WarningLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in LiteralValue literal)
     {
-        _builder.AppendLiteral(literal.Value);
+        _builder.AppendLiteralValue(literal);
     }
 
     /// <summary>
@@ -373,7 +373,7 @@ public ref partial struct ErrorLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in LiteralValue literal)
     {
-        _builder.AppendLiteral(literal.Value);
+        _builder.AppendLiteralValue(literal);
     }
 
     /// <summary>
@@ -453,7 +453,7 @@ public ref partial struct CriticalLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in LiteralValue literal)
     {
-        _builder.AppendLiteral(literal.Value);
+        _builder.AppendLiteralValue(literal);
     }
 
     /// <summary>
@@ -534,7 +534,7 @@ public ref partial struct LogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in LiteralValue literal)
     {
-        _builder.AppendLiteral(literal.Value);
+        _builder.AppendLiteralValue(literal);
     }
 
     /// <summary>
@@ -604,7 +604,7 @@ public ref partial struct ScopeLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in LiteralValue literal)
     {
-        _builder.AppendLiteral(literal.Value);
+        _builder.AppendLiteralValue(literal);
     }
 
     /// <summary>

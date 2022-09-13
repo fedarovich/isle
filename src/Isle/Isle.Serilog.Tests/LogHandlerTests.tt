@@ -509,6 +509,37 @@ public class <#= GetTestName(logEventLevel) #> : BaseFixture
     }
 
     #endregion
+
+    #region AppendFormatted LiteralValue
+
+    [Test]
+    public void AppendFormattedLiteralValue(<#if (logEventLevel == null) { #> [ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel, <# } #>[ValueSource(nameof(Literals))] string? literal, [Values] bool cacheable)
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var handler = new <#= GetTypeName(logEventLevel) #>(3, 0, Logger, <#if (logEventLevel == null) { #> logEventLevel, <# } #> out _);
+        handler.AppendFormatted(new LiteralValue(literal, cacheable));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be(literal ?? "");
+        logEvent.Properties.Count.Should().Be(0);
+        logEvent.RenderMessage().Should().Be(literal ?? "");
+    }
+
+    [Test]
+    public void AppendFormattedLiteralValueWithBraces(<#if (logEventLevel == null) { #> [ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel, <# } #>[Values] bool cacheable)
+    {
+        Assume.That(logEventLevel >= MinLogEventLevel);
+
+        var handler = new <#= GetTypeName(logEventLevel) #>(3, 0, Logger, <#if (logEventLevel == null) { #> logEventLevel, <# } #> out _);
+        handler.AppendFormatted(new LiteralValue("A{B}C", cacheable));
+        var logEvent = handler.GetLogEventAndReset();
+        logEvent.MessageTemplate.Text.Should().Be("A{{B}}C");
+        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C", 0));
+        logEvent.Properties.Count.Should().Be(0);
+        logEvent.RenderMessage().Should().Be("A{B}C");
+    }
+
+    #endregion
 }
 
 <# } #>

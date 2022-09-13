@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using BenchmarkDotNet.Attributes;
+﻿using BenchmarkDotNet.Attributes;
 using Isle.Configuration;
 using Isle.Extensions.Logging.Benchmarks.Serilog;
 using Microsoft.Extensions.Logging;

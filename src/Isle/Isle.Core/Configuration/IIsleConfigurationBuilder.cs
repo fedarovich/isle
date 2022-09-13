@@ -44,4 +44,18 @@ public interface IIsleConfigurationBuilder
     /// </para>
     /// </value>
     bool PreserveDefaultValueRepresentationForExplicitNames { get; set; }
+
+    /// <summary>
+    /// Gets the value indicating whether <see cref="LiteralValue"/>s can be cached by default.
+    /// </summary>
+    /// <remarks>
+    /// CAUTION! Literal values may be cached only if they are compile-time or run-time constants.
+    /// If literal value caching is enabled, passing non-constant values as <see cref="LiteralValue"/>s
+    /// will cause memory leaks.
+    /// </remarks>
+    /// <value>
+    /// <para>The value indicating whether <see cref="LiteralValue"/>s can be cached by default.</para>
+    /// <para>The default value is <see langword="false" />.</para>
+    /// </value>
+    bool CacheLiteralValues { get; set; }
 }

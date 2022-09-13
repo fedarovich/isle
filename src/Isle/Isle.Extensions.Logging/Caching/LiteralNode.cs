@@ -1,6 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-
-namespace Isle.Extensions.Logging.Caching;
+﻿namespace Isle.Extensions.Logging.Caching;
 
 internal sealed class LiteralNode : Node
 {

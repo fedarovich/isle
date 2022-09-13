@@ -78,7 +78,7 @@ public ref partial struct <#= GetTypeName(logEventLevel) #>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in LiteralValue literal)
     {
-        _builder.AppendLiteral(literal.Value);
+        _builder.AppendLiteralValue(literal);
     }
 
     /// <summary>

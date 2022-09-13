@@ -1,4 +1,6 @@
-﻿namespace Isle;
+﻿using Isle.Configuration;
+
+namespace Isle;
 
 /// <summary>
 /// Represents a hole value that must be interpreted not as a hole, but as a literal, i.e. the part of message template.
@@ -11,15 +13,45 @@ public readonly ref struct LiteralValue
     public string? Value { get; }
 
     /// <summary>
+    /// Gets the value indicating whether this literal value can be cached.
+    /// </summary>
+    public bool IsCacheable { get; }
+
+    /// <summary>
     /// Initializes a new instance of <see cref="LiteralValue"/>.
     /// </summary>
     /// <param name="value">The string value to wrap.</param>
-    public LiteralValue(string? value) => Value = value;
+    /// <remarks>
+    /// <para>
+    /// The cacheability of the literal value depends on <see cref="IsleConfiguration.CacheLiteralValues"/>
+    /// global setting if this constructor is used.
+    /// </para>
+    /// <para>
+    /// CAUTION! Literal values may be cached only if they are compile-time or run-time constants.
+    /// If literal value caching is enabled, passing non-constant values as <see cref="LiteralValue"/>s
+    /// will cause memory leaks.
+    /// </para>
+    /// </remarks>
+    public LiteralValue(string? value) : this(value, IsleConfiguration.Current.CacheLiteralValues)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of <see cref="LiteralValue"/>.
+    /// </summary>
+    /// <param name="value">The string value to wrap.</param>
+    /// <param name="isCacheable">The value indicating whether this literal value can be cached.</param>
+    /// <remarks>
+    /// CAUTION! Literal values may be cached only if they are compile-time or run-time constants.
+    /// If literal value caching is enabled, passing non-constant values as <see cref="LiteralValue"/>s
+    /// will cause memory leaks.
+    /// </remarks>
+    public LiteralValue(string? value, bool isCacheable) => (Value, IsCacheable) = (value, isCacheable);
 
     /// <summary>
     /// Returns a value that indicates whether this instance wraps the string equal to a the value wrapped with the other <paramref name="literalValue"/>.
     /// </summary>
-    public bool Equals(LiteralValue literalValue) => Value == literalValue.Value;
+    public bool Equals(LiteralValue literalValue) => Value == literalValue.Value && IsCacheable == literalValue.IsCacheable;
 
     /// <inheritdoc />
     public override bool Equals(object? obj) => throw new NotSupportedException();

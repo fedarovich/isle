@@ -1008,12 +1008,12 @@ public class InformationLogInterpolatedStringHandlerTests : BaseFixture
     #region AppendFormatted with LiteralValue
 
     [Test]
-    public void AppendFormattedLiteralValue([ValueSource(nameof(Literals))] string? literal)
+    public void AppendFormattedLiteralValue([ValueSource(nameof(Literals))] string? literal, [Values] bool cacheable)
     {
         Assume.That(logLevel >= MinLogLevel);
 
         var handler = new InformationLogInterpolatedStringHandler(0, 1, Logger,  out _);
-        handler.AppendFormatted((LiteralValue) literal);
+        handler.AppendFormatted(new LiteralValue(literal, cacheable));
         var values = handler.GetFormattedLogValuesAndReset();
         values.Count.Should().Be(1);
         values[0].Should().Be(new KeyValuePair<string, object>("{OriginalFormat}", literal ?? ""));
@@ -1021,12 +1021,12 @@ public class InformationLogInterpolatedStringHandlerTests : BaseFixture
     }
 
     [Test]
-    public void AppendFormattedLiteralValueWithBraces()
+    public void AppendFormattedLiteralValueWithBraces([Values] bool cacheable)
     {
         Assume.That(logLevel >= MinLogLevel);
 
         var handler = new InformationLogInterpolatedStringHandler(0, 1, Logger,  out _);
-        handler.AppendFormatted(new LiteralValue("A{B}C"));
+        handler.AppendFormatted(new LiteralValue("A{B}C", cacheable));
         var values = handler.GetFormattedLogValuesAndReset();
         values.Count.Should().Be(1);
         values[0].Should().Be(new KeyValuePair<string, object>("{OriginalFormat}", "A{{B}}C"));

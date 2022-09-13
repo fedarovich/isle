@@ -67,6 +67,7 @@ internal abstract class Node
             : children.GetOrAdd(rawLiteral, static (rl, parent) => new LiteralNode(parent, rl), this);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public HoleNode GetOrAddHoleNode(string name)
     {
         var nextNode = Volatile.Read(ref _holeNodes);
@@ -106,6 +107,7 @@ internal abstract class Node
             : children.GetOrAdd(name, static (name, parent) => new HoleNode(parent, name), this);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public FormattedHoleNode GetOrAddFormattedHoleNode(string name, int alignment, string? format)
     {
         var nextNode = Volatile.Read(ref _formattedHoleNodes);
@@ -146,6 +148,11 @@ internal abstract class Node
             : children.GetOrAdd(
                 formatKey,
                 static (formatKey, parent) => new FormattedHoleNode(parent, formatKey.Name, formatKey.Alignment, formatKey.Format), this);
+    }
+
+    public LiteralNode CreateNotCachedLiteralNode(string rawLiteral)
+    {
+        return new LiteralNode(this, rawLiteral);
     }
 
     public TemplateNode GetTemplateNode()
