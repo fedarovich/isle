@@ -76,9 +76,9 @@ public ref partial struct <#= GetTypeName(logEventLevel) #>
     /// Appends a <see cref="LiteralValue" /> to the template string.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void AppendFormatted(LiteralValue literal)
+    public void AppendFormatted(in LiteralValue literal)
     {
-        _builder.AppendLiteral(literal.Value);
+        _builder.AppendLiteralValue(literal);
     }
 
     /// <summary>

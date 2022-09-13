@@ -61,6 +61,18 @@ internal sealed class CachingLogEventBuilder : LogEventBuilder
         }
     }
 
+    public override void AppendLiteralValue(in LiteralValue literalValue)
+    {
+        if (literalValue.IsCacheable)
+        {
+            AppendLiteral(literalValue.Value);
+        }
+        else if (!string.IsNullOrEmpty(literalValue.Value))
+        {
+            _lastNode = _lastNode.CreateNotCachedTextNode(literalValue.Value);
+        }
+    }
+
     public override void AppendFormatted<T>(string name, T value, int alignment, string? format)
     {
         AppendFormatted(value.Named(IsleConfiguration.Current.ValueNameConverter(name), false), alignment, format);

@@ -159,6 +159,11 @@ internal abstract class Node
                 static (formatKey, arg) => new PropertyNode(arg.parent, formatKey.Name, arg.rawName, formatKey.Alignment, formatKey.Format), (parent: this, rawName));
     }
 
+    public TextNode CreateNotCachedTextNode(string rawLiteral)
+    {
+        return new TextNode(this, rawLiteral);
+    }
+
     public TemplateNode GetTemplateNode()
     {
         return Volatile.Read(ref _templateNode) ?? InitializeTemplateNode();

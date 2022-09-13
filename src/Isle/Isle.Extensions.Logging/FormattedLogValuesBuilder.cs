@@ -50,5 +50,10 @@ internal abstract class FormattedLogValuesBuilder
 
     public abstract void AppendLiteral(string? str);
 
+    public virtual void AppendLiteralValue(in LiteralValue literalValue)
+    {
+        AppendLiteral(literalValue.Value);
+    }
+
     public abstract void AppendFormatted(string name, object? value, int alignment = 0, string? format = null);
 }

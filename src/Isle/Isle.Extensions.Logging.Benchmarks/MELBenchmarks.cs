@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
 using BenchmarkDotNet.Attributes;
 using Isle.Configuration;
 using Isle.Extensions.Logging.Benchmarks.MEL;

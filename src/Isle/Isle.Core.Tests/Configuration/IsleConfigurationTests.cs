@@ -36,6 +36,7 @@ internal class IsleConfigurationTests
         IsleConfiguration.Configure(_ => {});
         IsleConfiguration.Current.ValueRepresentationPolicy.Should().Be(DefaultValueRepresentationPolicy.Instance);
         IsleConfiguration.Current.PreserveDefaultValueRepresentationForExplicitNames.Should().BeFalse();
+        IsleConfiguration.Current.CacheLiteralValues.Should().BeFalse();
     }
 
     [Test]
@@ -49,6 +50,7 @@ internal class IsleConfigurationTests
             builder.ValueNameConverter = valueNameConverter;
             builder.ValueRepresentationPolicy = AutoDestructuringValueRepresentationPolicy.Instance;
             builder.PreserveDefaultValueRepresentationForExplicitNames = true;
+            builder.CacheLiteralValues = true;
             builder.RegisterExtensionConfigurationHook(hook);
         });
         hook.Received(1).ApplyExtensionConfiguration();
@@ -56,6 +58,7 @@ internal class IsleConfigurationTests
         IsleConfiguration.Current.ValueNameConverter.Should().Be(valueNameConverter);
         IsleConfiguration.Current.ValueRepresentationPolicy.Should().Be(AutoDestructuringValueRepresentationPolicy.Instance);
         IsleConfiguration.Current.PreserveDefaultValueRepresentationForExplicitNames.Should().BeTrue();
+        IsleConfiguration.Current.CacheLiteralValues.Should().BeTrue();
         hook.ClearReceivedCalls();
 
         IsleConfiguration.Reset();

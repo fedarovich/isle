@@ -470,7 +470,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void LogTrace_LiteralValue()
+    public void LogTrace_LiteralValue([Values] bool cacheable)
     {
  
         const LogLevel logLevel = LogLevel.Trace;
@@ -478,7 +478,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
 
         
         
-        Logger.LogTrace($"{(LiteralValue) "Test"}");
+        Logger.LogTrace($"{new LiteralValue("Test", cacheable)}");
         Logger.LogTrace(message);
 
         if (logLevel < MinLogLevel)
@@ -508,7 +508,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void LogTrace_LiteralValueWithBraces()
+    public void LogTrace_LiteralValueWithBraces([Values] bool cacheable)
     {
  
         const LogLevel logLevel = LogLevel.Trace;
@@ -516,7 +516,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
 
         
         
-        Logger.LogTrace($"{(LiteralValue) "T{es}t"}");
+        Logger.LogTrace($"{new LiteralValue("T{es}t", cacheable)}");
         Logger.LogTrace(message);
 
         if (logLevel < MinLogLevel)
@@ -542,6 +542,47 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
                 ),
                 LogEventEquivalency);
             logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
+    [Test]
+    public void LogTrace_MixedLiteralValue([Values] bool cacheable)
+    {
+var x = 1;
+        var y = 2;
+
+ 
+        const LogLevel logLevel = LogLevel.Trace;
+        
+        
+        Logger.LogTrace(            $"A{x}B{new LiteralValue("C", cacheable)}D{y}E");
+        Logger.LogTrace(            "A{x}BCD{y}E", x, y);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    default(Exception),
+                    Parser.Parse("A{x}BCD{y}E"),
+                    new LogEventProperty[]
+                    {
+                        x.ToLogEventProperty(),
+                        y.ToLogEventProperty(),
+                        SourceContextProperty,
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be($"A{x}BCD{y}E");
         }
     }
 
@@ -995,7 +1036,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void LogTrace_LiteralValue_WithException()
+    public void LogTrace_LiteralValue_WithException([Values] bool cacheable)
     {
  
         const LogLevel logLevel = LogLevel.Trace;
@@ -1003,7 +1044,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
 
         
         Exception exception = new InvalidOperationException("Test exception."); 
-        Logger.LogTrace(exception, $"{(LiteralValue) "Test"}");
+        Logger.LogTrace(exception, $"{new LiteralValue("Test", cacheable)}");
         Logger.LogTrace(exception, message);
 
         if (logLevel < MinLogLevel)
@@ -1033,7 +1074,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void LogTrace_LiteralValueWithBraces_WithException()
+    public void LogTrace_LiteralValueWithBraces_WithException([Values] bool cacheable)
     {
  
         const LogLevel logLevel = LogLevel.Trace;
@@ -1041,7 +1082,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
 
         
         Exception exception = new InvalidOperationException("Test exception."); 
-        Logger.LogTrace(exception, $"{(LiteralValue) "T{es}t"}");
+        Logger.LogTrace(exception, $"{new LiteralValue("T{es}t", cacheable)}");
         Logger.LogTrace(exception, message);
 
         if (logLevel < MinLogLevel)
@@ -1067,6 +1108,47 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
                 ),
                 LogEventEquivalency);
             logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
+    [Test]
+    public void LogTrace_MixedLiteralValue_WithException([Values] bool cacheable)
+    {
+var x = 1;
+        var y = 2;
+
+ 
+        const LogLevel logLevel = LogLevel.Trace;
+        
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogTrace(exception,             $"A{x}B{new LiteralValue("C", cacheable)}D{y}E");
+        Logger.LogTrace(exception,             "A{x}BCD{y}E", x, y);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    exception,
+                    Parser.Parse("A{x}BCD{y}E"),
+                    new LogEventProperty[]
+                    {
+                        x.ToLogEventProperty(),
+                        y.ToLogEventProperty(),
+                        SourceContextProperty,
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be($"A{x}BCD{y}E");
         }
     }
 
@@ -1531,7 +1613,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void LogTrace_LiteralValue_WithEventId()
+    public void LogTrace_LiteralValue_WithEventId([Values] bool cacheable)
     {
  
         const LogLevel logLevel = LogLevel.Trace;
@@ -1539,7 +1621,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
 
         EventId eventId = 5;
         
-        Logger.LogTrace(eventId, $"{(LiteralValue) "Test"}");
+        Logger.LogTrace(eventId, $"{new LiteralValue("Test", cacheable)}");
         Logger.LogTrace(eventId, message);
 
         if (logLevel < MinLogLevel)
@@ -1570,7 +1652,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void LogTrace_LiteralValueWithBraces_WithEventId()
+    public void LogTrace_LiteralValueWithBraces_WithEventId([Values] bool cacheable)
     {
  
         const LogLevel logLevel = LogLevel.Trace;
@@ -1578,7 +1660,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
 
         EventId eventId = 5;
         
-        Logger.LogTrace(eventId, $"{(LiteralValue) "T{es}t"}");
+        Logger.LogTrace(eventId, $"{new LiteralValue("T{es}t", cacheable)}");
         Logger.LogTrace(eventId, message);
 
         if (logLevel < MinLogLevel)
@@ -1605,6 +1687,48 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
                 ),
                 LogEventEquivalency);
             logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
+    [Test]
+    public void LogTrace_MixedLiteralValue_WithEventId([Values] bool cacheable)
+    {
+var x = 1;
+        var y = 2;
+
+ 
+        const LogLevel logLevel = LogLevel.Trace;
+        EventId eventId = 5;
+        
+        Logger.LogTrace(eventId,             $"A{x}B{new LiteralValue("C", cacheable)}D{y}E");
+        Logger.LogTrace(eventId,             "A{x}BCD{y}E", x, y);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    default(Exception),
+                    Parser.Parse("A{x}BCD{y}E"),
+                    new LogEventProperty[]
+                    {
+                        x.ToLogEventProperty(),
+                        y.ToLogEventProperty(),
+                        SourceContextProperty,
+                        EventIdProperty(eventId)
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be($"A{x}BCD{y}E");
         }
     }
 
@@ -2069,7 +2193,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void LogTrace_LiteralValue_WithEventId_WithException()
+    public void LogTrace_LiteralValue_WithEventId_WithException([Values] bool cacheable)
     {
  
         const LogLevel logLevel = LogLevel.Trace;
@@ -2077,7 +2201,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
 
         EventId eventId = 5;
         Exception exception = new InvalidOperationException("Test exception."); 
-        Logger.LogTrace(eventId, exception, $"{(LiteralValue) "Test"}");
+        Logger.LogTrace(eventId, exception, $"{new LiteralValue("Test", cacheable)}");
         Logger.LogTrace(eventId, exception, message);
 
         if (logLevel < MinLogLevel)
@@ -2108,7 +2232,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void LogTrace_LiteralValueWithBraces_WithEventId_WithException()
+    public void LogTrace_LiteralValueWithBraces_WithEventId_WithException([Values] bool cacheable)
     {
  
         const LogLevel logLevel = LogLevel.Trace;
@@ -2116,7 +2240,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
 
         EventId eventId = 5;
         Exception exception = new InvalidOperationException("Test exception."); 
-        Logger.LogTrace(eventId, exception, $"{(LiteralValue) "T{es}t"}");
+        Logger.LogTrace(eventId, exception, $"{new LiteralValue("T{es}t", cacheable)}");
         Logger.LogTrace(eventId, exception, message);
 
         if (logLevel < MinLogLevel)
@@ -2143,6 +2267,48 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
                 ),
                 LogEventEquivalency);
             logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
+    [Test]
+    public void LogTrace_MixedLiteralValue_WithEventId_WithException([Values] bool cacheable)
+    {
+var x = 1;
+        var y = 2;
+
+ 
+        const LogLevel logLevel = LogLevel.Trace;
+        EventId eventId = 5;
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogTrace(eventId, exception,             $"A{x}B{new LiteralValue("C", cacheable)}D{y}E");
+        Logger.LogTrace(eventId, exception,             "A{x}BCD{y}E", x, y);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    exception,
+                    Parser.Parse("A{x}BCD{y}E"),
+                    new LogEventProperty[]
+                    {
+                        x.ToLogEventProperty(),
+                        y.ToLogEventProperty(),
+                        SourceContextProperty,
+                        EventIdProperty(eventId)
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be($"A{x}BCD{y}E");
         }
     }
 
@@ -2602,7 +2768,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void LogDebug_LiteralValue()
+    public void LogDebug_LiteralValue([Values] bool cacheable)
     {
  
         const LogLevel logLevel = LogLevel.Debug;
@@ -2610,7 +2776,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
 
         
         
-        Logger.LogDebug($"{(LiteralValue) "Test"}");
+        Logger.LogDebug($"{new LiteralValue("Test", cacheable)}");
         Logger.LogDebug(message);
 
         if (logLevel < MinLogLevel)
@@ -2640,7 +2806,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void LogDebug_LiteralValueWithBraces()
+    public void LogDebug_LiteralValueWithBraces([Values] bool cacheable)
     {
  
         const LogLevel logLevel = LogLevel.Debug;
@@ -2648,7 +2814,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
 
         
         
-        Logger.LogDebug($"{(LiteralValue) "T{es}t"}");
+        Logger.LogDebug($"{new LiteralValue("T{es}t", cacheable)}");
         Logger.LogDebug(message);
 
         if (logLevel < MinLogLevel)
@@ -2674,6 +2840,47 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
                 ),
                 LogEventEquivalency);
             logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
+    [Test]
+    public void LogDebug_MixedLiteralValue([Values] bool cacheable)
+    {
+var x = 1;
+        var y = 2;
+
+ 
+        const LogLevel logLevel = LogLevel.Debug;
+        
+        
+        Logger.LogDebug(            $"A{x}B{new LiteralValue("C", cacheable)}D{y}E");
+        Logger.LogDebug(            "A{x}BCD{y}E", x, y);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    default(Exception),
+                    Parser.Parse("A{x}BCD{y}E"),
+                    new LogEventProperty[]
+                    {
+                        x.ToLogEventProperty(),
+                        y.ToLogEventProperty(),
+                        SourceContextProperty,
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be($"A{x}BCD{y}E");
         }
     }
 
@@ -3127,7 +3334,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void LogDebug_LiteralValue_WithException()
+    public void LogDebug_LiteralValue_WithException([Values] bool cacheable)
     {
  
         const LogLevel logLevel = LogLevel.Debug;
@@ -3135,7 +3342,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
 
         
         Exception exception = new InvalidOperationException("Test exception."); 
-        Logger.LogDebug(exception, $"{(LiteralValue) "Test"}");
+        Logger.LogDebug(exception, $"{new LiteralValue("Test", cacheable)}");
         Logger.LogDebug(exception, message);
 
         if (logLevel < MinLogLevel)
@@ -3165,7 +3372,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void LogDebug_LiteralValueWithBraces_WithException()
+    public void LogDebug_LiteralValueWithBraces_WithException([Values] bool cacheable)
     {
  
         const LogLevel logLevel = LogLevel.Debug;
@@ -3173,7 +3380,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
 
         
         Exception exception = new InvalidOperationException("Test exception."); 
-        Logger.LogDebug(exception, $"{(LiteralValue) "T{es}t"}");
+        Logger.LogDebug(exception, $"{new LiteralValue("T{es}t", cacheable)}");
         Logger.LogDebug(exception, message);
 
         if (logLevel < MinLogLevel)
@@ -3199,6 +3406,47 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
                 ),
                 LogEventEquivalency);
             logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
+    [Test]
+    public void LogDebug_MixedLiteralValue_WithException([Values] bool cacheable)
+    {
+var x = 1;
+        var y = 2;
+
+ 
+        const LogLevel logLevel = LogLevel.Debug;
+        
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogDebug(exception,             $"A{x}B{new LiteralValue("C", cacheable)}D{y}E");
+        Logger.LogDebug(exception,             "A{x}BCD{y}E", x, y);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    exception,
+                    Parser.Parse("A{x}BCD{y}E"),
+                    new LogEventProperty[]
+                    {
+                        x.ToLogEventProperty(),
+                        y.ToLogEventProperty(),
+                        SourceContextProperty,
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be($"A{x}BCD{y}E");
         }
     }
 
@@ -3663,7 +3911,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void LogDebug_LiteralValue_WithEventId()
+    public void LogDebug_LiteralValue_WithEventId([Values] bool cacheable)
     {
  
         const LogLevel logLevel = LogLevel.Debug;
@@ -3671,7 +3919,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
 
         EventId eventId = 5;
         
-        Logger.LogDebug(eventId, $"{(LiteralValue) "Test"}");
+        Logger.LogDebug(eventId, $"{new LiteralValue("Test", cacheable)}");
         Logger.LogDebug(eventId, message);
 
         if (logLevel < MinLogLevel)
@@ -3702,7 +3950,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void LogDebug_LiteralValueWithBraces_WithEventId()
+    public void LogDebug_LiteralValueWithBraces_WithEventId([Values] bool cacheable)
     {
  
         const LogLevel logLevel = LogLevel.Debug;
@@ -3710,7 +3958,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
 
         EventId eventId = 5;
         
-        Logger.LogDebug(eventId, $"{(LiteralValue) "T{es}t"}");
+        Logger.LogDebug(eventId, $"{new LiteralValue("T{es}t", cacheable)}");
         Logger.LogDebug(eventId, message);
 
         if (logLevel < MinLogLevel)
@@ -3737,6 +3985,48 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
                 ),
                 LogEventEquivalency);
             logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
+    [Test]
+    public void LogDebug_MixedLiteralValue_WithEventId([Values] bool cacheable)
+    {
+var x = 1;
+        var y = 2;
+
+ 
+        const LogLevel logLevel = LogLevel.Debug;
+        EventId eventId = 5;
+        
+        Logger.LogDebug(eventId,             $"A{x}B{new LiteralValue("C", cacheable)}D{y}E");
+        Logger.LogDebug(eventId,             "A{x}BCD{y}E", x, y);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    default(Exception),
+                    Parser.Parse("A{x}BCD{y}E"),
+                    new LogEventProperty[]
+                    {
+                        x.ToLogEventProperty(),
+                        y.ToLogEventProperty(),
+                        SourceContextProperty,
+                        EventIdProperty(eventId)
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be($"A{x}BCD{y}E");
         }
     }
 
@@ -4201,7 +4491,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void LogDebug_LiteralValue_WithEventId_WithException()
+    public void LogDebug_LiteralValue_WithEventId_WithException([Values] bool cacheable)
     {
  
         const LogLevel logLevel = LogLevel.Debug;
@@ -4209,7 +4499,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
 
         EventId eventId = 5;
         Exception exception = new InvalidOperationException("Test exception."); 
-        Logger.LogDebug(eventId, exception, $"{(LiteralValue) "Test"}");
+        Logger.LogDebug(eventId, exception, $"{new LiteralValue("Test", cacheable)}");
         Logger.LogDebug(eventId, exception, message);
 
         if (logLevel < MinLogLevel)
@@ -4240,7 +4530,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void LogDebug_LiteralValueWithBraces_WithEventId_WithException()
+    public void LogDebug_LiteralValueWithBraces_WithEventId_WithException([Values] bool cacheable)
     {
  
         const LogLevel logLevel = LogLevel.Debug;
@@ -4248,7 +4538,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
 
         EventId eventId = 5;
         Exception exception = new InvalidOperationException("Test exception."); 
-        Logger.LogDebug(eventId, exception, $"{(LiteralValue) "T{es}t"}");
+        Logger.LogDebug(eventId, exception, $"{new LiteralValue("T{es}t", cacheable)}");
         Logger.LogDebug(eventId, exception, message);
 
         if (logLevel < MinLogLevel)
@@ -4275,6 +4565,48 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
                 ),
                 LogEventEquivalency);
             logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
+    [Test]
+    public void LogDebug_MixedLiteralValue_WithEventId_WithException([Values] bool cacheable)
+    {
+var x = 1;
+        var y = 2;
+
+ 
+        const LogLevel logLevel = LogLevel.Debug;
+        EventId eventId = 5;
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogDebug(eventId, exception,             $"A{x}B{new LiteralValue("C", cacheable)}D{y}E");
+        Logger.LogDebug(eventId, exception,             "A{x}BCD{y}E", x, y);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    exception,
+                    Parser.Parse("A{x}BCD{y}E"),
+                    new LogEventProperty[]
+                    {
+                        x.ToLogEventProperty(),
+                        y.ToLogEventProperty(),
+                        SourceContextProperty,
+                        EventIdProperty(eventId)
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be($"A{x}BCD{y}E");
         }
     }
 
@@ -4734,7 +5066,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void LogInformation_LiteralValue()
+    public void LogInformation_LiteralValue([Values] bool cacheable)
     {
  
         const LogLevel logLevel = LogLevel.Information;
@@ -4742,7 +5074,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
 
         
         
-        Logger.LogInformation($"{(LiteralValue) "Test"}");
+        Logger.LogInformation($"{new LiteralValue("Test", cacheable)}");
         Logger.LogInformation(message);
 
         if (logLevel < MinLogLevel)
@@ -4772,7 +5104,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void LogInformation_LiteralValueWithBraces()
+    public void LogInformation_LiteralValueWithBraces([Values] bool cacheable)
     {
  
         const LogLevel logLevel = LogLevel.Information;
@@ -4780,7 +5112,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
 
         
         
-        Logger.LogInformation($"{(LiteralValue) "T{es}t"}");
+        Logger.LogInformation($"{new LiteralValue("T{es}t", cacheable)}");
         Logger.LogInformation(message);
 
         if (logLevel < MinLogLevel)
@@ -4806,6 +5138,47 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
                 ),
                 LogEventEquivalency);
             logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
+    [Test]
+    public void LogInformation_MixedLiteralValue([Values] bool cacheable)
+    {
+var x = 1;
+        var y = 2;
+
+ 
+        const LogLevel logLevel = LogLevel.Information;
+        
+        
+        Logger.LogInformation(            $"A{x}B{new LiteralValue("C", cacheable)}D{y}E");
+        Logger.LogInformation(            "A{x}BCD{y}E", x, y);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    default(Exception),
+                    Parser.Parse("A{x}BCD{y}E"),
+                    new LogEventProperty[]
+                    {
+                        x.ToLogEventProperty(),
+                        y.ToLogEventProperty(),
+                        SourceContextProperty,
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be($"A{x}BCD{y}E");
         }
     }
 
@@ -5259,7 +5632,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void LogInformation_LiteralValue_WithException()
+    public void LogInformation_LiteralValue_WithException([Values] bool cacheable)
     {
  
         const LogLevel logLevel = LogLevel.Information;
@@ -5267,7 +5640,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
 
         
         Exception exception = new InvalidOperationException("Test exception."); 
-        Logger.LogInformation(exception, $"{(LiteralValue) "Test"}");
+        Logger.LogInformation(exception, $"{new LiteralValue("Test", cacheable)}");
         Logger.LogInformation(exception, message);
 
         if (logLevel < MinLogLevel)
@@ -5297,7 +5670,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void LogInformation_LiteralValueWithBraces_WithException()
+    public void LogInformation_LiteralValueWithBraces_WithException([Values] bool cacheable)
     {
  
         const LogLevel logLevel = LogLevel.Information;
@@ -5305,7 +5678,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
 
         
         Exception exception = new InvalidOperationException("Test exception."); 
-        Logger.LogInformation(exception, $"{(LiteralValue) "T{es}t"}");
+        Logger.LogInformation(exception, $"{new LiteralValue("T{es}t", cacheable)}");
         Logger.LogInformation(exception, message);
 
         if (logLevel < MinLogLevel)
@@ -5331,6 +5704,47 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
                 ),
                 LogEventEquivalency);
             logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
+    [Test]
+    public void LogInformation_MixedLiteralValue_WithException([Values] bool cacheable)
+    {
+var x = 1;
+        var y = 2;
+
+ 
+        const LogLevel logLevel = LogLevel.Information;
+        
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogInformation(exception,             $"A{x}B{new LiteralValue("C", cacheable)}D{y}E");
+        Logger.LogInformation(exception,             "A{x}BCD{y}E", x, y);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    exception,
+                    Parser.Parse("A{x}BCD{y}E"),
+                    new LogEventProperty[]
+                    {
+                        x.ToLogEventProperty(),
+                        y.ToLogEventProperty(),
+                        SourceContextProperty,
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be($"A{x}BCD{y}E");
         }
     }
 
@@ -5795,7 +6209,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void LogInformation_LiteralValue_WithEventId()
+    public void LogInformation_LiteralValue_WithEventId([Values] bool cacheable)
     {
  
         const LogLevel logLevel = LogLevel.Information;
@@ -5803,7 +6217,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
 
         EventId eventId = 5;
         
-        Logger.LogInformation(eventId, $"{(LiteralValue) "Test"}");
+        Logger.LogInformation(eventId, $"{new LiteralValue("Test", cacheable)}");
         Logger.LogInformation(eventId, message);
 
         if (logLevel < MinLogLevel)
@@ -5834,7 +6248,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void LogInformation_LiteralValueWithBraces_WithEventId()
+    public void LogInformation_LiteralValueWithBraces_WithEventId([Values] bool cacheable)
     {
  
         const LogLevel logLevel = LogLevel.Information;
@@ -5842,7 +6256,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
 
         EventId eventId = 5;
         
-        Logger.LogInformation(eventId, $"{(LiteralValue) "T{es}t"}");
+        Logger.LogInformation(eventId, $"{new LiteralValue("T{es}t", cacheable)}");
         Logger.LogInformation(eventId, message);
 
         if (logLevel < MinLogLevel)
@@ -5869,6 +6283,48 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
                 ),
                 LogEventEquivalency);
             logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
+    [Test]
+    public void LogInformation_MixedLiteralValue_WithEventId([Values] bool cacheable)
+    {
+var x = 1;
+        var y = 2;
+
+ 
+        const LogLevel logLevel = LogLevel.Information;
+        EventId eventId = 5;
+        
+        Logger.LogInformation(eventId,             $"A{x}B{new LiteralValue("C", cacheable)}D{y}E");
+        Logger.LogInformation(eventId,             "A{x}BCD{y}E", x, y);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    default(Exception),
+                    Parser.Parse("A{x}BCD{y}E"),
+                    new LogEventProperty[]
+                    {
+                        x.ToLogEventProperty(),
+                        y.ToLogEventProperty(),
+                        SourceContextProperty,
+                        EventIdProperty(eventId)
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be($"A{x}BCD{y}E");
         }
     }
 
@@ -6333,7 +6789,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void LogInformation_LiteralValue_WithEventId_WithException()
+    public void LogInformation_LiteralValue_WithEventId_WithException([Values] bool cacheable)
     {
  
         const LogLevel logLevel = LogLevel.Information;
@@ -6341,7 +6797,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
 
         EventId eventId = 5;
         Exception exception = new InvalidOperationException("Test exception."); 
-        Logger.LogInformation(eventId, exception, $"{(LiteralValue) "Test"}");
+        Logger.LogInformation(eventId, exception, $"{new LiteralValue("Test", cacheable)}");
         Logger.LogInformation(eventId, exception, message);
 
         if (logLevel < MinLogLevel)
@@ -6372,7 +6828,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void LogInformation_LiteralValueWithBraces_WithEventId_WithException()
+    public void LogInformation_LiteralValueWithBraces_WithEventId_WithException([Values] bool cacheable)
     {
  
         const LogLevel logLevel = LogLevel.Information;
@@ -6380,7 +6836,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
 
         EventId eventId = 5;
         Exception exception = new InvalidOperationException("Test exception."); 
-        Logger.LogInformation(eventId, exception, $"{(LiteralValue) "T{es}t"}");
+        Logger.LogInformation(eventId, exception, $"{new LiteralValue("T{es}t", cacheable)}");
         Logger.LogInformation(eventId, exception, message);
 
         if (logLevel < MinLogLevel)
@@ -6407,6 +6863,48 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
                 ),
                 LogEventEquivalency);
             logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
+    [Test]
+    public void LogInformation_MixedLiteralValue_WithEventId_WithException([Values] bool cacheable)
+    {
+var x = 1;
+        var y = 2;
+
+ 
+        const LogLevel logLevel = LogLevel.Information;
+        EventId eventId = 5;
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogInformation(eventId, exception,             $"A{x}B{new LiteralValue("C", cacheable)}D{y}E");
+        Logger.LogInformation(eventId, exception,             "A{x}BCD{y}E", x, y);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    exception,
+                    Parser.Parse("A{x}BCD{y}E"),
+                    new LogEventProperty[]
+                    {
+                        x.ToLogEventProperty(),
+                        y.ToLogEventProperty(),
+                        SourceContextProperty,
+                        EventIdProperty(eventId)
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be($"A{x}BCD{y}E");
         }
     }
 
@@ -6866,7 +7364,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void LogWarning_LiteralValue()
+    public void LogWarning_LiteralValue([Values] bool cacheable)
     {
  
         const LogLevel logLevel = LogLevel.Warning;
@@ -6874,7 +7372,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
 
         
         
-        Logger.LogWarning($"{(LiteralValue) "Test"}");
+        Logger.LogWarning($"{new LiteralValue("Test", cacheable)}");
         Logger.LogWarning(message);
 
         if (logLevel < MinLogLevel)
@@ -6904,7 +7402,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void LogWarning_LiteralValueWithBraces()
+    public void LogWarning_LiteralValueWithBraces([Values] bool cacheable)
     {
  
         const LogLevel logLevel = LogLevel.Warning;
@@ -6912,7 +7410,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
 
         
         
-        Logger.LogWarning($"{(LiteralValue) "T{es}t"}");
+        Logger.LogWarning($"{new LiteralValue("T{es}t", cacheable)}");
         Logger.LogWarning(message);
 
         if (logLevel < MinLogLevel)
@@ -6938,6 +7436,47 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
                 ),
                 LogEventEquivalency);
             logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
+    [Test]
+    public void LogWarning_MixedLiteralValue([Values] bool cacheable)
+    {
+var x = 1;
+        var y = 2;
+
+ 
+        const LogLevel logLevel = LogLevel.Warning;
+        
+        
+        Logger.LogWarning(            $"A{x}B{new LiteralValue("C", cacheable)}D{y}E");
+        Logger.LogWarning(            "A{x}BCD{y}E", x, y);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    default(Exception),
+                    Parser.Parse("A{x}BCD{y}E"),
+                    new LogEventProperty[]
+                    {
+                        x.ToLogEventProperty(),
+                        y.ToLogEventProperty(),
+                        SourceContextProperty,
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be($"A{x}BCD{y}E");
         }
     }
 
@@ -7391,7 +7930,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void LogWarning_LiteralValue_WithException()
+    public void LogWarning_LiteralValue_WithException([Values] bool cacheable)
     {
  
         const LogLevel logLevel = LogLevel.Warning;
@@ -7399,7 +7938,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
 
         
         Exception exception = new InvalidOperationException("Test exception."); 
-        Logger.LogWarning(exception, $"{(LiteralValue) "Test"}");
+        Logger.LogWarning(exception, $"{new LiteralValue("Test", cacheable)}");
         Logger.LogWarning(exception, message);
 
         if (logLevel < MinLogLevel)
@@ -7429,7 +7968,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void LogWarning_LiteralValueWithBraces_WithException()
+    public void LogWarning_LiteralValueWithBraces_WithException([Values] bool cacheable)
     {
  
         const LogLevel logLevel = LogLevel.Warning;
@@ -7437,7 +7976,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
 
         
         Exception exception = new InvalidOperationException("Test exception."); 
-        Logger.LogWarning(exception, $"{(LiteralValue) "T{es}t"}");
+        Logger.LogWarning(exception, $"{new LiteralValue("T{es}t", cacheable)}");
         Logger.LogWarning(exception, message);
 
         if (logLevel < MinLogLevel)
@@ -7463,6 +8002,47 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
                 ),
                 LogEventEquivalency);
             logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
+    [Test]
+    public void LogWarning_MixedLiteralValue_WithException([Values] bool cacheable)
+    {
+var x = 1;
+        var y = 2;
+
+ 
+        const LogLevel logLevel = LogLevel.Warning;
+        
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogWarning(exception,             $"A{x}B{new LiteralValue("C", cacheable)}D{y}E");
+        Logger.LogWarning(exception,             "A{x}BCD{y}E", x, y);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    exception,
+                    Parser.Parse("A{x}BCD{y}E"),
+                    new LogEventProperty[]
+                    {
+                        x.ToLogEventProperty(),
+                        y.ToLogEventProperty(),
+                        SourceContextProperty,
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be($"A{x}BCD{y}E");
         }
     }
 
@@ -7927,7 +8507,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void LogWarning_LiteralValue_WithEventId()
+    public void LogWarning_LiteralValue_WithEventId([Values] bool cacheable)
     {
  
         const LogLevel logLevel = LogLevel.Warning;
@@ -7935,7 +8515,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
 
         EventId eventId = 5;
         
-        Logger.LogWarning(eventId, $"{(LiteralValue) "Test"}");
+        Logger.LogWarning(eventId, $"{new LiteralValue("Test", cacheable)}");
         Logger.LogWarning(eventId, message);
 
         if (logLevel < MinLogLevel)
@@ -7966,7 +8546,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void LogWarning_LiteralValueWithBraces_WithEventId()
+    public void LogWarning_LiteralValueWithBraces_WithEventId([Values] bool cacheable)
     {
  
         const LogLevel logLevel = LogLevel.Warning;
@@ -7974,7 +8554,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
 
         EventId eventId = 5;
         
-        Logger.LogWarning(eventId, $"{(LiteralValue) "T{es}t"}");
+        Logger.LogWarning(eventId, $"{new LiteralValue("T{es}t", cacheable)}");
         Logger.LogWarning(eventId, message);
 
         if (logLevel < MinLogLevel)
@@ -8001,6 +8581,48 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
                 ),
                 LogEventEquivalency);
             logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
+    [Test]
+    public void LogWarning_MixedLiteralValue_WithEventId([Values] bool cacheable)
+    {
+var x = 1;
+        var y = 2;
+
+ 
+        const LogLevel logLevel = LogLevel.Warning;
+        EventId eventId = 5;
+        
+        Logger.LogWarning(eventId,             $"A{x}B{new LiteralValue("C", cacheable)}D{y}E");
+        Logger.LogWarning(eventId,             "A{x}BCD{y}E", x, y);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    default(Exception),
+                    Parser.Parse("A{x}BCD{y}E"),
+                    new LogEventProperty[]
+                    {
+                        x.ToLogEventProperty(),
+                        y.ToLogEventProperty(),
+                        SourceContextProperty,
+                        EventIdProperty(eventId)
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be($"A{x}BCD{y}E");
         }
     }
 
@@ -8465,7 +9087,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void LogWarning_LiteralValue_WithEventId_WithException()
+    public void LogWarning_LiteralValue_WithEventId_WithException([Values] bool cacheable)
     {
  
         const LogLevel logLevel = LogLevel.Warning;
@@ -8473,7 +9095,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
 
         EventId eventId = 5;
         Exception exception = new InvalidOperationException("Test exception."); 
-        Logger.LogWarning(eventId, exception, $"{(LiteralValue) "Test"}");
+        Logger.LogWarning(eventId, exception, $"{new LiteralValue("Test", cacheable)}");
         Logger.LogWarning(eventId, exception, message);
 
         if (logLevel < MinLogLevel)
@@ -8504,7 +9126,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void LogWarning_LiteralValueWithBraces_WithEventId_WithException()
+    public void LogWarning_LiteralValueWithBraces_WithEventId_WithException([Values] bool cacheable)
     {
  
         const LogLevel logLevel = LogLevel.Warning;
@@ -8512,7 +9134,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
 
         EventId eventId = 5;
         Exception exception = new InvalidOperationException("Test exception."); 
-        Logger.LogWarning(eventId, exception, $"{(LiteralValue) "T{es}t"}");
+        Logger.LogWarning(eventId, exception, $"{new LiteralValue("T{es}t", cacheable)}");
         Logger.LogWarning(eventId, exception, message);
 
         if (logLevel < MinLogLevel)
@@ -8539,6 +9161,48 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
                 ),
                 LogEventEquivalency);
             logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
+    [Test]
+    public void LogWarning_MixedLiteralValue_WithEventId_WithException([Values] bool cacheable)
+    {
+var x = 1;
+        var y = 2;
+
+ 
+        const LogLevel logLevel = LogLevel.Warning;
+        EventId eventId = 5;
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogWarning(eventId, exception,             $"A{x}B{new LiteralValue("C", cacheable)}D{y}E");
+        Logger.LogWarning(eventId, exception,             "A{x}BCD{y}E", x, y);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    exception,
+                    Parser.Parse("A{x}BCD{y}E"),
+                    new LogEventProperty[]
+                    {
+                        x.ToLogEventProperty(),
+                        y.ToLogEventProperty(),
+                        SourceContextProperty,
+                        EventIdProperty(eventId)
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be($"A{x}BCD{y}E");
         }
     }
 
@@ -8998,7 +9662,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void LogError_LiteralValue()
+    public void LogError_LiteralValue([Values] bool cacheable)
     {
  
         const LogLevel logLevel = LogLevel.Error;
@@ -9006,7 +9670,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
 
         
         
-        Logger.LogError($"{(LiteralValue) "Test"}");
+        Logger.LogError($"{new LiteralValue("Test", cacheable)}");
         Logger.LogError(message);
 
         if (logLevel < MinLogLevel)
@@ -9036,7 +9700,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void LogError_LiteralValueWithBraces()
+    public void LogError_LiteralValueWithBraces([Values] bool cacheable)
     {
  
         const LogLevel logLevel = LogLevel.Error;
@@ -9044,7 +9708,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
 
         
         
-        Logger.LogError($"{(LiteralValue) "T{es}t"}");
+        Logger.LogError($"{new LiteralValue("T{es}t", cacheable)}");
         Logger.LogError(message);
 
         if (logLevel < MinLogLevel)
@@ -9070,6 +9734,47 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
                 ),
                 LogEventEquivalency);
             logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
+    [Test]
+    public void LogError_MixedLiteralValue([Values] bool cacheable)
+    {
+var x = 1;
+        var y = 2;
+
+ 
+        const LogLevel logLevel = LogLevel.Error;
+        
+        
+        Logger.LogError(            $"A{x}B{new LiteralValue("C", cacheable)}D{y}E");
+        Logger.LogError(            "A{x}BCD{y}E", x, y);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    default(Exception),
+                    Parser.Parse("A{x}BCD{y}E"),
+                    new LogEventProperty[]
+                    {
+                        x.ToLogEventProperty(),
+                        y.ToLogEventProperty(),
+                        SourceContextProperty,
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be($"A{x}BCD{y}E");
         }
     }
 
@@ -9523,7 +10228,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void LogError_LiteralValue_WithException()
+    public void LogError_LiteralValue_WithException([Values] bool cacheable)
     {
  
         const LogLevel logLevel = LogLevel.Error;
@@ -9531,7 +10236,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
 
         
         Exception exception = new InvalidOperationException("Test exception."); 
-        Logger.LogError(exception, $"{(LiteralValue) "Test"}");
+        Logger.LogError(exception, $"{new LiteralValue("Test", cacheable)}");
         Logger.LogError(exception, message);
 
         if (logLevel < MinLogLevel)
@@ -9561,7 +10266,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void LogError_LiteralValueWithBraces_WithException()
+    public void LogError_LiteralValueWithBraces_WithException([Values] bool cacheable)
     {
  
         const LogLevel logLevel = LogLevel.Error;
@@ -9569,7 +10274,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
 
         
         Exception exception = new InvalidOperationException("Test exception."); 
-        Logger.LogError(exception, $"{(LiteralValue) "T{es}t"}");
+        Logger.LogError(exception, $"{new LiteralValue("T{es}t", cacheable)}");
         Logger.LogError(exception, message);
 
         if (logLevel < MinLogLevel)
@@ -9595,6 +10300,47 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
                 ),
                 LogEventEquivalency);
             logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
+    [Test]
+    public void LogError_MixedLiteralValue_WithException([Values] bool cacheable)
+    {
+var x = 1;
+        var y = 2;
+
+ 
+        const LogLevel logLevel = LogLevel.Error;
+        
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogError(exception,             $"A{x}B{new LiteralValue("C", cacheable)}D{y}E");
+        Logger.LogError(exception,             "A{x}BCD{y}E", x, y);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    exception,
+                    Parser.Parse("A{x}BCD{y}E"),
+                    new LogEventProperty[]
+                    {
+                        x.ToLogEventProperty(),
+                        y.ToLogEventProperty(),
+                        SourceContextProperty,
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be($"A{x}BCD{y}E");
         }
     }
 
@@ -10059,7 +10805,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void LogError_LiteralValue_WithEventId()
+    public void LogError_LiteralValue_WithEventId([Values] bool cacheable)
     {
  
         const LogLevel logLevel = LogLevel.Error;
@@ -10067,7 +10813,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
 
         EventId eventId = 5;
         
-        Logger.LogError(eventId, $"{(LiteralValue) "Test"}");
+        Logger.LogError(eventId, $"{new LiteralValue("Test", cacheable)}");
         Logger.LogError(eventId, message);
 
         if (logLevel < MinLogLevel)
@@ -10098,7 +10844,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void LogError_LiteralValueWithBraces_WithEventId()
+    public void LogError_LiteralValueWithBraces_WithEventId([Values] bool cacheable)
     {
  
         const LogLevel logLevel = LogLevel.Error;
@@ -10106,7 +10852,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
 
         EventId eventId = 5;
         
-        Logger.LogError(eventId, $"{(LiteralValue) "T{es}t"}");
+        Logger.LogError(eventId, $"{new LiteralValue("T{es}t", cacheable)}");
         Logger.LogError(eventId, message);
 
         if (logLevel < MinLogLevel)
@@ -10133,6 +10879,48 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
                 ),
                 LogEventEquivalency);
             logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
+    [Test]
+    public void LogError_MixedLiteralValue_WithEventId([Values] bool cacheable)
+    {
+var x = 1;
+        var y = 2;
+
+ 
+        const LogLevel logLevel = LogLevel.Error;
+        EventId eventId = 5;
+        
+        Logger.LogError(eventId,             $"A{x}B{new LiteralValue("C", cacheable)}D{y}E");
+        Logger.LogError(eventId,             "A{x}BCD{y}E", x, y);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    default(Exception),
+                    Parser.Parse("A{x}BCD{y}E"),
+                    new LogEventProperty[]
+                    {
+                        x.ToLogEventProperty(),
+                        y.ToLogEventProperty(),
+                        SourceContextProperty,
+                        EventIdProperty(eventId)
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be($"A{x}BCD{y}E");
         }
     }
 
@@ -10597,7 +11385,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void LogError_LiteralValue_WithEventId_WithException()
+    public void LogError_LiteralValue_WithEventId_WithException([Values] bool cacheable)
     {
  
         const LogLevel logLevel = LogLevel.Error;
@@ -10605,7 +11393,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
 
         EventId eventId = 5;
         Exception exception = new InvalidOperationException("Test exception."); 
-        Logger.LogError(eventId, exception, $"{(LiteralValue) "Test"}");
+        Logger.LogError(eventId, exception, $"{new LiteralValue("Test", cacheable)}");
         Logger.LogError(eventId, exception, message);
 
         if (logLevel < MinLogLevel)
@@ -10636,7 +11424,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void LogError_LiteralValueWithBraces_WithEventId_WithException()
+    public void LogError_LiteralValueWithBraces_WithEventId_WithException([Values] bool cacheable)
     {
  
         const LogLevel logLevel = LogLevel.Error;
@@ -10644,7 +11432,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
 
         EventId eventId = 5;
         Exception exception = new InvalidOperationException("Test exception."); 
-        Logger.LogError(eventId, exception, $"{(LiteralValue) "T{es}t"}");
+        Logger.LogError(eventId, exception, $"{new LiteralValue("T{es}t", cacheable)}");
         Logger.LogError(eventId, exception, message);
 
         if (logLevel < MinLogLevel)
@@ -10671,6 +11459,48 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
                 ),
                 LogEventEquivalency);
             logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
+    [Test]
+    public void LogError_MixedLiteralValue_WithEventId_WithException([Values] bool cacheable)
+    {
+var x = 1;
+        var y = 2;
+
+ 
+        const LogLevel logLevel = LogLevel.Error;
+        EventId eventId = 5;
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogError(eventId, exception,             $"A{x}B{new LiteralValue("C", cacheable)}D{y}E");
+        Logger.LogError(eventId, exception,             "A{x}BCD{y}E", x, y);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    exception,
+                    Parser.Parse("A{x}BCD{y}E"),
+                    new LogEventProperty[]
+                    {
+                        x.ToLogEventProperty(),
+                        y.ToLogEventProperty(),
+                        SourceContextProperty,
+                        EventIdProperty(eventId)
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be($"A{x}BCD{y}E");
         }
     }
 
@@ -11130,7 +11960,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void LogCritical_LiteralValue()
+    public void LogCritical_LiteralValue([Values] bool cacheable)
     {
  
         const LogLevel logLevel = LogLevel.Critical;
@@ -11138,7 +11968,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
 
         
         
-        Logger.LogCritical($"{(LiteralValue) "Test"}");
+        Logger.LogCritical($"{new LiteralValue("Test", cacheable)}");
         Logger.LogCritical(message);
 
         if (logLevel < MinLogLevel)
@@ -11168,7 +11998,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void LogCritical_LiteralValueWithBraces()
+    public void LogCritical_LiteralValueWithBraces([Values] bool cacheable)
     {
  
         const LogLevel logLevel = LogLevel.Critical;
@@ -11176,7 +12006,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
 
         
         
-        Logger.LogCritical($"{(LiteralValue) "T{es}t"}");
+        Logger.LogCritical($"{new LiteralValue("T{es}t", cacheable)}");
         Logger.LogCritical(message);
 
         if (logLevel < MinLogLevel)
@@ -11202,6 +12032,47 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
                 ),
                 LogEventEquivalency);
             logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
+    [Test]
+    public void LogCritical_MixedLiteralValue([Values] bool cacheable)
+    {
+var x = 1;
+        var y = 2;
+
+ 
+        const LogLevel logLevel = LogLevel.Critical;
+        
+        
+        Logger.LogCritical(            $"A{x}B{new LiteralValue("C", cacheable)}D{y}E");
+        Logger.LogCritical(            "A{x}BCD{y}E", x, y);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    default(Exception),
+                    Parser.Parse("A{x}BCD{y}E"),
+                    new LogEventProperty[]
+                    {
+                        x.ToLogEventProperty(),
+                        y.ToLogEventProperty(),
+                        SourceContextProperty,
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be($"A{x}BCD{y}E");
         }
     }
 
@@ -11655,7 +12526,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void LogCritical_LiteralValue_WithException()
+    public void LogCritical_LiteralValue_WithException([Values] bool cacheable)
     {
  
         const LogLevel logLevel = LogLevel.Critical;
@@ -11663,7 +12534,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
 
         
         Exception exception = new InvalidOperationException("Test exception."); 
-        Logger.LogCritical(exception, $"{(LiteralValue) "Test"}");
+        Logger.LogCritical(exception, $"{new LiteralValue("Test", cacheable)}");
         Logger.LogCritical(exception, message);
 
         if (logLevel < MinLogLevel)
@@ -11693,7 +12564,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void LogCritical_LiteralValueWithBraces_WithException()
+    public void LogCritical_LiteralValueWithBraces_WithException([Values] bool cacheable)
     {
  
         const LogLevel logLevel = LogLevel.Critical;
@@ -11701,7 +12572,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
 
         
         Exception exception = new InvalidOperationException("Test exception."); 
-        Logger.LogCritical(exception, $"{(LiteralValue) "T{es}t"}");
+        Logger.LogCritical(exception, $"{new LiteralValue("T{es}t", cacheable)}");
         Logger.LogCritical(exception, message);
 
         if (logLevel < MinLogLevel)
@@ -11727,6 +12598,47 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
                 ),
                 LogEventEquivalency);
             logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
+    [Test]
+    public void LogCritical_MixedLiteralValue_WithException([Values] bool cacheable)
+    {
+var x = 1;
+        var y = 2;
+
+ 
+        const LogLevel logLevel = LogLevel.Critical;
+        
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogCritical(exception,             $"A{x}B{new LiteralValue("C", cacheable)}D{y}E");
+        Logger.LogCritical(exception,             "A{x}BCD{y}E", x, y);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    exception,
+                    Parser.Parse("A{x}BCD{y}E"),
+                    new LogEventProperty[]
+                    {
+                        x.ToLogEventProperty(),
+                        y.ToLogEventProperty(),
+                        SourceContextProperty,
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be($"A{x}BCD{y}E");
         }
     }
 
@@ -12191,7 +13103,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void LogCritical_LiteralValue_WithEventId()
+    public void LogCritical_LiteralValue_WithEventId([Values] bool cacheable)
     {
  
         const LogLevel logLevel = LogLevel.Critical;
@@ -12199,7 +13111,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
 
         EventId eventId = 5;
         
-        Logger.LogCritical(eventId, $"{(LiteralValue) "Test"}");
+        Logger.LogCritical(eventId, $"{new LiteralValue("Test", cacheable)}");
         Logger.LogCritical(eventId, message);
 
         if (logLevel < MinLogLevel)
@@ -12230,7 +13142,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void LogCritical_LiteralValueWithBraces_WithEventId()
+    public void LogCritical_LiteralValueWithBraces_WithEventId([Values] bool cacheable)
     {
  
         const LogLevel logLevel = LogLevel.Critical;
@@ -12238,7 +13150,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
 
         EventId eventId = 5;
         
-        Logger.LogCritical(eventId, $"{(LiteralValue) "T{es}t"}");
+        Logger.LogCritical(eventId, $"{new LiteralValue("T{es}t", cacheable)}");
         Logger.LogCritical(eventId, message);
 
         if (logLevel < MinLogLevel)
@@ -12265,6 +13177,48 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
                 ),
                 LogEventEquivalency);
             logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
+    [Test]
+    public void LogCritical_MixedLiteralValue_WithEventId([Values] bool cacheable)
+    {
+var x = 1;
+        var y = 2;
+
+ 
+        const LogLevel logLevel = LogLevel.Critical;
+        EventId eventId = 5;
+        
+        Logger.LogCritical(eventId,             $"A{x}B{new LiteralValue("C", cacheable)}D{y}E");
+        Logger.LogCritical(eventId,             "A{x}BCD{y}E", x, y);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    default(Exception),
+                    Parser.Parse("A{x}BCD{y}E"),
+                    new LogEventProperty[]
+                    {
+                        x.ToLogEventProperty(),
+                        y.ToLogEventProperty(),
+                        SourceContextProperty,
+                        EventIdProperty(eventId)
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be($"A{x}BCD{y}E");
         }
     }
 
@@ -12729,7 +13683,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void LogCritical_LiteralValue_WithEventId_WithException()
+    public void LogCritical_LiteralValue_WithEventId_WithException([Values] bool cacheable)
     {
  
         const LogLevel logLevel = LogLevel.Critical;
@@ -12737,7 +13691,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
 
         EventId eventId = 5;
         Exception exception = new InvalidOperationException("Test exception."); 
-        Logger.LogCritical(eventId, exception, $"{(LiteralValue) "Test"}");
+        Logger.LogCritical(eventId, exception, $"{new LiteralValue("Test", cacheable)}");
         Logger.LogCritical(eventId, exception, message);
 
         if (logLevel < MinLogLevel)
@@ -12768,7 +13722,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void LogCritical_LiteralValueWithBraces_WithEventId_WithException()
+    public void LogCritical_LiteralValueWithBraces_WithEventId_WithException([Values] bool cacheable)
     {
  
         const LogLevel logLevel = LogLevel.Critical;
@@ -12776,7 +13730,7 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
 
         EventId eventId = 5;
         Exception exception = new InvalidOperationException("Test exception."); 
-        Logger.LogCritical(eventId, exception, $"{(LiteralValue) "T{es}t"}");
+        Logger.LogCritical(eventId, exception, $"{new LiteralValue("T{es}t", cacheable)}");
         Logger.LogCritical(eventId, exception, message);
 
         if (logLevel < MinLogLevel)
@@ -12803,6 +13757,48 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
                 ),
                 LogEventEquivalency);
             logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
+    [Test]
+    public void LogCritical_MixedLiteralValue_WithEventId_WithException([Values] bool cacheable)
+    {
+var x = 1;
+        var y = 2;
+
+ 
+        const LogLevel logLevel = LogLevel.Critical;
+        EventId eventId = 5;
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.LogCritical(eventId, exception,             $"A{x}B{new LiteralValue("C", cacheable)}D{y}E");
+        Logger.LogCritical(eventId, exception,             "A{x}BCD{y}E", x, y);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    exception,
+                    Parser.Parse("A{x}BCD{y}E"),
+                    new LogEventProperty[]
+                    {
+                        x.ToLogEventProperty(),
+                        y.ToLogEventProperty(),
+                        SourceContextProperty,
+                        EventIdProperty(eventId)
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be($"A{x}BCD{y}E");
         }
     }
 
@@ -13240,13 +14236,13 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void Log_LiteralValue([ValueSource(nameof(LogLevels))] LogLevel logLevel)
+    public void Log_LiteralValue([ValueSource(nameof(LogLevels))] LogLevel logLevel, [Values] bool cacheable)
     {
         const string message = "Test";
 
         
         
-        Logger.Log(logLevel, $"{(LiteralValue) "Test"}");
+        Logger.Log(logLevel, $"{new LiteralValue("Test", cacheable)}");
         Logger.Log(logLevel, message);
 
         if (logLevel < MinLogLevel)
@@ -13276,13 +14272,13 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void Log_LiteralValueWithBraces([ValueSource(nameof(LogLevels))] LogLevel logLevel)
+    public void Log_LiteralValueWithBraces([ValueSource(nameof(LogLevels))] LogLevel logLevel, [Values] bool cacheable)
     {
         const string message = "T{{es}}t";
 
         
         
-        Logger.Log(logLevel, $"{(LiteralValue) "T{es}t"}");
+        Logger.Log(logLevel, $"{new LiteralValue("T{es}t", cacheable)}");
         Logger.Log(logLevel, message);
 
         if (logLevel < MinLogLevel)
@@ -13308,6 +14304,45 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
                 ),
                 LogEventEquivalency);
             logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
+    [Test]
+    public void Log_MixedLiteralValue([ValueSource(nameof(LogLevels))] LogLevel logLevel, [Values] bool cacheable)
+    {
+var x = 1;
+        var y = 2;
+
+        
+        
+        Logger.Log(logLevel,             $"A{x}B{new LiteralValue("C", cacheable)}D{y}E");
+        Logger.Log(logLevel,             "A{x}BCD{y}E", x, y);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    default(Exception),
+                    Parser.Parse("A{x}BCD{y}E"),
+                    new LogEventProperty[]
+                    {
+                        x.ToLogEventProperty(),
+                        y.ToLogEventProperty(),
+                        SourceContextProperty,
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be($"A{x}BCD{y}E");
         }
     }
 
@@ -13739,13 +14774,13 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void Log_LiteralValue_WithException([ValueSource(nameof(LogLevels))] LogLevel logLevel)
+    public void Log_LiteralValue_WithException([ValueSource(nameof(LogLevels))] LogLevel logLevel, [Values] bool cacheable)
     {
         const string message = "Test";
 
         
         Exception exception = new InvalidOperationException("Test exception."); 
-        Logger.Log(logLevel, exception, $"{(LiteralValue) "Test"}");
+        Logger.Log(logLevel, exception, $"{new LiteralValue("Test", cacheable)}");
         Logger.Log(logLevel, exception, message);
 
         if (logLevel < MinLogLevel)
@@ -13775,13 +14810,13 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void Log_LiteralValueWithBraces_WithException([ValueSource(nameof(LogLevels))] LogLevel logLevel)
+    public void Log_LiteralValueWithBraces_WithException([ValueSource(nameof(LogLevels))] LogLevel logLevel, [Values] bool cacheable)
     {
         const string message = "T{{es}}t";
 
         
         Exception exception = new InvalidOperationException("Test exception."); 
-        Logger.Log(logLevel, exception, $"{(LiteralValue) "T{es}t"}");
+        Logger.Log(logLevel, exception, $"{new LiteralValue("T{es}t", cacheable)}");
         Logger.Log(logLevel, exception, message);
 
         if (logLevel < MinLogLevel)
@@ -13807,6 +14842,45 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
                 ),
                 LogEventEquivalency);
             logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
+    [Test]
+    public void Log_MixedLiteralValue_WithException([ValueSource(nameof(LogLevels))] LogLevel logLevel, [Values] bool cacheable)
+    {
+var x = 1;
+        var y = 2;
+
+        
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.Log(logLevel, exception,             $"A{x}B{new LiteralValue("C", cacheable)}D{y}E");
+        Logger.Log(logLevel, exception,             "A{x}BCD{y}E", x, y);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    exception,
+                    Parser.Parse("A{x}BCD{y}E"),
+                    new LogEventProperty[]
+                    {
+                        x.ToLogEventProperty(),
+                        y.ToLogEventProperty(),
+                        SourceContextProperty,
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be($"A{x}BCD{y}E");
         }
     }
 
@@ -14249,13 +15323,13 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void Log_LiteralValue_WithEventId([ValueSource(nameof(LogLevels))] LogLevel logLevel)
+    public void Log_LiteralValue_WithEventId([ValueSource(nameof(LogLevels))] LogLevel logLevel, [Values] bool cacheable)
     {
         const string message = "Test";
 
         EventId eventId = 5;
         
-        Logger.Log(logLevel, eventId, $"{(LiteralValue) "Test"}");
+        Logger.Log(logLevel, eventId, $"{new LiteralValue("Test", cacheable)}");
         Logger.Log(logLevel, eventId, message);
 
         if (logLevel < MinLogLevel)
@@ -14286,13 +15360,13 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void Log_LiteralValueWithBraces_WithEventId([ValueSource(nameof(LogLevels))] LogLevel logLevel)
+    public void Log_LiteralValueWithBraces_WithEventId([ValueSource(nameof(LogLevels))] LogLevel logLevel, [Values] bool cacheable)
     {
         const string message = "T{{es}}t";
 
         EventId eventId = 5;
         
-        Logger.Log(logLevel, eventId, $"{(LiteralValue) "T{es}t"}");
+        Logger.Log(logLevel, eventId, $"{new LiteralValue("T{es}t", cacheable)}");
         Logger.Log(logLevel, eventId, message);
 
         if (logLevel < MinLogLevel)
@@ -14319,6 +15393,46 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
                 ),
                 LogEventEquivalency);
             logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
+    [Test]
+    public void Log_MixedLiteralValue_WithEventId([ValueSource(nameof(LogLevels))] LogLevel logLevel, [Values] bool cacheable)
+    {
+var x = 1;
+        var y = 2;
+
+        EventId eventId = 5;
+        
+        Logger.Log(logLevel, eventId,             $"A{x}B{new LiteralValue("C", cacheable)}D{y}E");
+        Logger.Log(logLevel, eventId,             "A{x}BCD{y}E", x, y);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    default(Exception),
+                    Parser.Parse("A{x}BCD{y}E"),
+                    new LogEventProperty[]
+                    {
+                        x.ToLogEventProperty(),
+                        y.ToLogEventProperty(),
+                        SourceContextProperty,
+                        EventIdProperty(eventId)
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be($"A{x}BCD{y}E");
         }
     }
 
@@ -14761,13 +15875,13 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void Log_LiteralValue_WithEventId_WithException([ValueSource(nameof(LogLevels))] LogLevel logLevel)
+    public void Log_LiteralValue_WithEventId_WithException([ValueSource(nameof(LogLevels))] LogLevel logLevel, [Values] bool cacheable)
     {
         const string message = "Test";
 
         EventId eventId = 5;
         Exception exception = new InvalidOperationException("Test exception."); 
-        Logger.Log(logLevel, eventId, exception, $"{(LiteralValue) "Test"}");
+        Logger.Log(logLevel, eventId, exception, $"{new LiteralValue("Test", cacheable)}");
         Logger.Log(logLevel, eventId, exception, message);
 
         if (logLevel < MinLogLevel)
@@ -14798,13 +15912,13 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
     }
 
     [Test]
-    public void Log_LiteralValueWithBraces_WithEventId_WithException([ValueSource(nameof(LogLevels))] LogLevel logLevel)
+    public void Log_LiteralValueWithBraces_WithEventId_WithException([ValueSource(nameof(LogLevels))] LogLevel logLevel, [Values] bool cacheable)
     {
         const string message = "T{{es}}t";
 
         EventId eventId = 5;
         Exception exception = new InvalidOperationException("Test exception."); 
-        Logger.Log(logLevel, eventId, exception, $"{(LiteralValue) "T{es}t"}");
+        Logger.Log(logLevel, eventId, exception, $"{new LiteralValue("T{es}t", cacheable)}");
         Logger.Log(logLevel, eventId, exception, message);
 
         if (logLevel < MinLogLevel)
@@ -14831,6 +15945,46 @@ public class SerilogLoggerExtensionsTests : SerilogBaseFixture
                 ),
                 LogEventEquivalency);
             logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be("T{es}t");
+        }
+    }
+
+    [Test]
+    public void Log_MixedLiteralValue_WithEventId_WithException([ValueSource(nameof(LogLevels))] LogLevel logLevel, [Values] bool cacheable)
+    {
+var x = 1;
+        var y = 2;
+
+        EventId eventId = 5;
+        Exception exception = new InvalidOperationException("Test exception."); 
+        Logger.Log(logLevel, eventId, exception,             $"A{x}B{new LiteralValue("C", cacheable)}D{y}E");
+        Logger.Log(logLevel, eventId, exception,             "A{x}BCD{y}E", x, y);
+
+        if (logLevel < MinLogLevel)
+        {
+            LogEvents.Should().BeEmpty();
+        }
+        else
+        {
+            LogEvents.Should().HaveCount(2);
+            var logEvent = LogEvents.First();
+            var serilogEvent = LogEvents.Last();
+            logEvent.Should().BeEquivalentTo(serilogEvent, LogEventEquivalency);
+            logEvent.Should().BeEquivalentTo(
+                new LogEvent(
+                    DateTimeOffset.Now,
+                    ToSerilogLevel(logLevel),
+                    exception,
+                    Parser.Parse("A{x}BCD{y}E"),
+                    new LogEventProperty[]
+                    {
+                        x.ToLogEventProperty(),
+                        y.ToLogEventProperty(),
+                        SourceContextProperty,
+                        EventIdProperty(eventId)
+                    }
+                ),
+                LogEventEquivalency);
+            logEvent.RenderMessage(CultureInfo.InvariantCulture).Should().Be($"A{x}BCD{y}E");
         }
     }
 

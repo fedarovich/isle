@@ -52,6 +52,11 @@ internal abstract class LogEventBuilder
 
     public abstract void AppendLiteral(string? str);
 
+    public virtual void AppendLiteralValue(in LiteralValue literalValue)
+    {
+        AppendLiteral(literalValue.Value);
+    }
+
     public abstract void AppendFormatted<T>(string name, T value, int alignment, string? format);
 
     public abstract void AppendFormatted(in NamedLogValue namedLogValue, int alignment, string? format);

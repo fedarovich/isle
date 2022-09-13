@@ -639,7 +639,7 @@ public class LoggerExtensionsTests : BaseFixture
     }
 
     [Test]
-    public void <#= GetTestName("LiteralValue", logEventLevel, withException) #>(<#if (logEventLevel == null) { #>[ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel<# } #>)
+    public void <#= GetTestName("LiteralValue", logEventLevel, withException) #>(<#if (logEventLevel == null) { #>[ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel, <# } #>[Values] bool cacheable)
     {
 <#if (logEventLevel != null) { #> 
         const LogEventLevel logEventLevel = LogEventLevel.<#= (logEventLevel) #>;
@@ -648,7 +648,7 @@ public class LoggerExtensionsTests : BaseFixture
 
         <#if (withException) { #>Exception exception = new InvalidOperationException("Test exception."); <# } #>
 
-        Logger.<#= GetMethodName(logEventLevel, true)  #>(<#if (logEventLevel == null) { #>logEventLevel, <# } #><#if (withException) { #>exception, <# } #>$"{(LiteralValue) "Test"}");
+        Logger.<#= GetMethodName(logEventLevel, true)  #>(<#if (logEventLevel == null) { #>logEventLevel, <# } #><#if (withException) { #>exception, <# } #>$"{new LiteralValue("Test", cacheable)}");
         Logger.<#= GetMethodName(logEventLevel, false) #>(<#if (logEventLevel == null) { #>logEventLevel, <# } #><#if (withException) { #>exception, <# } #>message);
 
         if (logEventLevel < MinLogEventLevel)
@@ -680,7 +680,7 @@ public class LoggerExtensionsTests : BaseFixture
     }
 
     [Test]
-    public void <#= GetTestName("LiteralValueWithBraces", logEventLevel, withException) #>(<#if (logEventLevel == null) { #>[ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel<# } #>)
+    public void <#= GetTestName("LiteralValueWithBraces", logEventLevel, withException) #>(<#if (logEventLevel == null) { #>[ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel, <# } #>[Values] bool cacheable)
     {
 <#if (logEventLevel != null) { #> 
         const LogEventLevel logEventLevel = LogEventLevel.<#= (logEventLevel) #>;
@@ -689,7 +689,7 @@ public class LoggerExtensionsTests : BaseFixture
 
         <#if (withException) { #>Exception exception = new InvalidOperationException("Test exception."); <# } #>
 
-        Logger.<#= GetMethodName(logEventLevel, true)  #>(<#if (logEventLevel == null) { #>logEventLevel, <# } #><#if (withException) { #>exception, <# } #>$"{new LiteralValue("T{es}t")}");
+        Logger.<#= GetMethodName(logEventLevel, true)  #>(<#if (logEventLevel == null) { #>logEventLevel, <# } #><#if (withException) { #>exception, <# } #>$"{new LiteralValue("T{es}t", cacheable)}");
         Logger.<#= GetMethodName(logEventLevel, false) #>(<#if (logEventLevel == null) { #>logEventLevel, <# } #><#if (withException) { #>exception, <# } #>message);
 
         if (logEventLevel < MinLogEventLevel)
@@ -721,7 +721,7 @@ public class LoggerExtensionsTests : BaseFixture
     }
 
     [Test]
-    public void <#= GetTestName("MixedLiteralValue", logEventLevel, withException) #>(<#if (logEventLevel == null) { #>[ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel<# } #>)
+    public void <#= GetTestName("MixedLiteralValue", logEventLevel, withException) #>(<#if (logEventLevel == null) { #>[ValueSource(nameof(LogEventLevels))] LogEventLevel logEventLevel, <# } #>[Values] bool cacheable)
     {
         var value1 = 5;
         var value2 = 7;
@@ -731,7 +731,7 @@ public class LoggerExtensionsTests : BaseFixture
 <# } #>
         <#if (withException) { #>Exception exception = new InvalidOperationException("Test exception."); <# } #>
 
-        Logger.<#= GetMethodName(logEventLevel, true)  #>(<#if (logEventLevel == null) { #>logEventLevel, <# } #><#if (withException) { #>exception, <# } #>$"A{value1}B{(LiteralValue) "C"}D{value2}E");
+        Logger.<#= GetMethodName(logEventLevel, true)  #>(<#if (logEventLevel == null) { #>logEventLevel, <# } #><#if (withException) { #>exception, <# } #>$"A{value1}B{new LiteralValue("C", cacheable)}D{value2}E");
 
         if (logEventLevel < MinLogEventLevel)
         {
