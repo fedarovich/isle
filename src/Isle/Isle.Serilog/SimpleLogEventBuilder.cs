@@ -60,7 +60,7 @@ internal sealed class SimpleLogEventBuilder : LogEventBuilder
     public override void AppendFormatted<T>(string name, T value, int alignment, string? format)
     {
         var configuration = IsleConfiguration.Current;
-        name = configuration.ValueNameConverter(name);
+        name = configuration.ConvertValueName(name);
         Destructuring destructuring;
         if (name.StartsWith(DestructureOperator))
         {

@@ -85,7 +85,7 @@ public static class LoggingExtensions
     internal static string GetNameFromCallerArgumentExpression<T>(this string expression)
     {
         var configuration = IsleConfiguration.Current;
-        var name = configuration.ValueNameConverter(expression);
+        var name = configuration.ConvertValueName(expression);
         if (!name.StartsWith(DestructureOperator) && !name.StartsWith(StringifyOperator))
         {
             var representation = configuration.ValueRepresentationPolicy.GetRepresentationOfType<T>();

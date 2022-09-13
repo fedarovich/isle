@@ -55,7 +55,9 @@ internal class IsleConfigurationTests
         });
         hook.Received(1).ApplyExtensionConfiguration();
         hook.DidNotReceive().ResetExtensionConfiguration();
+#pragma warning disable CS0618
         IsleConfiguration.Current.ValueNameConverter.Should().Be(valueNameConverter);
+#pragma warning restore CS0618
         IsleConfiguration.Current.ValueRepresentationPolicy.Should().Be(AutoDestructuringValueRepresentationPolicy.Instance);
         IsleConfiguration.Current.PreserveDefaultValueRepresentationForExplicitNames.Should().BeTrue();
         IsleConfiguration.Current.CacheLiteralValues.Should().BeTrue();

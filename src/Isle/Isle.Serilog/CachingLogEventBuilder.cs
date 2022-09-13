@@ -75,7 +75,7 @@ internal sealed class CachingLogEventBuilder : LogEventBuilder
 
     public override void AppendFormatted<T>(string name, T value, int alignment, string? format)
     {
-        AppendFormatted(value.Named(IsleConfiguration.Current.ValueNameConverter(name), false), alignment, format);
+        AppendFormatted(value.Named(IsleConfiguration.Current.ConvertValueName(name), false), alignment, format);
     }
 
     public override void AppendFormatted(in NamedLogValue namedLogValue, int alignment, string? format)

@@ -11,7 +11,11 @@ public sealed class IsleConfiguration
 {
     private static volatile IsleConfiguration? _current;
 
+    private static readonly Func<string, string> DefaultValueNameConverter = static name => name;
+
     private readonly IList<IIsleExtensionConfigurationHook> _extensionHooks;
+    private readonly Func<string, string>? _valueNameConverter;
+    
 
     /// <summary>
     /// Gets the current ISLE configuration or throws <see cref="InvalidOperationException"/> if ISLE has not been configured yet.
@@ -35,7 +39,7 @@ public sealed class IsleConfiguration
     private IsleConfiguration(IsleConfigurationBuilder builder)
     {
         ValueRepresentationPolicy = builder.ValueRepresentationPolicy ?? DefaultValueRepresentationPolicy.Instance;
-        ValueNameConverter = builder.ValueNameConverter ?? (name => name);
+        _valueNameConverter = builder.ValueNameConverter;
         PreserveDefaultValueRepresentationForExplicitNames = builder.PreserveDefaultValueRepresentationForExplicitNames;
         CacheLiteralValues = builder.CacheLiteralValues;
         _extensionHooks = builder.ExtensionHooks;
@@ -55,7 +59,17 @@ public sealed class IsleConfiguration
     /// <remarks>
     /// Identity transform is used by default.
     /// </remarks>
-    public Func<string, string> ValueNameConverter { get; }
+    /// <seealso cref="ConvertValueName"/>
+    [Obsolete($"This property is deprecated. Use {nameof(ConvertValueName)} method instead.")]
+    public Func<string, string> ValueNameConverter => _valueNameConverter ?? DefaultValueNameConverter;
+
+    /// <summary>
+    /// Converts the value name using <see cref="ValueNameConverter"/> if one has been configured; otherwise returns the name unmodified.
+    /// </summary>
+    /// <param name="name">The arg</param>
+    /// <returns></returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public string ConvertValueName(string name) => _valueNameConverter == null ? name : _valueNameConverter(name);
 
     /// <summary>
     /// Gets the value indicating whether <see cref="LoggingExtensions.Named{T}(T,string)"/>

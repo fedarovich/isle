@@ -20,7 +20,9 @@ internal class IsleConfigurationBuilderExtensionsTests
         IsleConfiguration.Configure(builder => builder
             .WithValueRepresentationPolicy(AutoDestructuringValueRepresentationPolicy.Instance)
             .WithNameConverter(valueNameConverter));
+#pragma warning disable CS0618
         IsleConfiguration.Current.ValueNameConverter.Should().Be(valueNameConverter);
+#pragma warning restore CS0618
         IsleConfiguration.Current.ValueRepresentationPolicy.Should().Be(AutoDestructuringValueRepresentationPolicy.Instance);
     }
 
