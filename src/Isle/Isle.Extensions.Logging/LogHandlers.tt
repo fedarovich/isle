@@ -14,6 +14,7 @@
 #nullable enable
 using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
+using Isle.Configuration;
 
 namespace Isle.Extensions.Logging;
 
@@ -29,6 +30,7 @@ namespace Isle.Extensions.Logging;
 public ref partial struct <#= GetTypeName(logLevel) #>
 {
     private FormattedLogValuesBuilder _builder = null!;
+    private IsleConfiguration _configuration = null!;
 
     /// <summary>
     /// Creates a new instance of <see cref="<#= GetTypeName(logLevel) #>" />.
@@ -52,6 +54,7 @@ public ref partial struct <#= GetTypeName(logLevel) #>
         {
 <# } #>
             _builder = FormattedLogValuesBuilder.Acquire(literalLength, formattedCount);
+            _configuration = IsleConfiguration.Current;
 <# if (logLevel != Scope) { #>
         }
 <# } #>
@@ -87,7 +90,7 @@ public ref partial struct <#= GetTypeName(logLevel) #>
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "") => _builder.AppendFormatted(
-        name.GetNameFromCallerArgumentExpression<T>(),
+        name.GetNameFromCallerArgumentExpression<T>(_configuration),
         value,
         alignment, 
         format);

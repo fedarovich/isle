@@ -17,6 +17,7 @@ internal sealed class SimpleLogEventBuilder : LogEventBuilder
     private LogEventProperty[] _properties = null!;
     private ILogger _logger = null!;
     private StringBuilder _messageTemplateBuilder = null!;
+    private IsleConfiguration _configuration = null!;
     private int _currentPosition;
     private int _propertyIndex;
 
@@ -28,6 +29,7 @@ internal sealed class SimpleLogEventBuilder : LogEventBuilder
         _properties = new LogEventProperty[formattedCount];
         _messageTemplateBuilder = StringBuilderCache.Acquire(Math.Max(literalLength + formattedCount * 16, StringBuilderCache.MaxBuilderSize));
         _logger = logger;
+        _configuration = IsleConfiguration.Current;
     }
 
     protected override LogEvent BuildAndReset(LogEventLevel level, Exception? exception = null)
@@ -42,6 +44,7 @@ internal sealed class SimpleLogEventBuilder : LogEventBuilder
         _properties = null!;
         _currentPosition = 0;
         _propertyIndex = 0;
+        _configuration = null!;
         return logEvent;
     }
 
@@ -59,7 +62,7 @@ internal sealed class SimpleLogEventBuilder : LogEventBuilder
 
     public override void AppendFormatted<T>(string name, T value, int alignment, string? format)
     {
-        var configuration = IsleConfiguration.Current;
+        var configuration = _configuration;
         name = configuration.ConvertValueName(name);
         Destructuring destructuring;
         if (name.StartsWith(DestructureOperator))

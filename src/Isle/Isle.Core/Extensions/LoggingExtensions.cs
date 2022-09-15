@@ -58,7 +58,7 @@ public static class LoggingExtensions
         return Named(value, name, preserveDefaultValueRepresentation, IsleConfiguration.Current);
     }
 
-    private static NamedLogValue Named<T>(T value, string name, bool preserveDefaultValueRepresentation, IsleConfiguration configuration)
+    internal static NamedLogValue Named<T>(this T value, string name, bool preserveDefaultValueRepresentation, IsleConfiguration configuration)
     {
         if (string.IsNullOrWhiteSpace(name))
             throw new ArgumentException("The name cannot be null or empty string.", nameof(name));
@@ -82,9 +82,8 @@ public static class LoggingExtensions
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static string GetNameFromCallerArgumentExpression<T>(this string expression)
+    internal static string GetNameFromCallerArgumentExpression<T>(this string expression, IsleConfiguration configuration)
     {
-        var configuration = IsleConfiguration.Current;
         var name = configuration.ConvertValueName(expression);
         if (!name.StartsWith(DestructureOperator) && !name.StartsWith(StringifyOperator))
         {

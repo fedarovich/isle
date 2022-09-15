@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
+using Isle.Configuration;
 
 namespace Isle.Extensions.Logging;
 
@@ -15,6 +16,7 @@ namespace Isle.Extensions.Logging;
 public ref partial struct TraceLogInterpolatedStringHandler
 {
     private FormattedLogValuesBuilder _builder = null!;
+    private IsleConfiguration _configuration = null!;
 
     /// <summary>
     /// Creates a new instance of <see cref="TraceLogInterpolatedStringHandler" />.
@@ -30,6 +32,7 @@ public ref partial struct TraceLogInterpolatedStringHandler
         if (isEnabled)
         {
             _builder = FormattedLogValuesBuilder.Acquire(literalLength, formattedCount);
+            _configuration = IsleConfiguration.Current;
         }
     }
 
@@ -61,7 +64,7 @@ public ref partial struct TraceLogInterpolatedStringHandler
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "") => _builder.AppendFormatted(
-        name.GetNameFromCallerArgumentExpression<T>(),
+        name.GetNameFromCallerArgumentExpression<T>(_configuration),
         value,
         alignment, 
         format);
@@ -95,6 +98,7 @@ public ref partial struct TraceLogInterpolatedStringHandler
 public ref partial struct DebugLogInterpolatedStringHandler
 {
     private FormattedLogValuesBuilder _builder = null!;
+    private IsleConfiguration _configuration = null!;
 
     /// <summary>
     /// Creates a new instance of <see cref="DebugLogInterpolatedStringHandler" />.
@@ -110,6 +114,7 @@ public ref partial struct DebugLogInterpolatedStringHandler
         if (isEnabled)
         {
             _builder = FormattedLogValuesBuilder.Acquire(literalLength, formattedCount);
+            _configuration = IsleConfiguration.Current;
         }
     }
 
@@ -141,7 +146,7 @@ public ref partial struct DebugLogInterpolatedStringHandler
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "") => _builder.AppendFormatted(
-        name.GetNameFromCallerArgumentExpression<T>(),
+        name.GetNameFromCallerArgumentExpression<T>(_configuration),
         value,
         alignment, 
         format);
@@ -175,6 +180,7 @@ public ref partial struct DebugLogInterpolatedStringHandler
 public ref partial struct InformationLogInterpolatedStringHandler
 {
     private FormattedLogValuesBuilder _builder = null!;
+    private IsleConfiguration _configuration = null!;
 
     /// <summary>
     /// Creates a new instance of <see cref="InformationLogInterpolatedStringHandler" />.
@@ -190,6 +196,7 @@ public ref partial struct InformationLogInterpolatedStringHandler
         if (isEnabled)
         {
             _builder = FormattedLogValuesBuilder.Acquire(literalLength, formattedCount);
+            _configuration = IsleConfiguration.Current;
         }
     }
 
@@ -221,7 +228,7 @@ public ref partial struct InformationLogInterpolatedStringHandler
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "") => _builder.AppendFormatted(
-        name.GetNameFromCallerArgumentExpression<T>(),
+        name.GetNameFromCallerArgumentExpression<T>(_configuration),
         value,
         alignment, 
         format);
@@ -255,6 +262,7 @@ public ref partial struct InformationLogInterpolatedStringHandler
 public ref partial struct WarningLogInterpolatedStringHandler
 {
     private FormattedLogValuesBuilder _builder = null!;
+    private IsleConfiguration _configuration = null!;
 
     /// <summary>
     /// Creates a new instance of <see cref="WarningLogInterpolatedStringHandler" />.
@@ -270,6 +278,7 @@ public ref partial struct WarningLogInterpolatedStringHandler
         if (isEnabled)
         {
             _builder = FormattedLogValuesBuilder.Acquire(literalLength, formattedCount);
+            _configuration = IsleConfiguration.Current;
         }
     }
 
@@ -301,7 +310,7 @@ public ref partial struct WarningLogInterpolatedStringHandler
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "") => _builder.AppendFormatted(
-        name.GetNameFromCallerArgumentExpression<T>(),
+        name.GetNameFromCallerArgumentExpression<T>(_configuration),
         value,
         alignment, 
         format);
@@ -335,6 +344,7 @@ public ref partial struct WarningLogInterpolatedStringHandler
 public ref partial struct ErrorLogInterpolatedStringHandler
 {
     private FormattedLogValuesBuilder _builder = null!;
+    private IsleConfiguration _configuration = null!;
 
     /// <summary>
     /// Creates a new instance of <see cref="ErrorLogInterpolatedStringHandler" />.
@@ -350,6 +360,7 @@ public ref partial struct ErrorLogInterpolatedStringHandler
         if (isEnabled)
         {
             _builder = FormattedLogValuesBuilder.Acquire(literalLength, formattedCount);
+            _configuration = IsleConfiguration.Current;
         }
     }
 
@@ -381,7 +392,7 @@ public ref partial struct ErrorLogInterpolatedStringHandler
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "") => _builder.AppendFormatted(
-        name.GetNameFromCallerArgumentExpression<T>(),
+        name.GetNameFromCallerArgumentExpression<T>(_configuration),
         value,
         alignment, 
         format);
@@ -415,6 +426,7 @@ public ref partial struct ErrorLogInterpolatedStringHandler
 public ref partial struct CriticalLogInterpolatedStringHandler
 {
     private FormattedLogValuesBuilder _builder = null!;
+    private IsleConfiguration _configuration = null!;
 
     /// <summary>
     /// Creates a new instance of <see cref="CriticalLogInterpolatedStringHandler" />.
@@ -430,6 +442,7 @@ public ref partial struct CriticalLogInterpolatedStringHandler
         if (isEnabled)
         {
             _builder = FormattedLogValuesBuilder.Acquire(literalLength, formattedCount);
+            _configuration = IsleConfiguration.Current;
         }
     }
 
@@ -461,7 +474,7 @@ public ref partial struct CriticalLogInterpolatedStringHandler
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "") => _builder.AppendFormatted(
-        name.GetNameFromCallerArgumentExpression<T>(),
+        name.GetNameFromCallerArgumentExpression<T>(_configuration),
         value,
         alignment, 
         format);
@@ -495,6 +508,7 @@ public ref partial struct CriticalLogInterpolatedStringHandler
 public ref partial struct LogInterpolatedStringHandler
 {
     private FormattedLogValuesBuilder _builder = null!;
+    private IsleConfiguration _configuration = null!;
 
     /// <summary>
     /// Creates a new instance of <see cref="LogInterpolatedStringHandler" />.
@@ -511,6 +525,7 @@ public ref partial struct LogInterpolatedStringHandler
         if (isEnabled)
         {
             _builder = FormattedLogValuesBuilder.Acquire(literalLength, formattedCount);
+            _configuration = IsleConfiguration.Current;
         }
     }
 
@@ -542,7 +557,7 @@ public ref partial struct LogInterpolatedStringHandler
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "") => _builder.AppendFormatted(
-        name.GetNameFromCallerArgumentExpression<T>(),
+        name.GetNameFromCallerArgumentExpression<T>(_configuration),
         value,
         alignment, 
         format);
@@ -576,6 +591,7 @@ public ref partial struct LogInterpolatedStringHandler
 public ref partial struct ScopeLogInterpolatedStringHandler
 {
     private FormattedLogValuesBuilder _builder = null!;
+    private IsleConfiguration _configuration = null!;
 
     /// <summary>
     /// Creates a new instance of <see cref="ScopeLogInterpolatedStringHandler" />.
@@ -586,6 +602,7 @@ public ref partial struct ScopeLogInterpolatedStringHandler
         ILogger logger    )
     {
             _builder = FormattedLogValuesBuilder.Acquire(literalLength, formattedCount);
+            _configuration = IsleConfiguration.Current;
     }
 
 
@@ -612,7 +629,7 @@ public ref partial struct ScopeLogInterpolatedStringHandler
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "") => _builder.AppendFormatted(
-        name.GetNameFromCallerArgumentExpression<T>(),
+        name.GetNameFromCallerArgumentExpression<T>(_configuration),
         value,
         alignment, 
         format);

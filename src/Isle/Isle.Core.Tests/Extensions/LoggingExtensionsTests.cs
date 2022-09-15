@@ -73,21 +73,21 @@ public class LoggingExtensionsTests
     [Test]
     public void GetNameFromCallerArgumentExpressionWithDefaultValueRepresentation([Values("x", "$x", "@x")] string name)
     {
-        var newName = name.GetNameFromCallerArgumentExpression<int>();
+        var newName = name.GetNameFromCallerArgumentExpression<int>(IsleConfiguration.Current);
         newName.Should().Be(name.ToUpperInvariant());
     }
 
     [Test]
     public void GetNameFromCallerArgumentExpressionWithDestructureValueRepresentation([Values("x", "$x", "@x")] string name)
     {
-        var newName = name.GetNameFromCallerArgumentExpression<TimeSpan>();
+        var newName = name.GetNameFromCallerArgumentExpression<TimeSpan>(IsleConfiguration.Current);
         newName.Should().Be(name == "x" ? "@X" : name.ToUpperInvariant());
     }
 
     [Test]
     public void GetNameFromCallerArgumentExpressionWithStringifyValueRepresentation([Values("x", "$x", "@x")] string name)
     {
-        var newName = name.GetNameFromCallerArgumentExpression<DateTime>();
+        var newName = name.GetNameFromCallerArgumentExpression<DateTime>(IsleConfiguration.Current);
         newName.Should().Be(name == "x" ? "$X" : name.ToUpperInvariant());
     }
 
