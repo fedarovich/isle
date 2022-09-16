@@ -107,7 +107,7 @@ public ref partial struct <#= GetTypeName(logLevel) #>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal FormattedLogValuesBase GetFormattedLogValuesAndReset()
     {
-        var result = FormattedLogValuesBuilder.BuildAndRelease(_builder);
+        var result = _builder.BuildAndReset();
         _builder = null!;
         return result;
     }

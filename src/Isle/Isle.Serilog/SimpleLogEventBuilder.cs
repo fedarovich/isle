@@ -10,9 +10,15 @@ namespace Isle.Serilog;
 
 internal sealed class SimpleLogEventBuilder : LogEventBuilder
 {
+    [ThreadStatic]
+    private static SimpleLogEventBuilder? _cachedInstance;
+
     private const char DestructureOperator = '@';
     private const char StringifyOperator = '$';
-    
+    private const int MaxStringBuilderCapacity = 512;
+
+    private StringBuilder? _cachedStringBuilder;
+
     private List<MessageTemplateToken> _tokens = null!;
     private LogEventProperty[] _properties = null!;
     private ILogger _logger = null!;
@@ -23,29 +29,71 @@ internal sealed class SimpleLogEventBuilder : LogEventBuilder
 
     public override bool IsCaching => false;
 
-    protected override void Initialize(int literalLength, int formattedCount, ILogger logger)
+    private SimpleLogEventBuilder()
+    {
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static LogEventBuilder AcquireAndInitialize(int literalLength, int formattedCount, ILogger logger)
+    {
+        var instance = _cachedInstance ?? new SimpleLogEventBuilder();
+        _cachedInstance = null;
+        instance.Initialize(literalLength, formattedCount, logger);
+        return instance;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private void Initialize(int literalLength, int formattedCount, ILogger logger)
     {
         _tokens = new List<MessageTemplateToken>(formattedCount * 2 + 1);
         _properties = new LogEventProperty[formattedCount];
-        _messageTemplateBuilder = StringBuilderCache.Acquire(Math.Max(literalLength + formattedCount * 16, StringBuilderCache.MaxBuilderSize));
+        _messageTemplateBuilder = AcquireStringBuilder();
         _logger = logger;
         _configuration = IsleConfiguration.Current;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        StringBuilder AcquireStringBuilder()
+        {
+            var capacity = Math.Max(literalLength + formattedCount * 16, MaxStringBuilderCapacity);
+            var cachedStringBuilder = _cachedStringBuilder;
+            if (cachedStringBuilder == null || cachedStringBuilder.Capacity < capacity)
+                return new StringBuilder(capacity);
+
+            _cachedStringBuilder = null;
+            return cachedStringBuilder;
+        }
     }
 
-    protected override LogEvent BuildAndReset(LogEventLevel level, Exception? exception = null)
+    public override LogEvent BuildAndReset(LogEventLevel level, Exception? exception = null)
     {
         var logEvent = new LogEvent(
             DateTimeOffset.Now, 
             level, 
             exception, 
-            new MessageTemplate(StringBuilderCache.GetStringAndRelease(_messageTemplateBuilder), _tokens),
+            new MessageTemplate(GetStringAndRelease(_messageTemplateBuilder), _tokens),
             _properties.Length == _propertyIndex ? _properties : _properties.Take(_propertyIndex));
         _tokens = null!;
         _properties = null!;
         _currentPosition = 0;
         _propertyIndex = 0;
         _configuration = null!;
+        
+        _cachedInstance ??= this;
+
         return logEvent;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        string GetStringAndRelease(StringBuilder stringBuilder)
+        {
+            var str = stringBuilder.ToString();
+            if (stringBuilder.Capacity <= MaxStringBuilderCapacity)
+            {
+                stringBuilder.Clear();
+                _cachedStringBuilder = stringBuilder;
+            }
+
+            return str;
+        }
     }
 
     public override void AppendLiteral(string? literal)

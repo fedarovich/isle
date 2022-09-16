@@ -81,7 +81,7 @@ public ref partial struct TraceLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal FormattedLogValuesBase GetFormattedLogValuesAndReset()
     {
-        var result = FormattedLogValuesBuilder.BuildAndRelease(_builder);
+        var result = _builder.BuildAndReset();
         _builder = null!;
         return result;
     }
@@ -163,7 +163,7 @@ public ref partial struct DebugLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal FormattedLogValuesBase GetFormattedLogValuesAndReset()
     {
-        var result = FormattedLogValuesBuilder.BuildAndRelease(_builder);
+        var result = _builder.BuildAndReset();
         _builder = null!;
         return result;
     }
@@ -245,7 +245,7 @@ public ref partial struct InformationLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal FormattedLogValuesBase GetFormattedLogValuesAndReset()
     {
-        var result = FormattedLogValuesBuilder.BuildAndRelease(_builder);
+        var result = _builder.BuildAndReset();
         _builder = null!;
         return result;
     }
@@ -327,7 +327,7 @@ public ref partial struct WarningLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal FormattedLogValuesBase GetFormattedLogValuesAndReset()
     {
-        var result = FormattedLogValuesBuilder.BuildAndRelease(_builder);
+        var result = _builder.BuildAndReset();
         _builder = null!;
         return result;
     }
@@ -409,7 +409,7 @@ public ref partial struct ErrorLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal FormattedLogValuesBase GetFormattedLogValuesAndReset()
     {
-        var result = FormattedLogValuesBuilder.BuildAndRelease(_builder);
+        var result = _builder.BuildAndReset();
         _builder = null!;
         return result;
     }
@@ -491,7 +491,7 @@ public ref partial struct CriticalLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal FormattedLogValuesBase GetFormattedLogValuesAndReset()
     {
-        var result = FormattedLogValuesBuilder.BuildAndRelease(_builder);
+        var result = _builder.BuildAndReset();
         _builder = null!;
         return result;
     }
@@ -574,7 +574,7 @@ public ref partial struct LogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal FormattedLogValuesBase GetFormattedLogValuesAndReset()
     {
-        var result = FormattedLogValuesBuilder.BuildAndRelease(_builder);
+        var result = _builder.BuildAndReset();
         _builder = null!;
         return result;
     }
@@ -646,7 +646,7 @@ public ref partial struct ScopeLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal FormattedLogValuesBase GetFormattedLogValuesAndReset()
     {
-        var result = FormattedLogValuesBuilder.BuildAndRelease(_builder);
+        var result = _builder.BuildAndReset();
         _builder = null!;
         return result;
     }

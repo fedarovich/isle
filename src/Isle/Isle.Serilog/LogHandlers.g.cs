@@ -79,7 +79,7 @@ public ref partial struct VerboseLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal LogEvent GetLogEventAndReset(Exception? exception = null)
     {
-        var result = LogEventBuilder.BuildAndRelease(_builder, LogEventLevel.Verbose, exception);
+        var result = _builder.BuildAndReset(LogEventLevel.Verbose, exception);
         _builder = null!;
         return result;
     }
@@ -159,7 +159,7 @@ public ref partial struct DebugLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal LogEvent GetLogEventAndReset(Exception? exception = null)
     {
-        var result = LogEventBuilder.BuildAndRelease(_builder, LogEventLevel.Debug, exception);
+        var result = _builder.BuildAndReset(LogEventLevel.Debug, exception);
         _builder = null!;
         return result;
     }
@@ -239,7 +239,7 @@ public ref partial struct InformationLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal LogEvent GetLogEventAndReset(Exception? exception = null)
     {
-        var result = LogEventBuilder.BuildAndRelease(_builder, LogEventLevel.Information, exception);
+        var result = _builder.BuildAndReset(LogEventLevel.Information, exception);
         _builder = null!;
         return result;
     }
@@ -319,7 +319,7 @@ public ref partial struct WarningLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal LogEvent GetLogEventAndReset(Exception? exception = null)
     {
-        var result = LogEventBuilder.BuildAndRelease(_builder, LogEventLevel.Warning, exception);
+        var result = _builder.BuildAndReset(LogEventLevel.Warning, exception);
         _builder = null!;
         return result;
     }
@@ -399,7 +399,7 @@ public ref partial struct ErrorLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal LogEvent GetLogEventAndReset(Exception? exception = null)
     {
-        var result = LogEventBuilder.BuildAndRelease(_builder, LogEventLevel.Error, exception);
+        var result = _builder.BuildAndReset(LogEventLevel.Error, exception);
         _builder = null!;
         return result;
     }
@@ -479,7 +479,7 @@ public ref partial struct FatalLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal LogEvent GetLogEventAndReset(Exception? exception = null)
     {
-        var result = LogEventBuilder.BuildAndRelease(_builder, LogEventLevel.Fatal, exception);
+        var result = _builder.BuildAndReset(LogEventLevel.Fatal, exception);
         _builder = null!;
         return result;
     }
@@ -562,7 +562,7 @@ public ref partial struct LogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal LogEvent GetLogEventAndReset(Exception? exception = null)
     {
-        var result = LogEventBuilder.BuildAndRelease(_builder, _logEventLevel, exception);
+        var result = _builder.BuildAndReset(_logEventLevel, exception);
         _builder = null!;
         return result;
     }

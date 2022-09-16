@@ -5,6 +5,12 @@ namespace Isle.Extensions.Logging;
 
 internal sealed class SimpleFormattedLogValuesBuilder : FormattedLogValuesBuilder
 {
+    [ThreadStatic]
+    private static SimpleFormattedLogValuesBuilder? _cachedInstance;
+
+    private const int MaxStringBuilderCapacity = 512;
+
+    private StringBuilder? _cachedStringBuilder;
     private StringBuilder _originalFormatBuilder = null!;
     private FormattedLogValuesBase _formattedLogValues = null!;
     private Segment[] _segments = null!;
@@ -14,17 +20,43 @@ internal sealed class SimpleFormattedLogValuesBuilder : FormattedLogValuesBuilde
 
     public override bool IsCaching => false;
 
-    protected override void Initialize(int literalLength, int formattedCount)
+    private SimpleFormattedLogValuesBuilder()
     {
-        _originalFormatBuilder = StringBuilderCache.Acquire(Math.Max(literalLength + formattedCount * 16, StringBuilderCache.MaxBuilderSize));
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static FormattedLogValuesBuilder AcquireAndInitialize(int literalLength, int formattedCount)
+    {
+        var instance = _cachedInstance ?? new SimpleFormattedLogValuesBuilder();
+        _cachedInstance = null;
+        instance.Initialize(literalLength, formattedCount);
+        return instance;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private void Initialize(int literalLength, int formattedCount)
+    {
+        _originalFormatBuilder = AcquireStringBuilder();
         _formattedLogValues = FormattedLogValuesBase.Create(formattedCount);
         _segments = new Segment[formattedCount * 2 + 1];
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        StringBuilder AcquireStringBuilder()
+        {
+            var capacity = Math.Max(literalLength + formattedCount * 16, MaxStringBuilderCapacity);
+            var cachedStringBuilder = _cachedStringBuilder;
+            if (cachedStringBuilder == null || cachedStringBuilder.Capacity < capacity)
+                return new StringBuilder(capacity);
+
+            _cachedStringBuilder = null;
+            return cachedStringBuilder;
+        }
     }
-    
-    protected override FormattedLogValuesBase BuildAndReset()
+
+    public override FormattedLogValuesBase BuildAndReset()
     {
         var result = _formattedLogValues;
-        result.Values[_valueIndex] = new KeyValuePair<string, object?>(OriginalFormatName, StringBuilderCache.GetStringAndRelease(_originalFormatBuilder));
+        result.Values[_valueIndex] = new KeyValuePair<string, object?>(OriginalFormatName, GetStringAndRelease(_originalFormatBuilder));
         result.Count = _valueIndex + 1;
         result.SetSegments(_segments.AsMemory(0, _segmentIndex));
         
@@ -35,7 +67,22 @@ internal sealed class SimpleFormattedLogValuesBuilder : FormattedLogValuesBuilde
         _segmentIndex = 0;
         _valueIndex = 0;
 
+        _cachedInstance ??= this;
+
         return result;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        string GetStringAndRelease(StringBuilder stringBuilder)
+        {
+            var str = stringBuilder.ToString();
+            if (stringBuilder.Capacity <= MaxStringBuilderCapacity)
+            {
+                stringBuilder.Clear();
+                _cachedStringBuilder = stringBuilder;
+            }
+
+            return str;
+        }
     }
 
     public override void AppendLiteral(string? str)

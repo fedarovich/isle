@@ -1,22 +1,40 @@
-﻿using Isle.Extensions.Logging.Caching;
+﻿using System.Runtime.CompilerServices;
+using Isle.Extensions.Logging.Caching;
 
 namespace Isle.Extensions.Logging;
 
 internal sealed class CachingFormattedLogValuesBuilder : FormattedLogValuesBuilder
 {
+    [ThreadStatic]
+    private static CachingFormattedLogValuesBuilder? _cachedInstance;
+
     private Node _lastNode = null!;
     private FormattedLogValuesBase _formattedLogValues = null!;
     private int _valueIndex = 0;
 
     public override bool IsCaching => true;
 
-    protected override void Initialize(int literalLength, int formattedCount)
+    private CachingFormattedLogValuesBuilder()
+    {
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static FormattedLogValuesBuilder AcquireAndInitialize(int formattedCount)
+    {
+        var instance = _cachedInstance ?? new CachingFormattedLogValuesBuilder();
+        _cachedInstance = null;
+        instance.Initialize(formattedCount);
+        return instance;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private void Initialize(int formattedCount)
     {
         _lastNode = NodeCache.Instance;
         _formattedLogValues = FormattedLogValuesBase.Create(formattedCount);
     }
 
-    protected override FormattedLogValuesBase BuildAndReset()
+    public override FormattedLogValuesBase BuildAndReset()
     {
         var templateNode = _lastNode.GetTemplateNode();
         var result = _formattedLogValues;
@@ -27,6 +45,8 @@ internal sealed class CachingFormattedLogValuesBuilder : FormattedLogValuesBuild
         _lastNode = null!;
         _formattedLogValues = null!;
         _valueIndex = 0;
+
+        _cachedInstance ??= this;
 
         return result;
     }

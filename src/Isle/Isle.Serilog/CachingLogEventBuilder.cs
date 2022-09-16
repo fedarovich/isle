@@ -1,5 +1,6 @@
 ﻿using System.Buffers;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using Isle.Configuration;
 using Isle.Extensions;
 using Isle.Serilog.Caching;
@@ -11,6 +12,9 @@ namespace Isle.Serilog;
 
 internal sealed class CachingLogEventBuilder : LogEventBuilder
 {
+    [ThreadStatic]
+    private static CachingLogEventBuilder? _cachedInstance;
+
     private ILogger _logger = null!;
     private Node _lastNode = null!;
     private object?[] _propertyValues = null!;
@@ -19,7 +23,21 @@ internal sealed class CachingLogEventBuilder : LogEventBuilder
 
     public override bool IsCaching => true;
 
-    protected override void Initialize(int literalLength, int formattedCount, ILogger logger)
+    private CachingLogEventBuilder()
+    {
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static LogEventBuilder AcquireAndInitialize(int formattedCount, ILogger logger)
+    {
+        var instance = _cachedInstance ?? new CachingLogEventBuilder();
+        _cachedInstance = null;
+        instance.Initialize(formattedCount, logger);
+        return instance;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private void Initialize(int formattedCount, ILogger logger)
     {
         _logger = logger;
         _lastNode = NodeCache.Instance;
@@ -30,7 +48,7 @@ internal sealed class CachingLogEventBuilder : LogEventBuilder
         _configuration = IsleConfiguration.Current;
     }
 
-    protected override LogEvent BuildAndReset(LogEventLevel level, Exception? exception = null)
+    public override LogEvent BuildAndReset(LogEventLevel level, Exception? exception = null)
     {
         var templateNode = _lastNode.GetTemplateNode();
         
@@ -52,6 +70,8 @@ internal sealed class CachingLogEventBuilder : LogEventBuilder
         _lastNode = null!;
         _propertyValues = null!;
         _configuration = null!;
+
+        _cachedInstance ??= this;
 
         return logEvent;
     }
