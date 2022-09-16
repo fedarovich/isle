@@ -75,7 +75,7 @@ public static class LoggerExtensions
 <# } #>
 <# } #>
 <# } #>
-	private static void Log(ILogger logger, LogLevel logLevel, EventId eventId, Exception? exception, in FormattedLogValuesBase formattedLogValues)
+	private static void Log(ILogger logger, LogLevel logLevel, EventId eventId, Exception? exception, FormattedLogValuesBase formattedLogValues)
 	{
 		logger.Log(logLevel, eventId, formattedLogValues, exception, _messageFormatter);
 	}
