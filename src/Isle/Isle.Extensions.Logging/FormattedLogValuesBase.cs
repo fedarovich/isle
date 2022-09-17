@@ -76,23 +76,14 @@ internal abstract class FormattedLogValuesBase : IReadOnlyList<KeyValuePair<stri
 
         foreach (var segment in _segments.Span)
         {
-            switch (segment.Type)
+            if (segment.IsLiteral)
             {
-                case Segment.SegmentType.FormattedValue:
-                    var formattedValue = Values[index++];
-                    handler.AppendFormatted(FormatArgument(formattedValue.Value), segment.Alignment, segment.Format);
-                    break;
-                case Segment.SegmentType.Literal:
-                    handler.AppendFormatted(segment.Literal);
-                    break;
-                case Segment.SegmentType.LiteralList:
-                    foreach (var literal in segment.LiteralList)
-                    {
-                        handler.AppendFormatted(literal);
-                    }
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
+                handler.AppendFormatted(segment.String);
+            }
+            else
+            {
+                var formattedValue = Values[index++];
+                handler.AppendFormatted(FormatArgument(formattedValue.Value), segment.Alignment, segment.String);
             }
         }
 
