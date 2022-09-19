@@ -20,16 +20,13 @@ internal abstract class FormattedLogValuesBuilder
         return builder;
     }
 
-    public abstract bool IsCaching { get; }
-
     public abstract FormattedLogValuesBase BuildAndReset();
 
-    public abstract void AppendLiteral(string? str);
+    public abstract void AppendLiteral(string str);
 
-    public virtual void AppendLiteralValue(in LiteralValue literalValue)
-    {
-        AppendLiteral(literalValue.Value);
-    }
+    public abstract void AppendLiteralValue(in LiteralValue literalValue);
 
-    public abstract void AppendFormatted(string name, object? value, int alignment = 0, string? format = null);
+    public abstract void AppendFormatted(string name, object? value);
+
+    public abstract void AppendFormatted(string name, object? value, int alignment, string? format);
 }

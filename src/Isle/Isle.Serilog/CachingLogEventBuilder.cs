@@ -21,8 +21,6 @@ internal sealed class CachingLogEventBuilder : LogEventBuilder
     private IsleConfiguration _configuration = null!;
     private int _propertyIndex;
 
-    public override bool IsCaching => true;
-
     private CachingLogEventBuilder()
     {
     }
@@ -76,24 +74,22 @@ internal sealed class CachingLogEventBuilder : LogEventBuilder
         return logEvent;
     }
 
-    public override void AppendLiteral(string? str)
+    public override void AppendLiteral(string str)
     {
-        if (!string.IsNullOrEmpty(str))
-        {
-            _lastNode = _lastNode.GetOrAddTextNode(str);
-        }
+        _lastNode = _lastNode.GetOrAddTextNode(str);
     }
 
     public override void AppendLiteralValue(in LiteralValue literalValue)
     {
-        if (literalValue.IsCacheable)
-        {
-            AppendLiteral(literalValue.Value);
-        }
-        else if (!string.IsNullOrEmpty(literalValue.Value))
-        {
-            _lastNode = _lastNode.CreateNotCachedTextNode(literalValue.Value);
-        }
+        var str = literalValue.Value!;
+        _lastNode = literalValue.IsCacheable 
+            ? _lastNode.GetOrAddTextNode(str) 
+            : _lastNode.CreateNotCachedTextNode(str);
+    }
+
+    public override void AppendFormatted<T>(string name, T value)
+    {
+        AppendFormatted(value.Named(_configuration.ConvertValueName(name), false, _configuration));
     }
 
     public override void AppendFormatted<T>(string name, T value, int alignment, string? format)
@@ -101,11 +97,15 @@ internal sealed class CachingLogEventBuilder : LogEventBuilder
         AppendFormatted(value.Named(_configuration.ConvertValueName(name), false, _configuration), alignment, format);
     }
 
+    public override void AppendFormatted(in NamedLogValue namedLogValue)
+    {
+        _lastNode = _lastNode.GetOrAddPropertyNode(namedLogValue.Name, namedLogValue.RawName);
+        _propertyValues[_propertyIndex++] = namedLogValue.Value;
+    }
+
     public override void AppendFormatted(in NamedLogValue namedLogValue, int alignment, string? format)
     {
-        _lastNode = (alignment == 0 && string.IsNullOrEmpty(format))
-            ? _lastNode.GetOrAddPropertyNode(namedLogValue.Name, namedLogValue.RawName)
-            : _lastNode.GetOrAddPropertyNode(namedLogValue.Name, namedLogValue.RawName, alignment, format);
+        _lastNode = _lastNode.GetOrAddPropertyNode(namedLogValue.Name, namedLogValue.RawName, alignment, format);
         _propertyValues[_propertyIndex++] = namedLogValue.Value;
     }
 

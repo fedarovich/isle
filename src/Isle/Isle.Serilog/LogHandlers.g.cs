@@ -46,7 +46,10 @@ public ref partial struct VerboseLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendLiteral(string? str)
     {
-        _builder.AppendLiteral(str);
+        if (!string.IsNullOrEmpty(str))
+        {
+            _builder.AppendLiteral(str);
+        }
     }
 
     /// <summary>
@@ -55,7 +58,10 @@ public ref partial struct VerboseLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in LiteralValue literal)
     {
-        _builder.AppendLiteralValue(literal);
+        if (!string.IsNullOrEmpty(literal.Value))
+        {
+            _builder.AppendLiteralValue(literal);
+        }
     }
 
     /// <summary>
@@ -64,7 +70,14 @@ public ref partial struct VerboseLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "")
     {
-        _builder.AppendFormatted(name, value, alignment, format);
+        if (alignment == 0 && string.IsNullOrEmpty(format))
+        {
+            _builder.AppendFormatted(name, value);
+        }
+        else
+        {
+            _builder.AppendFormatted(name, value, alignment, format);
+        }
     }
 
     /// <summary>
@@ -73,7 +86,14 @@ public ref partial struct VerboseLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in NamedLogValue namedLogValue, int alignment = 0, string? format = null)
     {
-        _builder.AppendFormatted(namedLogValue, alignment, format);
+        if (alignment == 0 && string.IsNullOrEmpty(format))
+        {
+            _builder.AppendFormatted(namedLogValue);
+        }
+        else
+        {
+            _builder.AppendFormatted(namedLogValue, alignment, format);
+        }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -126,7 +146,10 @@ public ref partial struct DebugLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendLiteral(string? str)
     {
-        _builder.AppendLiteral(str);
+        if (!string.IsNullOrEmpty(str))
+        {
+            _builder.AppendLiteral(str);
+        }
     }
 
     /// <summary>
@@ -135,7 +158,10 @@ public ref partial struct DebugLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in LiteralValue literal)
     {
-        _builder.AppendLiteralValue(literal);
+        if (!string.IsNullOrEmpty(literal.Value))
+        {
+            _builder.AppendLiteralValue(literal);
+        }
     }
 
     /// <summary>
@@ -144,7 +170,14 @@ public ref partial struct DebugLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "")
     {
-        _builder.AppendFormatted(name, value, alignment, format);
+        if (alignment == 0 && string.IsNullOrEmpty(format))
+        {
+            _builder.AppendFormatted(name, value);
+        }
+        else
+        {
+            _builder.AppendFormatted(name, value, alignment, format);
+        }
     }
 
     /// <summary>
@@ -153,7 +186,14 @@ public ref partial struct DebugLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in NamedLogValue namedLogValue, int alignment = 0, string? format = null)
     {
-        _builder.AppendFormatted(namedLogValue, alignment, format);
+        if (alignment == 0 && string.IsNullOrEmpty(format))
+        {
+            _builder.AppendFormatted(namedLogValue);
+        }
+        else
+        {
+            _builder.AppendFormatted(namedLogValue, alignment, format);
+        }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -206,7 +246,10 @@ public ref partial struct InformationLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendLiteral(string? str)
     {
-        _builder.AppendLiteral(str);
+        if (!string.IsNullOrEmpty(str))
+        {
+            _builder.AppendLiteral(str);
+        }
     }
 
     /// <summary>
@@ -215,7 +258,10 @@ public ref partial struct InformationLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in LiteralValue literal)
     {
-        _builder.AppendLiteralValue(literal);
+        if (!string.IsNullOrEmpty(literal.Value))
+        {
+            _builder.AppendLiteralValue(literal);
+        }
     }
 
     /// <summary>
@@ -224,7 +270,14 @@ public ref partial struct InformationLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "")
     {
-        _builder.AppendFormatted(name, value, alignment, format);
+        if (alignment == 0 && string.IsNullOrEmpty(format))
+        {
+            _builder.AppendFormatted(name, value);
+        }
+        else
+        {
+            _builder.AppendFormatted(name, value, alignment, format);
+        }
     }
 
     /// <summary>
@@ -233,7 +286,14 @@ public ref partial struct InformationLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in NamedLogValue namedLogValue, int alignment = 0, string? format = null)
     {
-        _builder.AppendFormatted(namedLogValue, alignment, format);
+        if (alignment == 0 && string.IsNullOrEmpty(format))
+        {
+            _builder.AppendFormatted(namedLogValue);
+        }
+        else
+        {
+            _builder.AppendFormatted(namedLogValue, alignment, format);
+        }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -286,7 +346,10 @@ public ref partial struct WarningLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendLiteral(string? str)
     {
-        _builder.AppendLiteral(str);
+        if (!string.IsNullOrEmpty(str))
+        {
+            _builder.AppendLiteral(str);
+        }
     }
 
     /// <summary>
@@ -295,7 +358,10 @@ public ref partial struct WarningLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in LiteralValue literal)
     {
-        _builder.AppendLiteralValue(literal);
+        if (!string.IsNullOrEmpty(literal.Value))
+        {
+            _builder.AppendLiteralValue(literal);
+        }
     }
 
     /// <summary>
@@ -304,7 +370,14 @@ public ref partial struct WarningLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "")
     {
-        _builder.AppendFormatted(name, value, alignment, format);
+        if (alignment == 0 && string.IsNullOrEmpty(format))
+        {
+            _builder.AppendFormatted(name, value);
+        }
+        else
+        {
+            _builder.AppendFormatted(name, value, alignment, format);
+        }
     }
 
     /// <summary>
@@ -313,7 +386,14 @@ public ref partial struct WarningLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in NamedLogValue namedLogValue, int alignment = 0, string? format = null)
     {
-        _builder.AppendFormatted(namedLogValue, alignment, format);
+        if (alignment == 0 && string.IsNullOrEmpty(format))
+        {
+            _builder.AppendFormatted(namedLogValue);
+        }
+        else
+        {
+            _builder.AppendFormatted(namedLogValue, alignment, format);
+        }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -366,7 +446,10 @@ public ref partial struct ErrorLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendLiteral(string? str)
     {
-        _builder.AppendLiteral(str);
+        if (!string.IsNullOrEmpty(str))
+        {
+            _builder.AppendLiteral(str);
+        }
     }
 
     /// <summary>
@@ -375,7 +458,10 @@ public ref partial struct ErrorLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in LiteralValue literal)
     {
-        _builder.AppendLiteralValue(literal);
+        if (!string.IsNullOrEmpty(literal.Value))
+        {
+            _builder.AppendLiteralValue(literal);
+        }
     }
 
     /// <summary>
@@ -384,7 +470,14 @@ public ref partial struct ErrorLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "")
     {
-        _builder.AppendFormatted(name, value, alignment, format);
+        if (alignment == 0 && string.IsNullOrEmpty(format))
+        {
+            _builder.AppendFormatted(name, value);
+        }
+        else
+        {
+            _builder.AppendFormatted(name, value, alignment, format);
+        }
     }
 
     /// <summary>
@@ -393,7 +486,14 @@ public ref partial struct ErrorLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in NamedLogValue namedLogValue, int alignment = 0, string? format = null)
     {
-        _builder.AppendFormatted(namedLogValue, alignment, format);
+        if (alignment == 0 && string.IsNullOrEmpty(format))
+        {
+            _builder.AppendFormatted(namedLogValue);
+        }
+        else
+        {
+            _builder.AppendFormatted(namedLogValue, alignment, format);
+        }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -446,7 +546,10 @@ public ref partial struct FatalLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendLiteral(string? str)
     {
-        _builder.AppendLiteral(str);
+        if (!string.IsNullOrEmpty(str))
+        {
+            _builder.AppendLiteral(str);
+        }
     }
 
     /// <summary>
@@ -455,7 +558,10 @@ public ref partial struct FatalLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in LiteralValue literal)
     {
-        _builder.AppendLiteralValue(literal);
+        if (!string.IsNullOrEmpty(literal.Value))
+        {
+            _builder.AppendLiteralValue(literal);
+        }
     }
 
     /// <summary>
@@ -464,7 +570,14 @@ public ref partial struct FatalLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "")
     {
-        _builder.AppendFormatted(name, value, alignment, format);
+        if (alignment == 0 && string.IsNullOrEmpty(format))
+        {
+            _builder.AppendFormatted(name, value);
+        }
+        else
+        {
+            _builder.AppendFormatted(name, value, alignment, format);
+        }
     }
 
     /// <summary>
@@ -473,7 +586,14 @@ public ref partial struct FatalLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in NamedLogValue namedLogValue, int alignment = 0, string? format = null)
     {
-        _builder.AppendFormatted(namedLogValue, alignment, format);
+        if (alignment == 0 && string.IsNullOrEmpty(format))
+        {
+            _builder.AppendFormatted(namedLogValue);
+        }
+        else
+        {
+            _builder.AppendFormatted(namedLogValue, alignment, format);
+        }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -529,7 +649,10 @@ public ref partial struct LogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendLiteral(string? str)
     {
-        _builder.AppendLiteral(str);
+        if (!string.IsNullOrEmpty(str))
+        {
+            _builder.AppendLiteral(str);
+        }
     }
 
     /// <summary>
@@ -538,7 +661,10 @@ public ref partial struct LogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in LiteralValue literal)
     {
-        _builder.AppendLiteralValue(literal);
+        if (!string.IsNullOrEmpty(literal.Value))
+        {
+            _builder.AppendLiteralValue(literal);
+        }
     }
 
     /// <summary>
@@ -547,7 +673,14 @@ public ref partial struct LogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string name = "")
     {
-        _builder.AppendFormatted(name, value, alignment, format);
+        if (alignment == 0 && string.IsNullOrEmpty(format))
+        {
+            _builder.AppendFormatted(name, value);
+        }
+        else
+        {
+            _builder.AppendFormatted(name, value, alignment, format);
+        }
     }
 
     /// <summary>
@@ -556,7 +689,14 @@ public ref partial struct LogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in NamedLogValue namedLogValue, int alignment = 0, string? format = null)
     {
-        _builder.AppendFormatted(namedLogValue, alignment, format);
+        if (alignment == 0 && string.IsNullOrEmpty(format))
+        {
+            _builder.AppendFormatted(namedLogValue);
+        }
+        else
+        {
+            _builder.AppendFormatted(namedLogValue, alignment, format);
+        }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

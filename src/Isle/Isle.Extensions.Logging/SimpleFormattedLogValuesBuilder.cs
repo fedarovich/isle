@@ -18,8 +18,6 @@ internal sealed class SimpleFormattedLogValuesBuilder : FormattedLogValuesBuilde
     private int _valueIndex = 0;
     private int _segmentIndex = 0;
 
-    public override bool IsCaching => false;
-
     private SimpleFormattedLogValuesBuilder()
     {
     }
@@ -85,7 +83,7 @@ internal sealed class SimpleFormattedLogValuesBuilder : FormattedLogValuesBuilde
         }
     }
 
-    public override void AppendLiteral(string? str)
+    public override void AppendLiteral(string str)
     {
         var start = _originalFormatBuilder.Length;
         _originalFormatBuilder.EscapeAndAppend(str);
@@ -100,23 +98,36 @@ internal sealed class SimpleFormattedLogValuesBuilder : FormattedLogValuesBuilde
                 {
                     case Segment.SegmentType.Literal:
                     {
-                        prevSegment = new Segment(prevSegment, str!, _literalList ??= new List<string>());
+                        prevSegment = new Segment(prevSegment, str, _literalList ??= new List<string>());
                         return;
                     }
                     case Segment.SegmentType.LiteralList:
                     {
-                        prevSegment = new Segment(prevSegment, str!);
+                        prevSegment = new Segment(prevSegment, str);
                         return;
                     }
                 }
             }
 
-            _segments[_segmentIndex++] = new Segment(str!);
+            _segments[_segmentIndex++] = new Segment(str);
         }
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-    public override void AppendFormatted(string name, object? value, int alignment = 0, string? format = null)
+    public override void AppendLiteralValue(in LiteralValue literalValue)
+    {
+        AppendLiteral(literalValue.Value!);
+    }
+
+    public override void AppendFormatted(string name, object? value)
+    {
+        _originalFormatBuilder.Append('{');
+        _originalFormatBuilder.Append(name);
+        _originalFormatBuilder.Append('}');
+        _segments[_segmentIndex++] = new Segment(null, 0);
+        _formattedLogValues.Values[_valueIndex++] = new(name, value);
+    }
+
+    public override void AppendFormatted(string name, object? value, int alignment, string? format)
     {
         _originalFormatBuilder.Append('{');
 

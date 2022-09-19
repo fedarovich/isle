@@ -27,8 +27,6 @@ internal sealed class SimpleLogEventBuilder : LogEventBuilder
     private int _currentPosition;
     private int _propertyIndex;
 
-    public override bool IsCaching => false;
-
     private SimpleLogEventBuilder()
     {
     }
@@ -96,16 +94,47 @@ internal sealed class SimpleLogEventBuilder : LogEventBuilder
         }
     }
 
-    public override void AppendLiteral(string? literal)
+    public override void AppendLiteral(string literal)
     {
-        if (string.IsNullOrEmpty(literal))
-            return;
-
         _tokens.Add(new TextToken(literal, _currentPosition));
         var start = _messageTemplateBuilder.Length;
         _messageTemplateBuilder.EscapeAndAppend(literal);
         var end = _messageTemplateBuilder.Length;
         _currentPosition += end - start;
+    }
+
+    public override void AppendLiteralValue(in LiteralValue literalValue)
+    {
+        AppendLiteral(literalValue.Value!);
+    }
+
+    public override void AppendFormatted<T>(string name, T value)
+    {
+        var configuration = _configuration;
+        name = configuration.ConvertValueName(name);
+        Destructuring destructuring;
+        if (name.StartsWith(DestructureOperator))
+        {
+            destructuring = Destructuring.Destructure;
+            name = name.Substring(1);
+        }
+        else if (name.StartsWith(StringifyOperator))
+        {
+            destructuring = Destructuring.Stringify;
+            name = name.Substring(1);
+        }
+        else
+        {
+            destructuring = GetDestructuring(
+                configuration.ValueRepresentationPolicy.GetRepresentationOfType<T>());
+        }
+
+        if (name == string.Empty)
+            name = _propertyIndex.ToString(CultureInfo.InvariantCulture);
+
+        var rawText = GetRawText(name, destructuring);
+        _messageTemplateBuilder.Append(rawText);
+        AppendProperty(name, value, 0, null, rawText, destructuring);
     }
 
     public override void AppendFormatted<T>(string name, T value, int alignment, string? format)
@@ -137,6 +166,30 @@ internal sealed class SimpleLogEventBuilder : LogEventBuilder
         AppendProperty(name, value, alignment, format, rawText, destructuring);
     }
 
+    public override void AppendFormatted(in NamedLogValue namedLogValue)
+    {
+        var destructuring = Destructuring.Default;
+        var name = namedLogValue.Name;
+        if (namedLogValue.Name.StartsWith(DestructureOperator))
+        {
+            destructuring = Destructuring.Destructure;
+            name = ReferenceEquals(namedLogValue.Name, namedLogValue.RawName)
+                ? namedLogValue.Name.Substring(1)
+                : namedLogValue.RawName;
+        }
+        else if (namedLogValue.Name.StartsWith(StringifyOperator))
+        {
+            destructuring = Destructuring.Stringify;
+            name = ReferenceEquals(namedLogValue.Name, namedLogValue.RawName)
+                ? namedLogValue.Name.Substring(1)
+                : namedLogValue.RawName;
+        }
+
+        var rawText = GetRawText(name, destructuring);
+        _messageTemplateBuilder.Append(rawText);
+        AppendProperty(name, namedLogValue.Value, 0, null, rawText, destructuring);
+    }
+
     public override void AppendFormatted(in NamedLogValue namedLogValue, int alignment, string? format)
     {
         var destructuring = Destructuring.Default;
@@ -159,6 +212,31 @@ internal sealed class SimpleLogEventBuilder : LogEventBuilder
         var rawText = GetRawText(name, alignment, format, destructuring);
         _messageTemplateBuilder.Append(rawText);
         AppendProperty(name, namedLogValue.Value, alignment, format, rawText, destructuring);
+    }
+
+    [SkipLocalsInit]
+    private static string GetRawText(string name, Destructuring destructuring)
+    {
+        int bufferLength = name.Length + 3;
+        var vsb = bufferLength <= 256
+            ? new ValueStringBuilder(stackalloc char[bufferLength])
+            : new ValueStringBuilder(bufferLength);
+
+        vsb.Append('{');
+        switch (destructuring)
+        {
+            case Destructuring.Destructure:
+                vsb.Append(DestructureOperator);
+                break;
+            case Destructuring.Stringify:
+                vsb.Append(StringifyOperator);
+                break;
+        }
+        vsb.Append(name);
+
+        vsb.Append('}');
+        var rawText = vsb.ToString();
+        return rawText;
     }
 
     [SkipLocalsInit]

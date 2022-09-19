@@ -22,19 +22,18 @@ internal abstract class LogEventBuilder
         return builder;
     }
 
-    public abstract bool IsCaching { get; }
-
     public abstract LogEvent BuildAndReset(LogEventLevel level, Exception? exception = null);
 
-    public abstract void AppendLiteral(string? str);
+    public abstract void AppendLiteral(string str);
 
-    public virtual void AppendLiteralValue(in LiteralValue literalValue)
-    {
-        AppendLiteral(literalValue.Value);
-    }
+    public abstract void AppendLiteralValue(in LiteralValue literalValue);
+
+    public abstract void AppendFormatted<T>(string name, T value);
 
     public abstract void AppendFormatted<T>(string name, T value, int alignment, string? format);
 
+    public abstract void AppendFormatted(in NamedLogValue namedLogValue);
+    
     public abstract void AppendFormatted(in NamedLogValue namedLogValue, int alignment, string? format);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

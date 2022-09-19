@@ -12,8 +12,6 @@ internal sealed class CachingFormattedLogValuesBuilder : FormattedLogValuesBuild
     private FormattedLogValuesBase _formattedLogValues = null!;
     private int _valueIndex = 0;
 
-    public override bool IsCaching => true;
-
     private CachingFormattedLogValuesBuilder()
     {
     }
@@ -51,31 +49,28 @@ internal sealed class CachingFormattedLogValuesBuilder : FormattedLogValuesBuild
         return result;
     }
 
-    public override void AppendLiteral(string? str)
+    public override void AppendLiteral(string str)
     {
-        if (!string.IsNullOrEmpty(str))
-        {
-            _lastNode = _lastNode.GetOrAddLiteralNode(str);
-        }
+        _lastNode = _lastNode.GetOrAddLiteralNode(str);
     }
 
     public override void AppendLiteralValue(in LiteralValue literalValue)
     {
-        if (literalValue.IsCacheable)
-        {
-            AppendLiteral(literalValue.Value);
-        }
-        else if (!string.IsNullOrEmpty(literalValue.Value))
-        {
-            _lastNode = _lastNode.CreateNotCachedLiteralNode(literalValue.Value);
-        }
+        var str = literalValue.Value!;
+        _lastNode = literalValue.IsCacheable 
+            ? _lastNode.GetOrAddLiteralNode(str) 
+            : _lastNode.CreateNotCachedLiteralNode(str);
     }
 
-    public override void AppendFormatted(string name, object? value, int alignment = 0, string? format = null)
+    public override void AppendFormatted(string name, object? value)
     {
-        _lastNode = (alignment == 0 && string.IsNullOrEmpty(format))
-            ? _lastNode.GetOrAddHoleNode(name)
-            : _lastNode.GetOrAddFormattedHoleNode(name, alignment, format);
+        _lastNode = _lastNode.GetOrAddHoleNode(name);
+        _formattedLogValues.Values[_valueIndex++] = new(name, value);
+    }
+
+    public override void AppendFormatted(string name, object? value, int alignment, string? format)
+    {
+        _lastNode = _lastNode.GetOrAddFormattedHoleNode(name, alignment, format);
         _formattedLogValues.Values[_valueIndex++] = new(name, value);
     }
 }
