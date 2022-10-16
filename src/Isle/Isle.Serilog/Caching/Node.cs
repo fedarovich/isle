@@ -33,9 +33,11 @@ internal abstract class Node
 
     public int Offset { get; }
 
-    public abstract MessageTemplateToken Token { get; }
+    public abstract MessageTemplateToken GetToken();
 
+#if NETCOREAPP
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+#endif
     public TextNode GetOrAddTextNode(string rawLiteral)
     {
         var nextNode = Volatile.Read(ref _textNodes);
@@ -76,7 +78,9 @@ internal abstract class Node
             : children.GetOrAdd(rawLiteral, static (rl, parent) => new TextNode(parent, rl), this);
     }
 
+#if NETCOREAPP
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+#endif
     public PropertyNode GetOrAddPropertyNode(string name, string rawName)
     {
         var nextNode = Volatile.Read(ref _propertyNodes);
@@ -116,7 +120,9 @@ internal abstract class Node
             : children.GetOrAdd(name, static (name, arg) => new PropertyNode(arg.parent, name, arg.rawName), (parent: this, rawName));
     }
 
+#if NETCOREAPP
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+#endif
     public PropertyNode GetOrAddPropertyNode(string name, string rawName, int alignment, string? format)
     {
         var nextNode = Volatile.Read(ref _formattedPropertyNodes);

@@ -44,7 +44,9 @@ internal sealed class PropertyNode : Node
 
     public FormatKey FormatKey => new (Name, Token.Format, GetAlignment(Token.Alignment ?? default));
 
-    public override PropertyToken Token { get; }
+    public PropertyToken Token { get; }
+
+    public override MessageTemplateToken GetToken() => Token;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static Alignment GetAlignment(int alignment) => alignment <= 0

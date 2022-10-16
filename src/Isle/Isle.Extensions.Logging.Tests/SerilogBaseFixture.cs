@@ -17,7 +17,7 @@ namespace Isle.Extensions.Logging.Tests;
 
 public abstract class SerilogBaseFixture
 {
-    protected static readonly IReadOnlyList<LogLevel> LogLevels = Enum.GetValues<LogLevel>().Where(x => x != LogLevel.None).ToArray();
+    protected static readonly IReadOnlyList<LogLevel> LogLevels = EnumHelper.GetValues<LogLevel>().Where(x => x != LogLevel.None).ToArray();
         
     protected static readonly IReadOnlyList<object> FixtureArgs = (
         from logLevel in LogLevels

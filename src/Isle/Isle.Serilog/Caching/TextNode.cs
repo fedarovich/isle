@@ -9,5 +9,7 @@ internal sealed class TextNode : Node
         Token = new TextToken(text, Offset);
     }
 
-    public override TextToken Token { get; }
+    public TextToken Token { get; }
+
+    public override MessageTemplateToken GetToken() => Token;
 }

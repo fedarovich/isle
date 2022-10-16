@@ -6,7 +6,11 @@ namespace Isle;
 
 internal static class StringBuilderExtensions
 {
+#if NETCOREAPP
     [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.AggressiveOptimization)]
+#else
+    [MethodImpl(MethodImplOptions.NoInlining)]
+#endif
     internal static void EscapeAndAppend(this StringBuilder stringBuilder, in ReadOnlySpan<char> strSpan)
     {
         ReadOnlySpan<char> span = strSpan;

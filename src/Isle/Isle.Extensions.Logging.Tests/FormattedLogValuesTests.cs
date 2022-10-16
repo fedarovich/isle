@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using FluentAssertions;
 using NUnit.Framework;
@@ -122,7 +123,11 @@ public class FormattedLogValuesTests
             from type in typeof(FormattedLogValuesBase).Assembly.GetTypes()
             let match = regex.Match(type.Name)
             where match.Success
+#if NET6_0_OR_GREATER
             let n = int.Parse(match.Groups["n"].ValueSpan)
+#else
+            let n = int.Parse(match.Groups["n"].Value)
+#endif
             orderby n
             select (type, n)
         ).ToArray();

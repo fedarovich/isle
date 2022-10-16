@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
+		<TargetFrameworks>net6.0;net5.0;netstandard2.1</TargetFrameworks>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -13,6 +13,7 @@
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<Description>Adds support of structured logging using interpolated strings in C# 10 to Microsoft.Extensions.Logging.</Description>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <LangVersion>LatestMajor</LangVersion>
 	</PropertyGroup>
 
   <ItemGroup>

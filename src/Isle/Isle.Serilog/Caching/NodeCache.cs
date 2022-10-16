@@ -21,7 +21,7 @@ internal sealed class NodeCache : Node
     {
     }
 
-    public override MessageTemplateToken Token => null!;
+    public override MessageTemplateToken GetToken() => null!;
 
     protected internal override void Reset()
     {

@@ -22,7 +22,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Isle.Serilog", "Isle.Serilo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Isle.Serilog.Tests", "Isle.Serilog.Tests\Isle.Serilog.Tests.csproj", "{3519605E-123D-403C-8A12-49487E6919E4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Isle.Serilog.Benchmarks", "Isle.Serilog.Benchmarks\Isle.Serilog.Benchmarks.csproj", "{2F80036F-BE70-406C-85CA-2071D69312E5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Isle.Serilog.Benchmarks", "Isle.Serilog.Benchmarks\Isle.Serilog.Benchmarks.csproj", "{2F80036F-BE70-406C-85CA-2071D69312E5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Isle.Compatibility", "Isle.Compatibility\Isle.Compatibility.csproj", "{321C9442-416C-4FA1-A96A-7FE7CFC2560E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -62,6 +64,10 @@ Global
 		{2F80036F-BE70-406C-85CA-2071D69312E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2F80036F-BE70-406C-85CA-2071D69312E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2F80036F-BE70-406C-85CA-2071D69312E5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{321C9442-416C-4FA1-A96A-7FE7CFC2560E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{321C9442-416C-4FA1-A96A-7FE7CFC2560E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{321C9442-416C-4FA1-A96A-7FE7CFC2560E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{321C9442-416C-4FA1-A96A-7FE7CFC2560E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

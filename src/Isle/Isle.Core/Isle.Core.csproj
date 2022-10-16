@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFrameworks>net6.0;net5.0;netstandard2.1</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Copyright>© Pavel Fedarovich, 2022</Copyright>
@@ -14,6 +14,7 @@
     <RootNamespace>Isle</RootNamespace>
     <Description>Provides core functionality to support structured logging using interpolated strings in C# 10.</Description>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <LangVersion>LatestMajor</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -26,6 +27,10 @@
     <InternalsVisibleTo Include="Isle.Extensions.Logging.Tests" />
     <InternalsVisibleTo Include="Isle.Serilog" />
     <InternalsVisibleTo Include="Isle.Serilog.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Isle.Compatibility\Isle.Compatibility.csproj" Condition="!$([MSBuild]::IsTargetFrameworkCompatible($(TargetFramework), 'net6.0'))" />
   </ItemGroup>
 
 </Project>

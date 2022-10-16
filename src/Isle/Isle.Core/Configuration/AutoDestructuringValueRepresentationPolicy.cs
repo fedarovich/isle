@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace Isle.Configuration;
 
+#pragma warning disable CS1574, CS1584, CS1581, CS1580
 /// <summary>
 /// <see cref="IValueRepresentationPolicy"/> that sets the representation of non-scalar types to <see cref="ValueRepresentation.Destructure"/>.
 /// </summary>
@@ -61,6 +62,7 @@ namespace Isle.Configuration;
 /// All other types are treated as complex and their values will be destructured.
 /// </para>
 /// </remarks>
+#pragma warning restore CS1574, CS1584, CS1581, CS1580
 public sealed class AutoDestructuringValueRepresentationPolicy : IValueRepresentationPolicy
 {
     /// <summary>
@@ -90,7 +92,9 @@ public sealed class AutoDestructuringValueRepresentationPolicy : IValueRepresent
         [SuppressMessage("ReSharper", "StaticMemberInGenericType")]
         public static readonly bool IsScalar;
 
+#if NETCOREAPP
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+#endif
         static TypeInfo()
         {
             var type = typeof(T);
@@ -102,8 +106,10 @@ public sealed class AutoDestructuringValueRepresentationPolicy : IValueRepresent
                     || type == typeof(DateTime)
                     || type == typeof(DateTimeOffset)
                     || type == typeof(TimeSpan)
+#if NET6_0_OR_GREATER
                     || type == typeof(DateOnly)
                     || type == typeof(TimeOnly)
+#endif
                     || type == typeof(Uri)
                     || type == typeof(Guid);
         }

@@ -156,8 +156,8 @@ internal ref struct ValueStringBuilder
         int remaining = _pos - index;
         _chars.Slice(index, remaining).CopyTo(_chars.Slice(index + count));
         s
-#if !NETCOREAPP
-                .AsSpan()
+#if !NET6_0_OR_GREATER
+            .AsSpan()
 #endif
             .CopyTo(_chars.Slice(index));
         _pos += count;
@@ -207,8 +207,8 @@ internal ref struct ValueStringBuilder
         }
 
         s
-#if !NETCOREAPP
-                .AsSpan()
+#if !NET6_0_OR_GREATER
+            .AsSpan()
 #endif
             .CopyTo(_chars.Slice(pos));
         _pos += s.Length;
@@ -315,9 +315,18 @@ internal ref struct ValueStringBuilder
         }
     }
 
-    internal void AppendSpanFormattable<T>(T value, string? format = null, IFormatProvider? provider = null) where T : ISpanFormattable
+    internal void AppendSpanFormattable<T>(T value, string? format = null, IFormatProvider? provider = null)
+#if NET6_0_OR_GREATER
+        where T : ISpanFormattable
+#else
+        where T : IFormattable
+#endif
     {
+#if NET6_0_OR_GREATER
         if (value.TryFormat(_chars.Slice(_pos), out int charsWritten, format, provider))
+#else
+        if (SpanFormattableHelper.TryFormat(value, _chars.Slice(_pos), out int charsWritten, format, provider))
+#endif
         {
             _pos += charsWritten;
         }

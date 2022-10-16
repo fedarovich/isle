@@ -26,7 +26,9 @@ internal abstract class Node
 
     public int Depth { get; }
 
+#if NETCOREAPP
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+#endif
     public LiteralNode GetOrAddLiteralNode(string rawLiteral)
     {
         var nextNode = Volatile.Read(ref _literalNodes);
@@ -67,7 +69,9 @@ internal abstract class Node
             : children.GetOrAdd(rawLiteral, static (rl, parent) => new LiteralNode(parent, rl), this);
     }
 
+#if NETCOREAPP
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+#endif
     public HoleNode GetOrAddHoleNode(string name)
     {
         var nextNode = Volatile.Read(ref _holeNodes);
@@ -107,7 +111,9 @@ internal abstract class Node
             : children.GetOrAdd(name, static (name, parent) => new HoleNode(parent, name), this);
     }
 
+#if NETCOREAPP
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+#endif
     public FormattedHoleNode GetOrAddFormattedHoleNode(string name, int alignment, string? format)
     {
         var nextNode = Volatile.Read(ref _formattedHoleNodes);

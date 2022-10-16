@@ -13,7 +13,7 @@ namespace Isle.Serilog.Tests;
 
 public abstract class BaseFixture
 {
-    protected static readonly IReadOnlyList<LogEventLevel> LogEventLevels = Enum.GetValues<LogEventLevel>().ToArray();
+    protected static readonly IReadOnlyList<LogEventLevel> LogEventLevels = EnumHelper.GetValues<LogEventLevel>().ToArray();
         
     protected static readonly IReadOnlyList<object> FixtureArgs = (
         from logEventLevel in LogEventLevels

@@ -67,7 +67,7 @@ public class MELBenchmarks
     [GlobalCleanup]
     public void GlobalCleanup()
     {
-        IsleConfiguration.Reset();
+        //IsleConfiguration.Reset();
         _loggerFactory.Dispose();
     }
 

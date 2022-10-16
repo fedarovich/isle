@@ -25,8 +25,10 @@ namespace Isle.Core.Tests.Configuration;
 [TestFixture(typeof(DateTime))]
 [TestFixture(typeof(DateTimeOffset))]
 [TestFixture(typeof(TimeSpan))]
+#if NET6_0_OR_GREATER
 [TestFixture(typeof(DateOnly))]
 [TestFixture(typeof(TimeOnly))]
+#endif
 [TestFixture(typeof(Guid))]
 [TestFixture(typeof(Uri))]
 [TestFixture(typeof(UriKind))] // Enum

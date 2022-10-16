@@ -1,36 +1,24 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFrameworks>net6.0;net5.0;netstandard2.1</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-	<Copyright>© Pavel Fedarovich, 2022</Copyright>
-	<PackageProjectUrl>https://github.com/fedarovich/isle</PackageProjectUrl>
-	<RepositoryUrl>https://github.com/fedarovich/isle.git</RepositoryUrl>
-	<RepositoryType>git</RepositoryType>
-	<PackageTags>structured logging; semantic logging; interpolated strings</PackageTags>
-	<PackageLicenseExpression>MIT</PackageLicenseExpression>
-	<Description>Adds support of structured logging using interpolated strings in C# 10 to Serilog.</Description>
-	<GenerateDocumentationFile>True</GenerateDocumentationFile>
+	  <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	  <Copyright>© Pavel Fedarovich, 2022</Copyright>
+	  <PackageProjectUrl>https://github.com/fedarovich/isle</PackageProjectUrl>
+	  <RepositoryUrl>https://github.com/fedarovich/isle.git</RepositoryUrl>
+	  <RepositoryType>git</RepositoryType>
+	  <PackageTags>structured logging; semantic logging; interpolated strings</PackageTags>
+	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
+	  <Description>Adds support of structured logging using interpolated strings in C# 10 to Serilog.</Description>
+	  <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <LangVersion>LatestMajor</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
     <InternalsVisibleTo Include="$(AssemblyName).Tests" />
     <InternalsVisibleTo Include="$(AssemblyName).Benchmarks" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="LoggerExtensions.g.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>LoggerExtensions.tt</DependentUpon>
-    </None>
-    <None Include="LogHandlers.g.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>LogHandlers.tt</DependentUpon>
-    </None>
   </ItemGroup>
 
   <ItemGroup>

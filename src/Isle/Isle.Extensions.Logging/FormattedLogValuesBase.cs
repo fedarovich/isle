@@ -74,7 +74,7 @@ internal abstract class FormattedLogValuesBase : IReadOnlyList<KeyValuePair<stri
 
         var handler = new DefaultInterpolatedStringHandler(0, _segments.Length, CultureInfo.InvariantCulture, stackalloc char[512]);
 
-        foreach (var segment in _segments.Span)
+        foreach (ref readonly var segment in _segments.Span)
         {
             switch (segment.Type)
             {

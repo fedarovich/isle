@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net5.0;netstandard2.1</TargetFrameworks>
+    <LangVersion>LatestMajor</LangVersion>
+    <RootNamespace>Isle</RootNamespace>
+    <Nullable>Enable</Nullable>
+    <Copyright>© Pavel Fedarovich, 2022</Copyright>
+    <PackageProjectUrl>https://github.com/fedarovich/isle</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/fedarovich/isle.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>structured logging; semantic logging; interpolated strings</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Description>Provides compatibility classes for Isle.Core on platforms older than .Net 6.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Isle.Core" />
+    <InternalsVisibleTo Include="Isle.Extensions.Logging" />
+    <InternalsVisibleTo Include="Isle.Serilog" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Condition="'$(TargetFramework)' == 'netstandard2.1'" Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
+  </ItemGroup>
+</Project>

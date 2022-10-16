@@ -51,7 +51,7 @@ internal sealed class TemplateNode
 
             MessageTemplate = new MessageTemplate(
                 vsb.ToString(),
-                nodes.Select(x => x.Token).Take(tokenCount));
+                nodes.Select(x => x.GetToken()).Take(tokenCount));
             PropertyNodes = propertyNodes;
         }
         finally

@@ -109,7 +109,11 @@ internal readonly record struct Segment
 
     public string? Format => _object as string;
 
+#if NET5_0_OR_GREATER
     public Span<string> LiteralList => CollectionsMarshal.AsSpan(_object as List<string>).Slice(_alignmentOrStart, _count);
+#else
+    public IEnumerable<string> LiteralList => (_object as List<string>)!.Skip(_alignmentOrStart).Take(_count);
+#endif
 
     public int Alignment => _alignmentOrStart;
 }
