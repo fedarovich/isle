@@ -34,8 +34,16 @@ internal static class SpanFormattableHelper
 
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static bool TryFormat<T>(T value, Span<char> destination, out int charsWritten,
-        ReadOnlySpan<char> format, IFormatProvider? provider)
+    internal static bool TryFormat<T>(
+        T value, 
+        Span<char> destination, 
+        out int charsWritten,
+#if NETCOREAPP || NETSTANDARD2_1
+        ReadOnlySpan<char> format,
+#else
+        string? format,
+#endif
+        IFormatProvider? provider)
     {
 #if NETCOREAPP || NETSTANDARD2_1
         return value switch

@@ -1,4 +1,5 @@
 ﻿#nullable enable
+#if NETCOREAPP || NETSTANDARD2_1
 using System.Runtime.InteropServices;
 
 namespace Isle.Extensions.Logging;
@@ -395,3 +396,5 @@ internal sealed class FormattedLogValues7 : FormattedLogValuesBase
     }
 }
 
+
+#endif

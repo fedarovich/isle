@@ -2,6 +2,7 @@
 using System;
 using System.Buffers;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -100,7 +101,11 @@ internal ref struct DefaultInterpolatedStringHandler
 
     /// <summary>Gets the built <see cref="string"/>.</summary>
     /// <returns>The built string.</returns>
+#if NETFRAMEWORK || NETSTANDARD2_0
+    public override string ToString() => CreateString(Text);
+#else
     public override string ToString() => new string(Text);
+#endif
 
     /// <summary>Gets the built <see cref="string"/> and clears the handler.</summary>
     /// <returns>The built string.</returns>
@@ -112,7 +117,11 @@ internal ref struct DefaultInterpolatedStringHandler
     /// </remarks>
     public string ToStringAndClear()
     {
+#if NETFRAMEWORK || NETSTANDARD2_0
+        string result = CreateString(Text);
+#else
         string result = new string(Text);
+#endif
         Clear();
         return result;
     }
@@ -206,7 +215,7 @@ internal ref struct DefaultInterpolatedStringHandler
         }
     }
 
-    #region AppendFormatted
+#region AppendFormatted
     // Design note:
     // The compiler requires a AppendFormatted overload for anything that might be within an interpolation expression;
     // if it can't find an appropriate overload, for handlers in general it'll simply fail to compile.
@@ -281,7 +290,7 @@ internal ref struct DefaultInterpolatedStringHandler
     // apply is ReadOnlySpan<char>, which isn't supported by either string.Format nor StringBuilder.AppendFormat, but more
     // importantly which can't be boxed to be passed to ICustomFormatter.Format.
 
-    #region AppendFormatted T
+#region AppendFormatted T
     /// <summary>Writes the specified value to the handler.</summary>
     /// <param name="value">The value to write.</param>
     public void AppendFormatted<T>(T value)
@@ -407,9 +416,9 @@ internal ref struct DefaultInterpolatedStringHandler
             AppendOrInsertAlignmentIfNeeded(startingPos, alignment);
         }
     }
-    #endregion
+#endregion
 
-    #region AppendFormatted ReadOnlySpan<char>
+#region AppendFormatted ReadOnlySpan<char>
     /// <summary>Writes the specified character span to the handler.</summary>
     /// <param name="value">The span to write.</param>
     public void AppendFormatted(ReadOnlySpan<char> value)
@@ -464,9 +473,9 @@ internal ref struct DefaultInterpolatedStringHandler
             _pos += value.Length;
         }
     }
-    #endregion
+#endregion
 
-    #region AppendFormatted string
+#region AppendFormatted string
     /// <summary>Writes the specified value to the handler.</summary>
     /// <param name="value">The value to write.</param>
     public void AppendFormatted(string? value)
@@ -514,9 +523,9 @@ internal ref struct DefaultInterpolatedStringHandler
         // simply to disambiguate between ROS<char> and object, just in case someone does specify a format, as
         // string is implicitly convertible to both. Just delegate to the T-based implementation.
         AppendFormatted<string?>(value, alignment, format);
-    #endregion
+#endregion
 
-    #region AppendFormatted object
+#region AppendFormatted object
     /// <summary>Writes the specified value to the handler.</summary>
     /// <param name="value">The value to write.</param>
     /// <param name="alignment">Minimum number of characters that should be written for this value.  If the value is negative, it indicates left-aligned and the required minimum is the absolute value.</param>
@@ -526,8 +535,8 @@ internal ref struct DefaultInterpolatedStringHandler
         // formatted with both an alignment and a format, or b) the compiler is unable to target type to T. It
         // exists purely to help make cases from (b) compile. Just delegate to the T-based implementation.
         AppendFormatted<object?>(value, alignment, format);
-    #endregion
-    #endregion
+#endregion
+#endregion
 
     /// <summary>Gets whether the provider provides a custom formatter.</summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)] // only used in a few hot path call sites
@@ -660,7 +669,7 @@ internal ref struct DefaultInterpolatedStringHandler
         // Even if the array creation fails in such a case, we may later fail in ToStringAndClear.
 
         uint newCapacity = Math.Max(requiredMinCapacity, Math.Min((uint)_chars.Length * 2, MaxLength));
-        int arraySize = (int)Math.Clamp(newCapacity, MinimumArrayPoolLength, int.MaxValue);
+        int arraySize = (int)Clamp(newCapacity, MinimumArrayPoolLength, int.MaxValue);
 
         char[] newArray = ArrayPool<char>.Shared.Rent(arraySize);
         _chars.Slice(0, _pos).CopyTo(newArray);
@@ -672,6 +681,48 @@ internal ref struct DefaultInterpolatedStringHandler
         {
             ArrayPool<char>.Shared.Return(toReturn);
         }
+    }
+
+#if NETFRAMEWORK || NETSTANDARD2_0
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static unsafe string CreateString(in ReadOnlySpan<char> text)
+    {
+        fixed (char* pText = text)
+        {
+            return new string(pText, 0, text.Length);
+        }
+    }
+#endif
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static uint Clamp(uint value, uint min, uint max)
+    {
+#if NETFRAMEWORK || NETSTANDARD2_0
+        if (min > max)
+        {
+            ThrowMinMaxException(min, max);
+        }
+
+        if (value < min)
+        {
+            return min;
+        }
+        
+        if (value > max)
+        {
+            return max;
+        }
+
+        return value;
+
+        [DoesNotReturn]
+        static void ThrowMinMaxException<T>(T min, T max)
+        {
+            throw new ArgumentException("The min value must be less than or equal to max value.");
+        }
+#else
+        return Math.Clamp(value, min, max);
+#endif
     }
 }
 #endif

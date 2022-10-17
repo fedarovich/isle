@@ -17,6 +17,7 @@ public class FormattedLogValuesTests
          from c in Enumerable.Range(0, fc + 1)
          select (fc, c)).ToArray();
 
+#if !NETFRAMEWORK
     [Test]
     public void Create0() => FormattedLogValuesBase.Create(0).Should().BeOfType<FormattedLogValues0>().Which.Count.Should().Be(1);
 
@@ -40,6 +41,7 @@ public class FormattedLogValuesTests
 
     [Test]
     public void Create7() => FormattedLogValuesBase.Create(7).Should().BeOfType<FormattedLogValues7>().Which.Count.Should().Be(8);
+#endif
 
     [Test]
     public void CreateN([Values(8, 9, 10, 20, 100)] int n) => FormattedLogValuesBase.Create(n).Should().BeOfType<FormattedLogValues>().Which.Count.Should().Be(n + 1);
@@ -115,6 +117,7 @@ public class FormattedLogValuesTests
         values.ToString().Should().Be("(null) a, (null), b");
     }
 
+#if !NETFRAMEWORK
     [Test]
     public void AllFixedCountFormattedLogValuesAreUsed()
     {
@@ -146,7 +149,8 @@ public class FormattedLogValuesTests
             formattedLogValuesN.Should().BeOfType(type);
         }
 
-        var formattedLogValues = FormattedLogValuesBase.Create(types[^1].n + 1);
+        var formattedLogValues = FormattedLogValuesBase.Create(types[types.Length - 1].n + 1);
         formattedLogValues.Should().BeOfType(typeof(FormattedLogValues));
     }
+#endif
 }

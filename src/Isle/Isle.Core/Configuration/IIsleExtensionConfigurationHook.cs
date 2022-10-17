@@ -14,6 +14,10 @@ public interface IIsleExtensionConfigurationHook
     /// Callback method that is called after the ISLE configuration is reset.
     /// </summary>
     void ResetExtensionConfiguration()
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1
     {
     }
+#else
+    ;
+#endif
 }

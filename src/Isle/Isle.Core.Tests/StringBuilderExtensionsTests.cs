@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using FluentAssertions;
 using NUnit.Framework;
 
@@ -10,7 +11,7 @@ public class StringBuilderExtensionsTests
     public void EscapeAndAppend([Values("abc", "a{c", "a}c", "{", "}", "", null)] string str)
     {
         var builder = new StringBuilder();
-        builder.EscapeAndAppend(str);
+        builder.EscapeAndAppend(str.AsSpan());
         var result = builder.ToString();
         result.Should().Be((str ?? "").Replace("{", "{{").Replace("}", "}}"));
     }

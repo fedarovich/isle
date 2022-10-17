@@ -86,7 +86,7 @@ internal sealed class SimpleFormattedLogValuesBuilder : FormattedLogValuesBuilde
     public override void AppendLiteral(string str)
     {
         var start = _originalFormatBuilder.Length;
-        _originalFormatBuilder.EscapeAndAppend(str);
+        _originalFormatBuilder.EscapeAndAppend(str.AsSpan());
         var end = _originalFormatBuilder.Length;
         var length = end - start;
         if (length > 0)

@@ -11,6 +11,10 @@ internal class IsleExtensionConfigurationHookTests
         public void ApplyExtensionConfiguration()
         {
         }
+
+        public void ResetExtensionConfiguration()
+        {
+        }
     }
 
     [Test]

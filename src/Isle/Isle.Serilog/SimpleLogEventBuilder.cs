@@ -98,7 +98,7 @@ internal sealed class SimpleLogEventBuilder : LogEventBuilder
     {
         _tokens.Add(new TextToken(literal, _currentPosition));
         var start = _messageTemplateBuilder.Length;
-        _messageTemplateBuilder.EscapeAndAppend(literal);
+        _messageTemplateBuilder.EscapeAndAppend(literal.AsSpan());
         var end = _messageTemplateBuilder.Length;
         _currentPosition += end - start;
     }

@@ -27,6 +27,7 @@ internal abstract class FormattedLogValuesBase : IReadOnlyList<KeyValuePair<stri
     }
 
     internal static FormattedLogValuesBase Create(int formattedCount) =>
+#if NETCOREAPP || NETSTANDARD2_1
         formattedCount switch
         {
             0 => new FormattedLogValues0(),
@@ -39,7 +40,10 @@ internal abstract class FormattedLogValuesBase : IReadOnlyList<KeyValuePair<stri
             7 => new FormattedLogValues7(),
             _ => new FormattedLogValues(formattedCount)
         };
-   
+#else
+        new FormattedLogValues(formattedCount);
+#endif
+
 
     public abstract IEnumerator<KeyValuePair<string, object?>> GetEnumerator();
 

@@ -5,6 +5,7 @@
 <#@ import namespace="System.Collections.Generic" #>
 <#@ output extension=".g.cs" #>
 #nullable enable
+#if NETCOREAPP || NETSTANDARD2_1
 using System.Runtime.InteropServices;
 
 namespace Isle.Extensions.Logging;
@@ -56,3 +57,5 @@ internal sealed class FormattedLogValues<#= n #> : FormattedLogValuesBase
 }
 
 <# } #>
+
+#endif

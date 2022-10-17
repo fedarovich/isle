@@ -15,7 +15,7 @@ public class ValueNameConvertersTests
         var x = "x";
         var xx1 = converter(x);
         xx1.Should().Be(x + x);
-        var xx2 = converter(new string(x));
+        var xx2 = converter(new string(x.ToCharArray()));
         xx2.Should().BeSameAs(xx1);
     }
 
@@ -27,19 +27,19 @@ public class ValueNameConvertersTests
         var x = "x";
         var xx1 = converter(x);
         xx1.Should().Be(x + x);
-        var xx2 = converter(new string(x));
+        var xx2 = converter(new string(x.ToCharArray()));
         xx2.Should().BeSameAs(xx1);
 
         var y = "y";
         var yy1 = converter(y);
         yy1.Should().Be(y + y);
-        var yy2 = converter(new string(y));
+        var yy2 = converter(new string(y.ToCharArray()));
         yy2.Should().BeSameAs(yy1);
 
         var z = "z";
         var zz1 = converter(z);
         zz1.Should().Be(z + z);
-        var zz2 = converter(new string(z));
+        var zz2 = converter(new string(z.ToCharArray()));
         zz2.Should().Be(z + z);
         zz2.Should().NotBeSameAs(zz1);
     }

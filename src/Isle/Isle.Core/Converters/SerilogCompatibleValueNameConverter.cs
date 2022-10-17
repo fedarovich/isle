@@ -21,7 +21,7 @@ internal sealed class SerilogCompatibleValueNameConverter
 
         int position = GetFirstPositionToRemove(expression, out var hasAt);
         if (position >= 0)
-            return Convert(expression, position, _capitalizeFirstCharacter, hasAt);
+            return Convert(expression.AsSpan(), position, _capitalizeFirstCharacter, hasAt);
 
         return _capitalizeFirstCharacter 
             ? CapitalizeFirstCharacterConverter.Convert(expression) 

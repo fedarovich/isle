@@ -5,6 +5,7 @@
 
 trigger:
 - main
+- backport
 
 pool:
   vmImage: windows-2022
@@ -48,6 +49,14 @@ steps:
     projects: 'src/Isle/Isle.sln'
     arguments: '-c $(BuildConfiguration) --no-build'
     nobuild: true
+
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet pack Isle.Compatibility'
+  inputs:
+    command: custom
+    custom: pack
+    projects: 'src/Isle/Isle.Compatibility/Isle.Compatibility.csproj'
+    arguments: '-c $(BuildConfiguration) -p:VersionPrefix=$(Build.BuildNumber) --version-suffix "$(Suffix)" --no-build --include-symbols -o "$(Build.ArtifactStagingDirectory)"'
 
 - task: DotNetCoreCLI@2
   displayName: 'dotnet pack Isle.Core'

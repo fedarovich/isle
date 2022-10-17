@@ -161,6 +161,7 @@ public class ValueStringBuilderTests
         vsb.ToString().Should().Be(sb.ToString());
     }
 
+#if NETCOREAPP || NETSTANDARD2_1
     [Test]
     public void AsSpan_ReturnsCorrectValue_DoesntClearBuilder()
     {
@@ -180,6 +181,7 @@ public class ValueStringBuilderTests
         sb.Length.Should().NotBe(0);
         vsb.Length.Should().Be(sb.Length);
     }
+#endif
 
     [Test]
     public void ToString_ClearsBuilder_ThenReusable()
@@ -218,6 +220,7 @@ public class ValueStringBuilderTests
         vsb.Length.Should().Be(0);
     }
 
+#if NETCOREAPP || NETSTANDARD2_1
     [Test]
     public void TryCopyTo_ClearsBuilder_ThenReusable()
     {
@@ -241,6 +244,7 @@ public class ValueStringBuilderTests
         vsb.Length.Should().Be(Text2.Length);
         vsb.ToString().Should().Be(Text2);
     }
+#endif
 
     [Test]
     public void Dispose_ClearsBuilder_ThenReusable()

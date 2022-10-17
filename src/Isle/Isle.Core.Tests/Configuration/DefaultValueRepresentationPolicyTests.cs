@@ -32,7 +32,7 @@ namespace Isle.Core.Tests.Configuration;
 [TestFixture(typeof(Guid))]
 [TestFixture(typeof(Uri))]
 [TestFixture(typeof(UriKind))] // Enum
-[TestFixture(typeof(Range))] // Struct
+[TestFixture(typeof(TestStruct))] // Struct
 [TestFixture(typeof(EventArgs))] // Class
 [TestFixture(typeof(int[]))] // Array
 [TestFixture(typeof(List<int>))] // Collection
