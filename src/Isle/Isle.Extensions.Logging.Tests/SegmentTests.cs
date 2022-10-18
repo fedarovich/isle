@@ -57,30 +57,48 @@ public class SegmentTests
         segment3.LiteralList.ToArray().Should().BeEquivalentTo("A", "B", "C");
     }
 
-    //[Test]
-    //public void AlignmentSegment([Values(-3, 0, 5)] int alignment)
-    //{
-    //    var segment = new Segment(alignment);
-    //    segment.IsLiteral.Should().BeFalse();
-    //    segment.Alignment.Should().Be(alignment);
-    //}
+#if !NET5_0_OR_GREATER
 
-    //[Test]
-    //public void LiteralSegment([Values(0, 3)] int start, [Values(0, 5)] int length)
-    //{
-    //    var segment = new Segment(start, length);
-    //    segment.IsLiteral.Should().BeTrue();
-    //    segment.Start.Should().Be(start);
-    //    segment.Length.Should().Be(length);
-    //}
+    [Test]
+    public void ListSegmentToArray()
+    {
+        var list = new List<string> { "A", "B", "C", "D", "E", "F" };
+        var segmentList = new Segment.ListSegment<string>(list, 2, 3);
+        segmentList.Length.Should().Be(3);
+        segmentList.ToArray().Should().BeEquivalentTo("C", "D", "E");
+    }
 
-    //[Test]
-    //public void Grow([Values(0, 3)] int start, [Values(0, 5)] int length, [Values(0, 11)] int increment)
-    //{
-    //    var segment = new Segment(start, length);
-    //    Segment.Grow(ref segment, increment);
-    //    segment.IsLiteral.Should().BeTrue();
-    //    segment.Start.Should().Be(start);
-    //    segment.Length.Should().Be(length + increment);
-    //}
+    [Test]
+    public void ListSegmentEnumerate()
+    {
+        var list = new List<string> { "A", "B", "C", "D", "E", "F" };
+        var segmentList = new Segment.ListSegment<string>(list, 2, 3);
+
+        var result = new List<string>();
+        foreach (var item in segmentList)
+        {
+            result.Add(item);
+        }
+
+        result.Count.Should().Be(3);
+        result.ToArray().Should().BeEquivalentTo("C", "D", "E");
+    }
+
+    [Test]
+    public void ListSegmentIterate()
+    {
+        var list = new List<string> { "A", "B", "C", "D", "E", "F" };
+        var segmentList = new Segment.ListSegment<string>(list, 2, 3);
+
+        var result = new List<string>();
+        for (int i = 0; i < segmentList.Length; i++)
+        {
+            result.Add(segmentList[i]);
+        }
+
+        result.Count.Should().Be(3);
+        result.ToArray().Should().BeEquivalentTo("C", "D", "E");
+    }
+
+#endif
 }

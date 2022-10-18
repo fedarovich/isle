@@ -11,7 +11,7 @@ namespace Isle.Extensions.Logging;
 /// This struct is very low level and does not provide good encapsulation for performance reasons.
 /// Thus we don't want to make it public.
 /// </remarks>
-internal readonly record struct Segment
+internal readonly partial record struct Segment
 {
     internal enum SegmentType
     {
@@ -112,7 +112,7 @@ internal readonly record struct Segment
 #if NET5_0_OR_GREATER
     public Span<string> LiteralList => CollectionsMarshal.AsSpan(_object as List<string>).Slice(_alignmentOrStart, _count);
 #else
-    public IEnumerable<string> LiteralList => (_object as List<string>)!.Skip(_alignmentOrStart).Take(_count);
+    public ListSegment<string> LiteralList => new ((_object as List<string>)!, _alignmentOrStart, _count);
 #endif
 
     public int Alignment => _alignmentOrStart;
