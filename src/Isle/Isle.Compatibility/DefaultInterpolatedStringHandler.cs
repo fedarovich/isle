@@ -318,7 +318,7 @@ internal ref struct DefaultInterpolatedStringHandler
         {
             // If the value can format itself directly into our buffer, do so.
 
-            if (SpanFormattableHelper.IsSpanFormattable(value))
+            if (SpanFormattableHelper.IsSpanFormattable<T>())
             {
                 int charsWritten;
                 while (!SpanFormattableHelper.TryFormat(value, _chars.Slice(_pos), out charsWritten, default, _provider))
@@ -365,7 +365,7 @@ internal ref struct DefaultInterpolatedStringHandler
         if (value is IFormattable)
         {
             // If the value can format itself directly into our buffer, do so.
-            if (SpanFormattableHelper.IsSpanFormattable(value))
+            if (SpanFormattableHelper.IsSpanFormattable<T>())
             {
                 int charsWritten;
                 while (SpanFormattableHelper.TryFormat(value, _chars.Slice(_pos), out charsWritten, format, _provider))

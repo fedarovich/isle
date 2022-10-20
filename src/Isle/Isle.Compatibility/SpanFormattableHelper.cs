@@ -8,7 +8,7 @@ namespace Isle;
 internal static class SpanFormattableHelper
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static bool IsSpanFormattable<T>(T value)
+    internal static bool IsSpanFormattable<T>()
     {
 #if NETCOREAPP || NETSTANDARD2_1
         return typeof(T) == typeof(byte)
