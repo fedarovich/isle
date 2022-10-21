@@ -1,4 +1,5 @@
 ﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Jobs;
 using Isle.Configuration;
 using Isle.Extensions.Logging.Benchmarks.Serilog;
 using Microsoft.Extensions.Logging;
@@ -8,6 +9,10 @@ using Serilog.Events;
 namespace Isle.Extensions.Logging.Benchmarks;
 
 [MemoryDiagnoser]
+[SimpleJob(RuntimeMoniker.Net60)]
+[SimpleJob(RuntimeMoniker.Net50)]
+[SimpleJob(RuntimeMoniker.NetCoreApp31)]
+[SimpleJob(RuntimeMoniker.Net48)]
 public class SerilogBenchmark
 {
     private ILoggerFactory _loggerFactory = null!;

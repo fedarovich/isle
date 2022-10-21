@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Jobs;
 using Isle.Configuration;
 using Isle.Extensions.Logging.Benchmarks.MEL;
 using Microsoft.Extensions.Logging;
@@ -8,6 +9,10 @@ namespace Isle.Extensions.Logging.Benchmarks;
 
 [MemoryDiagnoser]
 [SuppressMessage("ReSharper", "InconsistentNaming")]
+[SimpleJob(RuntimeMoniker.Net60)]
+[SimpleJob(RuntimeMoniker.Net50)]
+[SimpleJob(RuntimeMoniker.NetCoreApp31)]
+[SimpleJob(RuntimeMoniker.Net48)]
 public class MELBenchmarks
 {
     private ILoggerFactory _loggerFactory = null!;
@@ -67,7 +72,6 @@ public class MELBenchmarks
     [GlobalCleanup]
     public void GlobalCleanup()
     {
-        //IsleConfiguration.Reset();
         _loggerFactory.Dispose();
     }
 
