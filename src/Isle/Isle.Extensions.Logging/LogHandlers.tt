@@ -75,7 +75,7 @@ public ref partial struct <#= GetTypeName(logLevel) #>
     {
         if (!string.IsNullOrEmpty(str))
         {
-            _builder.AppendLiteral(str);
+            _builder.AppendLiteral(str!);
         }
     }
 

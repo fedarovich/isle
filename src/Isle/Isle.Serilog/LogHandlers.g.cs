@@ -48,7 +48,7 @@ public ref partial struct VerboseLogInterpolatedStringHandler
     {
         if (!string.IsNullOrEmpty(str))
         {
-            _builder.AppendLiteral(str);
+            _builder.AppendLiteral(str!);
         }
     }
 
@@ -148,7 +148,7 @@ public ref partial struct DebugLogInterpolatedStringHandler
     {
         if (!string.IsNullOrEmpty(str))
         {
-            _builder.AppendLiteral(str);
+            _builder.AppendLiteral(str!);
         }
     }
 
@@ -248,7 +248,7 @@ public ref partial struct InformationLogInterpolatedStringHandler
     {
         if (!string.IsNullOrEmpty(str))
         {
-            _builder.AppendLiteral(str);
+            _builder.AppendLiteral(str!);
         }
     }
 
@@ -348,7 +348,7 @@ public ref partial struct WarningLogInterpolatedStringHandler
     {
         if (!string.IsNullOrEmpty(str))
         {
-            _builder.AppendLiteral(str);
+            _builder.AppendLiteral(str!);
         }
     }
 
@@ -448,7 +448,7 @@ public ref partial struct ErrorLogInterpolatedStringHandler
     {
         if (!string.IsNullOrEmpty(str))
         {
-            _builder.AppendLiteral(str);
+            _builder.AppendLiteral(str!);
         }
     }
 
@@ -548,7 +548,7 @@ public ref partial struct FatalLogInterpolatedStringHandler
     {
         if (!string.IsNullOrEmpty(str))
         {
-            _builder.AppendLiteral(str);
+            _builder.AppendLiteral(str!);
         }
     }
 
@@ -651,7 +651,7 @@ public ref partial struct LogInterpolatedStringHandler
     {
         if (!string.IsNullOrEmpty(str))
         {
-            _builder.AppendLiteral(str);
+            _builder.AppendLiteral(str!);
         }
     }
 
