@@ -15,12 +15,8 @@
     <Description>Provides core functionality to support structured logging using interpolated strings in C# 10.</Description>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <LangVersion>LatestMajor</LangVersion>
-    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddAnalyzersToOutput</TargetsForTfmSpecificContentInPackage>
+    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);AddPackageFiles</TargetsForTfmSpecificContentInPackage>
   </PropertyGroup>
-
-  <ItemGroup>
-    <None Update="buildTransitive/**" Pack="True" PackagePath="/" />
-  </ItemGroup>
 
   <ItemGroup>
     <InternalsVisibleTo Include="$(AssemblyName).Tests" />
@@ -31,10 +27,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\.editorconfig" Link=".editorconfig" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Isle.Compatibility\Isle.Compatibility.csproj" Condition="!$([MSBuild]::IsTargetFrameworkCompatible($(TargetFramework), 'net6.0'))" />
   </ItemGroup>
 
@@ -42,13 +34,11 @@
     <ProjectReference Include="..\Isle.Core.Analyzers\Isle.Core.Analyzers.csproj" ReferenceOutputAssembly="False" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="tools\*.ps1" CopyToOutputDirectory="PreserveNewest" Pack="true" PackagePath="" />
-  </ItemGroup>
-
-  <Target Name="_AddAnalyzersToOutput">
+  <Target Name="AddPackageFiles">
     <ItemGroup>
       <TfmSpecificPackageFile Include="..\Isle.Core.Analyzers\bin\$(Configuration)\netstandard2.0\Isle.Core.Analyzers.dll" PackagePath="analyzers/dotnet/cs" />
+      <TfmSpecificPackageFile Include="buildTransitive/**" PackagePath="buildTransitive" />
+      <TfmSpecificPackageFile Include="tools/*.ps1" PackagePath="tools" />
     </ItemGroup>
   </Target>
 

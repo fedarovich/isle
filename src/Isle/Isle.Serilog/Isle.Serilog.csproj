@@ -14,6 +14,7 @@
 	  <Description>Adds support of structured logging using interpolated strings in C# 10 to Serilog.</Description>
 	  <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <LangVersion>LatestMajor</LangVersion>
+    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);AddPackageFiles</TargetsForTfmSpecificContentInPackage>
   </PropertyGroup>
 
   <ItemGroup>
@@ -61,8 +62,10 @@
     </Compile>
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="buildTransitive/**" Pack="True" PackagePath="/" />
-  </ItemGroup>
+  <Target Name="AddPackageFiles">
+    <ItemGroup>
+      <TfmSpecificPackageFile Include="buildTransitive/**" PackagePath="buildTransitive" />
+    </ItemGroup>
+  </Target>
 
 </Project>
