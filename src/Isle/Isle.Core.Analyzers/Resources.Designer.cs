@@ -61,7 +61,7 @@ namespace Isle.Core.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to ISLE requires C# 10.0 or greater..
+        ///   Looks up a localized string similar to ISLE requires C# 10.0 or greater. You must have .NET SDK 6 or later installed, and add &lt;LangVersion&gt;Latest&lt;/LangVersion&gt; to your .csproj file..
         /// </summary>
         internal static string LangVersionAnalyzerDescription {
             get {
