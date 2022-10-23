@@ -1,9 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using System.Collections.Immutable;
-using System.Linq;
 
 namespace Isle.Core.Analyzers
 {
@@ -29,17 +27,17 @@ namespace Isle.Core.Analyzers
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
-            context.RegisterSyntaxTreeAction(AnalyzeSyntaxTree);
+            context.RegisterCompilationAction(ctx => AnalyzeCompilation(ctx));
         }
 
-        private void AnalyzeSyntaxTree(SyntaxTreeAnalysisContext context)
+        private void AnalyzeCompilation(CompilationAnalysisContext context)
         {
-            if (context.Tree.Options is not CSharpParseOptions options)
+            if (context.Compilation is not CSharpCompilation compilation)
                 return;
 
-            if (options.LanguageVersion < LanguageVersion.CSharp10)
+            if (compilation.LanguageVersion < LanguageVersion.CSharp10)
             {
-                var diagnostic = Diagnostic.Create(Rule, Location.None, options.LanguageVersion.ToDisplayString());
+                var diagnostic = Diagnostic.Create(Rule, Location.None, compilation.LanguageVersion.ToDisplayString());
                 context.ReportDiagnostic(diagnostic);
             }
         }

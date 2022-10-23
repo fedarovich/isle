@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -25,7 +25,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Isle.Extensions.Logging\Isle.Extensions.Logging.csproj" />
+    <ProjectReference Include="..\Isle.Extensions.Logging\Isle.Extensions.Logging.csproj"  />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Isle.Core.Analyzers\Isle.Core.Analyzers.csproj" ReferenceOutputAssembly="False" OutputItemType="Analyzer" />
   </ItemGroup>
 
 </Project>

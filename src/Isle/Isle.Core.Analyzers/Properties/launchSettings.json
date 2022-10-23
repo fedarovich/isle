@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Isle.Core.Analyzers": {
+      "commandName": "DebugRoslynComponent",
+      "targetProject": "..\\Isle.Extensions.Logging.Benchmarks\\Isle.Extensions.Logging.Benchmarks.csproj"
+    }
+  }
+}
