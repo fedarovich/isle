@@ -11,11 +11,19 @@ ISLE (Interpolated String Logging Extensions) is a library that allows developer
 [![Build Status](https://dev.azure.com/pavelfedarovich/ISLE/_apis/build/status/fedarovich.isle?branchName=main)](https://dev.azure.com/pavelfedarovich/ISLE/_build/latest?definitionId=12&branchName=main)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/fedarovich/isle/blob/master/LICENSE)
 
+While originally supported on .Net 6 or later, starting from version 1.5 ISLE has been backported to .Net Standard 2.0 and thus can also be used with .Net Framework 4.6.1 or later, .Net Core 2.0 or later, and .Net 5.
+
 ## Getting Started
 
-The current version of ISLE provides a set of extensions methods for the [Microsoft.Extensions.Logging.ILogger](https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.logging.ilogger?view=dotnet-plat-ext-6.0) interface. In order to perform structured logging you must also add and configure the underlying logging provider (e.g. [Serilog](https://serilog.net)).
+The current version of ISLE provides a set of extensions methods for:
++ [`Microsoft.Extensions.Logging.ILogger`](https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.logging.ilogger?view=dotnet-plat-ext-6.0) interface by [Isle.Extensions.Logging](https://www.nuget.org/packages/Isle.Extensions.Logging) package
++ `Serilog.ILogger` interface by [Isle.Serilog](https://www.nuget.org/packages/Isle.Serilog) package. 
 
-To begin using ISLE you must install the `Isle.Extensions.Logging` package from NuGet.
+In order to perform structured logging you must also add and configure the underlying logging provider (e.g. [Serilog](https://serilog.net)).
+
+To begin using ISLE you must install the corresponding package from NuGet.
+
+> If you are using Serilog only indirectly via `Microsoft.Extensions.Logging.ILogger`, there is no need to install Isle.Serilog. Install just Isle.Extensions.Logging instead.
 
 Next, at the beginning of your program you must configure ISLE. The simplest configuration looks like this:
 ```
@@ -42,6 +50,8 @@ int area = width * height;
 logger.LogInformation($"The area of rectangle with the width = {width} and the height = {height} is {area}");
 ```
 This code with ISLE installed will produce exactly the same structured log message as previous one.
+
+> While Isle.Extensions.Logging is providing the same method names as `Microsoft.Extensions.Logging.ILogger` itself (e.g. `LogError`), the Isle.Serilog's method names have suffix *`Interpolated`* (e.g. `ErrorInterpolated`)
 
 ## Value Representation
 Any argument you log will be serialized by the logging framework either into a string or a destructured (object) form.
