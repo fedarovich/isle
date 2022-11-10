@@ -29,6 +29,10 @@ namespace Isle.Core.Tests.Configuration;
 [TestFixture(typeof(DateOnly), ValueRepresentation.Default)]
 [TestFixture(typeof(TimeOnly), ValueRepresentation.Default)]
 #endif
+#if NET7_0_OR_GREATER
+[TestFixture(typeof(Int128), ValueRepresentation.Default)]
+[TestFixture(typeof(UInt128), ValueRepresentation.Default)]
+#endif
 [TestFixture(typeof(Guid), ValueRepresentation.Default)]
 [TestFixture(typeof(Uri), ValueRepresentation.Default)]
 [TestFixture(typeof(UriKind), ValueRepresentation.Default)] // Enum

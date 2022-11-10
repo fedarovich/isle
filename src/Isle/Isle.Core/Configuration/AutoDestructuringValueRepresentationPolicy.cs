@@ -110,6 +110,10 @@ public sealed class AutoDestructuringValueRepresentationPolicy : IValueRepresent
                     || type == typeof(DateOnly)
                     || type == typeof(TimeOnly)
 #endif
+#if NET7_0_OR_GREATER
+                    || type == typeof(Int128)
+                    || type == typeof(UInt128)
+#endif
                     || type == typeof(Uri)
                     || type == typeof(Guid);
         }
