@@ -7,6 +7,7 @@ using Serilog.Events;
 namespace Isle.Serilog.Benchmarks;
 
 [MemoryDiagnoser]
+[SimpleJob(RuntimeMoniker.Net70)]
 [SimpleJob(RuntimeMoniker.Net60)]
 [SimpleJob(RuntimeMoniker.Net50)]
 [SimpleJob(RuntimeMoniker.NetCoreApp31)]

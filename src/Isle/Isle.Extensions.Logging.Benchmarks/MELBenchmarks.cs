@@ -9,6 +9,7 @@ namespace Isle.Extensions.Logging.Benchmarks;
 
 [MemoryDiagnoser]
 [SuppressMessage("ReSharper", "InconsistentNaming")]
+[SimpleJob(RuntimeMoniker.Net70)]
 [SimpleJob(RuntimeMoniker.Net60)]
 [SimpleJob(RuntimeMoniker.Net50)]
 [SimpleJob(RuntimeMoniker.NetCoreApp31)]

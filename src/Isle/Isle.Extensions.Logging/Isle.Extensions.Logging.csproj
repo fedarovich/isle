@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net6.0;net5.0;netstandard2.1;netstandard2.0</TargetFrameworks>
+		<TargetFrameworks>net7.0;net6.0;net5.0;netstandard2.1;netstandard2.0</TargetFrameworks>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -22,9 +22,13 @@
     <InternalsVisibleTo Include="$(AssemblyName).Benchmarks" />
   </ItemGroup>
 
-	<ItemGroup>
+	<ItemGroup Condition="'$(TargetFramework)' != 'net7.0'">
 		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0" />
 	</ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net7.0'">
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
+  </ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\Isle.Core\Isle.Core.csproj" />
