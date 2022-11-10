@@ -103,3 +103,8 @@ IsleConfiguration.Configure(builder => builder.WithNameConverter(CapitalizeFirst
 You can find some built-in name converters in the class `Isle.Converters.ValueNameConverters`. It also contains some helper functions for writing your own converters.
 
 Please note that the transform is not applied to the names explicitly specified using the `Named` method.
+
+## SAST Tools
+
+[PVS-Studio](https://pvs-studio.com/en/pvs-studio/?utm_source=github&utm_medium=organic&utm_campaign=open_source) - static analyzer for C, C++, C#, and Java code.
+
