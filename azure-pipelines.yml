@@ -27,6 +27,11 @@ variables:
 name: '$(MajorVersion).$(MinorVersion).$(rev:r)'
 
 steps:
+- task: UseDotNet@2
+  displayName: 'Install .Net 7'
+  inputs:
+    version: '7.x'
+
 - task: DotNetCoreCLI@2
   displayName: 'dotnet restore'
   inputs:
