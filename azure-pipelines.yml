@@ -30,7 +30,9 @@ steps:
 - task: UseDotNet@2
   displayName: 'Install .Net 7'
   inputs:
+    packageType: sdk
     version: '7.x'
+    performMultiLevelLookup: true    
 
 - task: DotNetCoreCLI@2
   displayName: 'dotnet restore'
