@@ -46,7 +46,7 @@ public interface IIsleConfigurationBuilder
     bool PreserveDefaultValueRepresentationForExplicitNames { get; set; }
 
     /// <summary>
-    /// Gets the value indicating whether <see cref="LiteralValue"/>s can be cached by default.
+    /// Gets or sets the value indicating whether <see cref="LiteralValue"/>s can be cached by default.
     /// </summary>
     /// <remarks>
     /// CAUTION! Literal values may be cached only if they are compile-time or run-time constants.
@@ -58,4 +58,17 @@ public interface IIsleConfigurationBuilder
     /// <para>The default value is <see langword="false" />.</para>
     /// </value>
     bool CacheLiteralValues { get; set; }
+
+    /// <summary>
+    /// Gets or sets the value indicating whether the ISLE configuration can be reset.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// It is not recommended to mark the configuration as resettable, as it will disable certain optimizations.
+    /// </para>
+    /// <para>
+    /// Resettable configurations are mainly intended to be used with unit tests.
+    /// </para>
+    /// </remarks>
+    bool IsResettable { get; set; }
 }

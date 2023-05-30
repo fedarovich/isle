@@ -23,7 +23,6 @@ internal sealed class SimpleLogEventBuilder : LogEventBuilder
     private LogEventProperty[] _properties = null!;
     private ILogger _logger = null!;
     private StringBuilder _messageTemplateBuilder = null!;
-    private IsleConfiguration _configuration = null!;
     private int _currentPosition;
     private int _propertyIndex;
 
@@ -47,7 +46,6 @@ internal sealed class SimpleLogEventBuilder : LogEventBuilder
         _properties = new LogEventProperty[formattedCount];
         _messageTemplateBuilder = AcquireStringBuilder();
         _logger = logger;
-        _configuration = IsleConfiguration.Current;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         StringBuilder AcquireStringBuilder()
@@ -74,7 +72,6 @@ internal sealed class SimpleLogEventBuilder : LogEventBuilder
         _properties = null!;
         _currentPosition = 0;
         _propertyIndex = 0;
-        _configuration = null!;
         
         _cachedInstance ??= this;
 
@@ -110,8 +107,7 @@ internal sealed class SimpleLogEventBuilder : LogEventBuilder
 
     public override void AppendFormatted<T>(string name, T value)
     {
-        var configuration = _configuration;
-        name = configuration.ConvertValueName(name);
+        name = CoreConfiguration.ConvertValueName(name);
         Destructuring destructuring;
         if (name.StartsWith(DestructureOperator))
         {
@@ -125,8 +121,7 @@ internal sealed class SimpleLogEventBuilder : LogEventBuilder
         }
         else
         {
-            destructuring = GetDestructuring(
-                configuration.ValueRepresentationPolicy.GetRepresentationOfType<T>());
+            destructuring = GetDestructuring(CoreConfiguration.GetRepresentationOfType<T>());
         }
 
         if (name == string.Empty)
@@ -139,8 +134,7 @@ internal sealed class SimpleLogEventBuilder : LogEventBuilder
 
     public override void AppendFormatted<T>(string name, T value, int alignment, string? format)
     {
-        var configuration = _configuration;
-        name = configuration.ConvertValueName(name);
+        name = CoreConfiguration.ConvertValueName(name);
         Destructuring destructuring;
         if (name.StartsWith(DestructureOperator))
         {
@@ -154,8 +148,7 @@ internal sealed class SimpleLogEventBuilder : LogEventBuilder
         }
         else
         {
-            destructuring = GetDestructuring(
-                configuration.ValueRepresentationPolicy.GetRepresentationOfType<T>());
+            destructuring = GetDestructuring(CoreConfiguration.GetRepresentationOfType<T>());
         }
 
         if (name == string.Empty)

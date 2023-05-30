@@ -31,7 +31,7 @@ public sealed class IsleConfiguration
 
             [DoesNotReturn]
             [MethodImpl(MethodImplOptions.NoInlining)]
-            IsleConfiguration ThrowInvalidOperationException() => throw new InvalidOperationException(
+            static IsleConfiguration ThrowInvalidOperationException() => throw new InvalidOperationException(
                 "Isle is not configured. Please, call IsleConfiguration.Configure before using Isle's logging methods.");
         }
     }
@@ -117,6 +117,8 @@ public sealed class IsleConfiguration
             throw new InvalidOperationException("Isle has already been configured.");
         }
 
+        CoreConfigurationSnapshot.Current = new CoreConfigurationSnapshot(builder);
+        
         foreach (var hook in configuration._extensionHooks)
         {
             hook.ApplyExtensionConfiguration();
@@ -146,9 +148,10 @@ public sealed class IsleConfiguration
             }
             configuration._extensionHooks.Clear();
         }
+        CoreConfigurationSnapshot.Reset();
     }
 
-    private class IsleConfigurationBuilder : IIsleConfigurationBuilder
+    internal class IsleConfigurationBuilder : IIsleConfigurationBuilder
     {
         public IValueRepresentationPolicy? ValueRepresentationPolicy { get; set; }
         
@@ -161,5 +164,7 @@ public sealed class IsleConfiguration
         public bool PreserveDefaultValueRepresentationForExplicitNames { get; set; }
         
         public bool CacheLiteralValues { get; set; }
+
+        public bool IsResettable { get; set; }
     }
 }

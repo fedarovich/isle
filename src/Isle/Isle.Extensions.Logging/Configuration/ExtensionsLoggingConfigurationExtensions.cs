@@ -10,12 +10,10 @@ namespace Isle.Configuration;
 public static class ExtensionsLoggingConfigurationExtensions
 {
     /// <summary>
-    /// Configures the parameters for integration with <see cref="ILogger"/>.
+    /// Adds and configures the ISLE extension for integration with <see cref="ILogger"/>.
     /// </summary>
-    /// <param name="this"></param>
-    /// <param name="buildConfiguration"></param>
-    /// <returns></returns>
-    public static IIsleConfigurationBuilder ConfigureExtensionsLogging(this IIsleConfigurationBuilder @this, Action<IExtensionsLoggingConfigurationBuilder>? buildConfiguration = null)
+    public static IIsleConfigurationBuilder AddExtensionsLogging(this IIsleConfigurationBuilder @this, 
+        Action<IExtensionsLoggingConfigurationBuilder>? buildConfiguration = null)
     {
         var builder = new ConfigurationBuilder();
         @this.RegisterExtensionConfigurationHook(builder);
@@ -23,21 +21,29 @@ public static class ExtensionsLoggingConfigurationExtensions
         return @this;
     }
 
+    /// <summary>
+    /// Adds and configures the ISLE extension for integration with <see cref="ILogger"/>.
+    /// </summary>
+    /// <seealso cref="AddExtensionsLogging"/>
+    [Obsolete($"Use {nameof(AddExtensionsLogging)} method instead.")]
+    public static IIsleConfigurationBuilder ConfigureExtensionsLogging(this IIsleConfigurationBuilder @this,
+        Action<IExtensionsLoggingConfigurationBuilder>? buildConfiguration = null)
+    {
+        return @this.AddExtensionsLogging(buildConfiguration);
+    }
+    
     private class ConfigurationBuilder : IExtensionsLoggingConfigurationBuilder, IIsleExtensionConfigurationHook
     {
         public bool EnableMessageTemplateCaching { get; set; } = true;
             
         public void ApplyExtensionConfiguration()
         {
-            ExtensionsLoggingConfiguration.Current = new ExtensionsLoggingConfiguration
-            {
-                EnableMessageTemplateCaching = EnableMessageTemplateCaching
-            };
+            ExtensionsLoggingConfigurationSnapshot.Current = new (this);
         }
 
         public void ResetExtensionConfiguration()
         {
-            ExtensionsLoggingConfiguration.Current = null!;
+            ExtensionsLoggingConfigurationSnapshot.Reset();
         }
     }
 }

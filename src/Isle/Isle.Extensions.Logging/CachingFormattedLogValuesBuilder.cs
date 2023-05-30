@@ -3,7 +3,7 @@ using Isle.Extensions.Logging.Caching;
 
 namespace Isle.Extensions.Logging;
 
-internal sealed class CachingFormattedLogValuesBuilder : FormattedLogValuesBuilder
+internal sealed class CachingFormattedLogValuesBuilder : IFormattedLogValuesBuilder
 {
     [ThreadStatic]
     private static CachingFormattedLogValuesBuilder? _cachedInstance;
@@ -16,27 +16,28 @@ internal sealed class CachingFormattedLogValuesBuilder : FormattedLogValuesBuild
     {
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static FormattedLogValuesBuilder AcquireAndInitialize(int formattedCount)
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    public static CachingFormattedLogValuesBuilder AcquireAndInitialize(FormattedLogValuesBase formattedLogValues)
     {
         var instance = _cachedInstance ?? new CachingFormattedLogValuesBuilder();
         _cachedInstance = null;
-        instance.Initialize(formattedCount);
+        instance.Initialize(formattedLogValues);
         return instance;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private void Initialize(int formattedCount)
+    private void Initialize(FormattedLogValuesBase formattedLogValues)
     {
+        _formattedLogValues = formattedLogValues;
         _lastNode = NodeCache.Instance;
-        _formattedLogValues = FormattedLogValuesBase.Create(formattedCount);
     }
 
-    public override FormattedLogValuesBase BuildAndReset()
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    public FormattedLogValuesBase BuildAndReset()
     {
         var templateNode = _lastNode.GetTemplateNode();
         var result = _formattedLogValues;
-        result.Values[_valueIndex] = new(OriginalFormatName, templateNode.MessageTemplate);
+        result.Values[_valueIndex] = new(FormattedLogValuesBuilder.OriginalFormatName, templateNode.MessageTemplate);
         result.Count = _valueIndex + 1;
         result.SetSegments(templateNode.Segments);
         
@@ -49,12 +50,14 @@ internal sealed class CachingFormattedLogValuesBuilder : FormattedLogValuesBuild
         return result;
     }
 
-    public override void AppendLiteral(string str)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void AppendLiteral(string str)
     {
         _lastNode = _lastNode.GetOrAddLiteralNode(str);
     }
 
-    public override void AppendLiteralValue(in LiteralValue literalValue)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void AppendLiteralValue(in LiteralValue literalValue)
     {
         var str = literalValue.Value!;
         _lastNode = literalValue.IsCacheable 
@@ -62,13 +65,15 @@ internal sealed class CachingFormattedLogValuesBuilder : FormattedLogValuesBuild
             : _lastNode.CreateNotCachedLiteralNode(str);
     }
 
-    public override void AppendFormatted(string name, object? value)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void AppendFormatted(string name, object? value)
     {
         _lastNode = _lastNode.GetOrAddHoleNode(name);
         _formattedLogValues.Values[_valueIndex++] = new(name, value);
     }
 
-    public override void AppendFormatted(string name, object? value, int alignment, string? format)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void AppendFormatted(string name, object? value, int alignment, string? format)
     {
         _lastNode = _lastNode.GetOrAddFormattedHoleNode(name, alignment, format);
         _formattedLogValues.Values[_valueIndex++] = new(name, value);

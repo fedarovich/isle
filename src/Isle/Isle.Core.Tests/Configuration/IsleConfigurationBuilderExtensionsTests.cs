@@ -19,7 +19,8 @@ internal class IsleConfigurationBuilderExtensionsTests
         var valueNameConverter = (string s) => s;
         IsleConfiguration.Configure(builder => builder
             .WithValueRepresentationPolicy(AutoDestructuringValueRepresentationPolicy.Instance)
-            .WithNameConverter(valueNameConverter));
+            .WithNameConverter(valueNameConverter)
+            .IsResettable());
 #pragma warning disable CS0618
         IsleConfiguration.Current.ValueNameConverter.Should().Be(valueNameConverter);
 #pragma warning restore CS0618
@@ -29,14 +30,14 @@ internal class IsleConfigurationBuilderExtensionsTests
     [Test]
     public void WithValueRepresentationPolicyThrowsArgumentNullException()
     {
-        var act = () => IsleConfiguration.Configure(b => b.WithValueRepresentationPolicy(null!));
+        var act = () => IsleConfiguration.Configure(b => b.WithValueRepresentationPolicy(null!).IsResettable());
         act.Should().Throw<ArgumentNullException>();
     }
 
     [Test]
     public void WithNameConverterThrowsArgumentNullException()
     {
-        var act = () => IsleConfiguration.Configure(b => b.WithNameConverter(null!));
+        var act = () => IsleConfiguration.Configure(b => b.WithNameConverter(null!).IsResettable());
         act.Should().Throw<ArgumentNullException>();
     }
 }

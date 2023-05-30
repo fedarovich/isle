@@ -87,7 +87,7 @@ public sealed class AutoDestructuringValueRepresentationPolicy : IValueRepresent
     public ValueRepresentation GetRepresentationOfType<T>() =>
         TypeInfo<T>.IsScalar ? ValueRepresentation.Default : ValueRepresentation.Destructure;
 
-    private static class TypeInfo<T>
+    internal static class TypeInfo<T>
     {
         [SuppressMessage("ReSharper", "StaticMemberInGenericType")]
         public static readonly bool IsScalar;
@@ -118,6 +118,4 @@ public sealed class AutoDestructuringValueRepresentationPolicy : IValueRepresent
                     || type == typeof(Guid);
         }
     }
-
-    
 }

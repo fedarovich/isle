@@ -18,7 +18,6 @@ internal sealed class CachingLogEventBuilder : LogEventBuilder
     private ILogger _logger = null!;
     private Node _lastNode = null!;
     private object?[] _propertyValues = null!;
-    private IsleConfiguration _configuration = null!;
     private int _propertyIndex;
 
     private CachingLogEventBuilder()
@@ -43,7 +42,6 @@ internal sealed class CachingLogEventBuilder : LogEventBuilder
             ? ArrayPool<object?>.Shared.Rent(formattedCount)
             : Array.Empty<object?>();
         _propertyIndex = 0;
-        _configuration = IsleConfiguration.Current;
     }
 
     public override LogEvent BuildAndReset(LogEventLevel level, Exception? exception = null)
@@ -67,7 +65,6 @@ internal sealed class CachingLogEventBuilder : LogEventBuilder
         _logger = null!;
         _lastNode = null!;
         _propertyValues = null!;
-        _configuration = null!;
 
         _cachedInstance ??= this;
 
@@ -89,12 +86,12 @@ internal sealed class CachingLogEventBuilder : LogEventBuilder
 
     public override void AppendFormatted<T>(string name, T value)
     {
-        AppendFormatted(value.Named(_configuration.ConvertValueName(name), false, _configuration));
+        AppendFormatted(value.Named(CoreConfiguration.ConvertValueName(name), false));
     }
 
     public override void AppendFormatted<T>(string name, T value, int alignment, string? format)
     {
-        AppendFormatted(value.Named(_configuration.ConvertValueName(name), false, _configuration), alignment, format);
+        AppendFormatted(value.Named(CoreConfiguration.ConvertValueName(name), false), alignment, format);
     }
 
     public override void AppendFormatted(in NamedLogValue namedLogValue)
