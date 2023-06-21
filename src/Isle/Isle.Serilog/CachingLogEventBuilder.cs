@@ -66,6 +66,10 @@ internal sealed class CachingLogEventBuilder : LogEventBuilder
 
         _logger = null!;
         _lastNode = null!;
+        if (_propertyValues.Length > 0)
+        {
+            ArrayPool<object?>.Shared.Return(_propertyValues, true);
+        }
         _propertyValues = null!;
         _configuration = null!;
 
