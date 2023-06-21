@@ -28,6 +28,13 @@ name: '$(MajorVersion).$(MinorVersion).$(rev:r)'
 
 steps:
 - task: UseDotNet@2
+  displayName: 'Install .Net 5'
+  inputs:
+    packageType: sdk
+    version: '5.x'
+    performMultiLevelLookup: true    
+
+- task: UseDotNet@2
   displayName: 'Install .Net 7'
   inputs:
     packageType: sdk
