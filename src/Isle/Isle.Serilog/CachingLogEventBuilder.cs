@@ -64,6 +64,10 @@ internal sealed class CachingLogEventBuilder : LogEventBuilder
 
         _logger = null!;
         _lastNode = null!;
+        if (_propertyValues.Length > 0)
+        {
+            ArrayPool<object?>.Shared.Return(_propertyValues, true);
+        }
         _propertyValues = null!;
 
         _cachedInstance ??= this;
@@ -71,6 +75,7 @@ internal sealed class CachingLogEventBuilder : LogEventBuilder
         return logEvent;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override void AppendLiteral(string str)
     {
         _lastNode = _lastNode.GetOrAddTextNode(str);

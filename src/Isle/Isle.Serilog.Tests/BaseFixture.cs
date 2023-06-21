@@ -40,7 +40,7 @@ public abstract class BaseFixture
         IsleConfiguration.Configure(builder => builder
             .IsResettable()
             .WithAutomaticDestructuring()
-            .ConfigureSerilog(cfg => cfg.EnableMessageTemplateCaching = EnableCaching)
+            .AddSerilog(cfg => cfg.EnableMessageTemplateCaching = EnableCaching)
         );
         Logger = new LoggerConfiguration()
             .WriteTo.TestSink(opt => opt.LogEvents = _logEvents)

@@ -7,6 +7,7 @@ using Serilog.Events;
 namespace Isle.Serilog.Benchmarks;
 
 [MemoryDiagnoser]
+[DisassemblyDiagnoser(maxDepth: 1, exportHtml: true)]
 [SimpleJob(RuntimeMoniker.Net70)]
 [SimpleJob(RuntimeMoniker.Net60)]
 [SimpleJob(RuntimeMoniker.Net50)]
@@ -26,6 +27,9 @@ public class SerilogBenchmark
     [ParamsAllValues]
     public bool EnableCaching { get; set; }
 
+    [ParamsAllValues]
+    public bool IsResettable { get; set; }
+
     [GlobalSetup(Target = nameof(Standard))]
     public void GlobalSetupStandard()
     {
@@ -36,16 +40,16 @@ public class SerilogBenchmark
     public void GlobalSetupWithManualDestructuring()
     {
         GlobalSetup();
-        IsleConfiguration.Configure(builder => builder
-            .ConfigureSerilog(cfg => cfg.EnableMessageTemplateCaching = EnableCaching));
+        IsleConfiguration.Configure(builder => builder.IsResettable(IsResettable)
+            .AddSerilog(cfg => cfg.EnableMessageTemplateCaching = EnableCaching));
     }
 
     [GlobalSetup(Targets = new[] { nameof(InterpolatedWithExplicitAutomaticDestructuring), nameof(InterpolatedWithImplicitAutomaticDestructuring) })]
     public void GlobalSetupWithAutoDestructuring()
     {
         GlobalSetup();
-        IsleConfiguration.Configure(builder => builder.WithAutomaticDestructuring()
-            .ConfigureSerilog(cfg => cfg.EnableMessageTemplateCaching = EnableCaching));
+        IsleConfiguration.Configure(builder => builder.IsResettable(IsResettable).WithAutomaticDestructuring()
+            .AddSerilog(cfg => cfg.EnableMessageTemplateCaching = EnableCaching));
     }
 
     private void GlobalSetup()
@@ -60,7 +64,6 @@ public class SerilogBenchmark
     [GlobalCleanup]
     public void GlobalCleanup()
     {
-        IsleConfiguration.Reset();
         (_logger as IDisposable)?.Dispose();
     }
 
@@ -91,6 +94,6 @@ public class SerilogBenchmark
     [Benchmark]
     public void InterpolatedWithLiteralValue()
     {
-        _logger.InformationInterpolated($"The area of rectangle {@Rect} is Width * Height = {Area} and its perimeter is 2 * (Width + Height) = {(LiteralValue) Perimeter.ToString()}.");
+        _logger.InformationInterpolated($"The area of rectangle {@Rect} is Width * Height = {Area} and its perimeter is 2 * (Width + Height) = {(LiteralValue)Perimeter.ToString()}.");
     }
 }
