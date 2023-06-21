@@ -56,7 +56,7 @@ internal sealed class TemplateNode
         }
         finally
         {
-            ArrayPool<Node>.Shared.Return(nodes);
+            ArrayPool<Node>.Shared.Return(nodes, true);
         }
     }
 

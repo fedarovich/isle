@@ -62,7 +62,7 @@ internal sealed class TemplateNode
 
         Segments = segments;
         MessageTemplate = builder.ToString();
-        ArrayPool<Node>.Shared.Return(nodes);
+        ArrayPool<Node>.Shared.Return(nodes, true);
     }
 
     public Segment[] Segments { get; }
