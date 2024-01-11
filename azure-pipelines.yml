@@ -34,7 +34,6 @@ steps:
     version: '3.1.x'
     performMultiLevelLookup: true
 
-steps:
 - task: UseDotNet@2
   displayName: 'Install .Net 5'
   inputs:
