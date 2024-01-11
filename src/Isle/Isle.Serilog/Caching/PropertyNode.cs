@@ -36,8 +36,7 @@ internal sealed class PropertyNode : Node
             RawText,
             format,
             GetAlignment(alignment),
-            destructuring,
-            Offset);
+            destructuring);
     }
 
     public string Name { get; }

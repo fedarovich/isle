@@ -24,7 +24,6 @@ internal sealed class SimpleLogEventBuilder : LogEventBuilder
     private ILogger _logger = null!;
     private StringBuilder _messageTemplateBuilder = null!;
     private IsleConfiguration _configuration = null!;
-    private int _currentPosition;
     private int _propertyIndex;
 
     private SimpleLogEventBuilder()
@@ -72,7 +71,6 @@ internal sealed class SimpleLogEventBuilder : LogEventBuilder
             _properties.Length == _propertyIndex ? _properties : _properties.Take(_propertyIndex));
         _tokens = null!;
         _properties = null!;
-        _currentPosition = 0;
         _propertyIndex = 0;
         _configuration = null!;
         
@@ -96,11 +94,10 @@ internal sealed class SimpleLogEventBuilder : LogEventBuilder
 
     public override void AppendLiteral(string literal)
     {
-        _tokens.Add(new TextToken(literal, _currentPosition));
+        _tokens.Add(new TextToken(literal));
         var start = _messageTemplateBuilder.Length;
         _messageTemplateBuilder.EscapeAndAppend(literal.AsSpan());
         var end = _messageTemplateBuilder.Length;
-        _currentPosition += end - start;
     }
 
     public override void AppendLiteralValue(in LiteralValue literalValue)
@@ -298,11 +295,8 @@ internal sealed class SimpleLogEventBuilder : LogEventBuilder
             rawText,
             format,
             GetAlignment(alignment),
-            destructuring,
-            _currentPosition);
+            destructuring);
         _tokens.Add(propertyToken);
-
-        _currentPosition += rawText.Length;
 
         if (destructuring != Destructuring.Stringify)
         {

@@ -68,7 +68,7 @@ public class <#= GetTestName(logEventLevel) #> : BaseFixture
         handler.AppendLiteral("A{B}C");
         var logEvent = handler.GetLogEventAndReset();
         logEvent.MessageTemplate.Text.Should().Be("A{{B}}C");
-        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C", 0));
+        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C"));
         logEvent.Properties.Count.Should().Be(0);
         logEvent.RenderMessage().Should().Be("A{B}C");
     }
@@ -369,7 +369,7 @@ public class <#= GetTestName(logEventLevel) #> : BaseFixture
         handler.AppendFormatted((LiteralValue) "A{B}C");
         var logEvent = handler.GetLogEventAndReset();
         logEvent.MessageTemplate.Text.Should().Be("A{{B}}C");
-        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C", 0));
+        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C"));
         logEvent.Properties.Count.Should().Be(0);
         logEvent.RenderMessage().Should().Be("A{B}C");
     }
@@ -534,7 +534,7 @@ public class <#= GetTestName(logEventLevel) #> : BaseFixture
         handler.AppendFormatted(new LiteralValue("A{B}C", cacheable));
         var logEvent = handler.GetLogEventAndReset();
         logEvent.MessageTemplate.Text.Should().Be("A{{B}}C");
-        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C", 0));
+        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C"));
         logEvent.Properties.Count.Should().Be(0);
         logEvent.RenderMessage().Should().Be("A{B}C");
     }

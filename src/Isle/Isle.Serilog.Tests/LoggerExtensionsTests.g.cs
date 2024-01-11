@@ -45,7 +45,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[] 
                 { 
-                    new TextToken(message, 0) 
+                    new TextToken(message) 
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(0);
@@ -80,7 +80,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[] 
                 { 
-                    new TextToken("T{es}t", 0) 
+                    new TextToken("T{es}t") 
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(0);
@@ -115,7 +115,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -156,7 +156,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value,3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 3), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value,3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 3))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -197,7 +197,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value:N}", format: "N", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value:N}", format: "N", destructuring: Destructuring.Default, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -238,7 +238,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value,6:N}", format: "N", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 6), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value,6:N}", format: "N", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 6))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -279,7 +279,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -320,7 +320,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -361,7 +361,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -413,21 +413,21 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new MessageTemplateToken[]
                 {
-                    new TextToken("ABCD", 0),
-                    new PropertyToken(nameof(arg1), "{arg1,7}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 7), startIndex: 4),
-                    new TextToken("EFGH", 12),
-                    new PropertyToken(nameof(arg2), "{arg2:N}", destructuring: Destructuring.Default, alignment: default(Alignment), format: "N", startIndex: 16),
-                    new TextToken("IJKL", 24),
-                    new PropertyToken(nameof(arg3), "{arg3,-10:F3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Left, 10), format: "F3", startIndex: 28),
-                    new TextToken("MNOP", 41),
-                    new PropertyToken(nameof(arg4), "{@arg4}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 45),
-                    new TextToken("QRST", 52),
-                    new PropertyToken(nameof(arg5), "{@arg5}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 56),
-                    new TextToken("UVWX", 63),
+                    new TextToken("ABCD"),
+                    new PropertyToken(nameof(arg1), "{arg1,7}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 7)),
+                    new TextToken("EFGH"),
+                    new PropertyToken(nameof(arg2), "{arg2:N}", destructuring: Destructuring.Default, alignment: default(Alignment), format: "N"),
+                    new TextToken("IJKL"),
+                    new PropertyToken(nameof(arg3), "{arg3,-10:F3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Left, 10), format: "F3"),
+                    new TextToken("MNOP"),
+                    new PropertyToken(nameof(arg4), "{@arg4}", destructuring: Destructuring.Destructure, alignment: default(Alignment)),
+                    new TextToken("QRST"),
+                    new PropertyToken(nameof(arg5), "{@arg5}", destructuring: Destructuring.Destructure, alignment: default(Alignment)),
+                    new TextToken("UVWX"),
                     new PropertyToken(nameof(veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg), 
                         "{veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg}", 
-                        destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 67),
-                    new TextToken("YZ", 152)
+                        destructuring: Destructuring.Default, alignment: default(Alignment)),
+                    new TextToken("YZ")
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(6);
@@ -473,12 +473,12 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new MessageTemplateToken[]
                 {
-                    new TextToken("Default: ", 0),
-                    new PropertyToken("default", "{default}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 9),
-                    new TextToken(", Stringified: ", 18),
-                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment), startIndex: 33),
-                    new TextToken(", Destructured: ", 39),
-                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 55)
+                    new TextToken("Default: "),
+                    new PropertyToken("default", "{default}", destructuring: Destructuring.Default, alignment: default(Alignment)),
+                    new TextToken(", Stringified: "),
+                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment)),
+                    new TextToken(", Destructured: "),
+                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(3);
@@ -521,12 +521,12 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new MessageTemplateToken[]
                 {
-                    new TextToken("Default: ", 0),
-                    new PropertyToken("default", "{@default}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 9),
-                    new TextToken(", Stringified: ", 19),
-                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment), startIndex: 34),
-                    new TextToken(", Destructured: ", 40),
-                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 56)
+                    new TextToken("Default: "),
+                    new PropertyToken("default", "{@default}", destructuring: Destructuring.Destructure, alignment: default(Alignment)),
+                    new TextToken(", Stringified: "),
+                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment)),
+                    new TextToken(", Destructured: "),
+                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(3);
@@ -569,7 +569,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[] 
                 { 
-                    new TextToken(message, 0) 
+                    new TextToken(message) 
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(0);
@@ -604,7 +604,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[] 
                 { 
-                    new TextToken("T{es}t", 0) 
+                    new TextToken("T{es}t") 
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(0);
@@ -637,13 +637,13 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new MessageTemplateToken[] 
                 { 
-                    new TextToken("A", 0),
-                    new PropertyToken(nameof(value1), "{value1}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 1),
-                    new TextToken("B", 9),
-                    new TextToken("C", 10),
-                    new TextToken("D", 11),
-                    new PropertyToken(nameof(value2), "{value2}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 12),
-                    new TextToken("E", 20)                    
+                    new TextToken("A"),
+                    new PropertyToken(nameof(value1), "{value1}", destructuring: Destructuring.Default, alignment: default(Alignment)),
+                    new TextToken("B"),
+                    new TextToken("C"),
+                    new TextToken("D"),
+                    new PropertyToken(nameof(value2), "{value2}", destructuring: Destructuring.Default, alignment: default(Alignment)),
+                    new TextToken("E")                    
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(2);
@@ -685,7 +685,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[] 
                 { 
-                    new TextToken(message, 0) 
+                    new TextToken(message) 
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(0);
@@ -720,7 +720,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[] 
                 { 
-                    new TextToken("T{es}t", 0) 
+                    new TextToken("T{es}t") 
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(0);
@@ -755,7 +755,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -796,7 +796,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value,3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 3), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value,3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 3))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -837,7 +837,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value:N}", format: "N", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value:N}", format: "N", destructuring: Destructuring.Default, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -878,7 +878,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value,6:N}", format: "N", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 6), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value,6:N}", format: "N", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 6))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -919,7 +919,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -960,7 +960,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -1001,7 +1001,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -1053,21 +1053,21 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new MessageTemplateToken[]
                 {
-                    new TextToken("ABCD", 0),
-                    new PropertyToken(nameof(arg1), "{arg1,7}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 7), startIndex: 4),
-                    new TextToken("EFGH", 12),
-                    new PropertyToken(nameof(arg2), "{arg2:N}", destructuring: Destructuring.Default, alignment: default(Alignment), format: "N", startIndex: 16),
-                    new TextToken("IJKL", 24),
-                    new PropertyToken(nameof(arg3), "{arg3,-10:F3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Left, 10), format: "F3", startIndex: 28),
-                    new TextToken("MNOP", 41),
-                    new PropertyToken(nameof(arg4), "{@arg4}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 45),
-                    new TextToken("QRST", 52),
-                    new PropertyToken(nameof(arg5), "{@arg5}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 56),
-                    new TextToken("UVWX", 63),
+                    new TextToken("ABCD"),
+                    new PropertyToken(nameof(arg1), "{arg1,7}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 7)),
+                    new TextToken("EFGH"),
+                    new PropertyToken(nameof(arg2), "{arg2:N}", destructuring: Destructuring.Default, alignment: default(Alignment), format: "N"),
+                    new TextToken("IJKL"),
+                    new PropertyToken(nameof(arg3), "{arg3,-10:F3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Left, 10), format: "F3"),
+                    new TextToken("MNOP"),
+                    new PropertyToken(nameof(arg4), "{@arg4}", destructuring: Destructuring.Destructure, alignment: default(Alignment)),
+                    new TextToken("QRST"),
+                    new PropertyToken(nameof(arg5), "{@arg5}", destructuring: Destructuring.Destructure, alignment: default(Alignment)),
+                    new TextToken("UVWX"),
                     new PropertyToken(nameof(veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg), 
                         "{veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg}", 
-                        destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 67),
-                    new TextToken("YZ", 152)
+                        destructuring: Destructuring.Default, alignment: default(Alignment)),
+                    new TextToken("YZ")
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(6);
@@ -1113,12 +1113,12 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new MessageTemplateToken[]
                 {
-                    new TextToken("Default: ", 0),
-                    new PropertyToken("default", "{default}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 9),
-                    new TextToken(", Stringified: ", 18),
-                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment), startIndex: 33),
-                    new TextToken(", Destructured: ", 39),
-                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 55)
+                    new TextToken("Default: "),
+                    new PropertyToken("default", "{default}", destructuring: Destructuring.Default, alignment: default(Alignment)),
+                    new TextToken(", Stringified: "),
+                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment)),
+                    new TextToken(", Destructured: "),
+                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(3);
@@ -1161,12 +1161,12 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new MessageTemplateToken[]
                 {
-                    new TextToken("Default: ", 0),
-                    new PropertyToken("default", "{@default}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 9),
-                    new TextToken(", Stringified: ", 19),
-                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment), startIndex: 34),
-                    new TextToken(", Destructured: ", 40),
-                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 56)
+                    new TextToken("Default: "),
+                    new PropertyToken("default", "{@default}", destructuring: Destructuring.Destructure, alignment: default(Alignment)),
+                    new TextToken(", Stringified: "),
+                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment)),
+                    new TextToken(", Destructured: "),
+                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(3);
@@ -1209,7 +1209,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[] 
                 { 
-                    new TextToken(message, 0) 
+                    new TextToken(message) 
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(0);
@@ -1244,7 +1244,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[] 
                 { 
-                    new TextToken("T{es}t", 0) 
+                    new TextToken("T{es}t") 
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(0);
@@ -1277,13 +1277,13 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new MessageTemplateToken[] 
                 { 
-                    new TextToken("A", 0),
-                    new PropertyToken(nameof(value1), "{value1}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 1),
-                    new TextToken("B", 9),
-                    new TextToken("C", 10),
-                    new TextToken("D", 11),
-                    new PropertyToken(nameof(value2), "{value2}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 12),
-                    new TextToken("E", 20)                    
+                    new TextToken("A"),
+                    new PropertyToken(nameof(value1), "{value1}", destructuring: Destructuring.Default, alignment: default(Alignment)),
+                    new TextToken("B"),
+                    new TextToken("C"),
+                    new TextToken("D"),
+                    new PropertyToken(nameof(value2), "{value2}", destructuring: Destructuring.Default, alignment: default(Alignment)),
+                    new TextToken("E")                    
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(2);
@@ -1330,7 +1330,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[] 
                 { 
-                    new TextToken(message, 0) 
+                    new TextToken(message) 
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(0);
@@ -1365,7 +1365,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[] 
                 { 
-                    new TextToken("T{es}t", 0) 
+                    new TextToken("T{es}t") 
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(0);
@@ -1400,7 +1400,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -1441,7 +1441,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value,3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 3), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value,3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 3))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -1482,7 +1482,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value:N}", format: "N", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value:N}", format: "N", destructuring: Destructuring.Default, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -1523,7 +1523,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value,6:N}", format: "N", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 6), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value,6:N}", format: "N", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 6))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -1564,7 +1564,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -1605,7 +1605,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -1646,7 +1646,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -1698,21 +1698,21 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new MessageTemplateToken[]
                 {
-                    new TextToken("ABCD", 0),
-                    new PropertyToken(nameof(arg1), "{arg1,7}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 7), startIndex: 4),
-                    new TextToken("EFGH", 12),
-                    new PropertyToken(nameof(arg2), "{arg2:N}", destructuring: Destructuring.Default, alignment: default(Alignment), format: "N", startIndex: 16),
-                    new TextToken("IJKL", 24),
-                    new PropertyToken(nameof(arg3), "{arg3,-10:F3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Left, 10), format: "F3", startIndex: 28),
-                    new TextToken("MNOP", 41),
-                    new PropertyToken(nameof(arg4), "{@arg4}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 45),
-                    new TextToken("QRST", 52),
-                    new PropertyToken(nameof(arg5), "{@arg5}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 56),
-                    new TextToken("UVWX", 63),
+                    new TextToken("ABCD"),
+                    new PropertyToken(nameof(arg1), "{arg1,7}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 7)),
+                    new TextToken("EFGH"),
+                    new PropertyToken(nameof(arg2), "{arg2:N}", destructuring: Destructuring.Default, alignment: default(Alignment), format: "N"),
+                    new TextToken("IJKL"),
+                    new PropertyToken(nameof(arg3), "{arg3,-10:F3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Left, 10), format: "F3"),
+                    new TextToken("MNOP"),
+                    new PropertyToken(nameof(arg4), "{@arg4}", destructuring: Destructuring.Destructure, alignment: default(Alignment)),
+                    new TextToken("QRST"),
+                    new PropertyToken(nameof(arg5), "{@arg5}", destructuring: Destructuring.Destructure, alignment: default(Alignment)),
+                    new TextToken("UVWX"),
                     new PropertyToken(nameof(veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg), 
                         "{veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg}", 
-                        destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 67),
-                    new TextToken("YZ", 152)
+                        destructuring: Destructuring.Default, alignment: default(Alignment)),
+                    new TextToken("YZ")
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(6);
@@ -1758,12 +1758,12 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new MessageTemplateToken[]
                 {
-                    new TextToken("Default: ", 0),
-                    new PropertyToken("default", "{default}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 9),
-                    new TextToken(", Stringified: ", 18),
-                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment), startIndex: 33),
-                    new TextToken(", Destructured: ", 39),
-                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 55)
+                    new TextToken("Default: "),
+                    new PropertyToken("default", "{default}", destructuring: Destructuring.Default, alignment: default(Alignment)),
+                    new TextToken(", Stringified: "),
+                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment)),
+                    new TextToken(", Destructured: "),
+                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(3);
@@ -1806,12 +1806,12 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new MessageTemplateToken[]
                 {
-                    new TextToken("Default: ", 0),
-                    new PropertyToken("default", "{@default}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 9),
-                    new TextToken(", Stringified: ", 19),
-                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment), startIndex: 34),
-                    new TextToken(", Destructured: ", 40),
-                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 56)
+                    new TextToken("Default: "),
+                    new PropertyToken("default", "{@default}", destructuring: Destructuring.Destructure, alignment: default(Alignment)),
+                    new TextToken(", Stringified: "),
+                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment)),
+                    new TextToken(", Destructured: "),
+                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(3);
@@ -1854,7 +1854,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[] 
                 { 
-                    new TextToken(message, 0) 
+                    new TextToken(message) 
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(0);
@@ -1889,7 +1889,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[] 
                 { 
-                    new TextToken("T{es}t", 0) 
+                    new TextToken("T{es}t") 
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(0);
@@ -1922,13 +1922,13 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new MessageTemplateToken[] 
                 { 
-                    new TextToken("A", 0),
-                    new PropertyToken(nameof(value1), "{value1}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 1),
-                    new TextToken("B", 9),
-                    new TextToken("C", 10),
-                    new TextToken("D", 11),
-                    new PropertyToken(nameof(value2), "{value2}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 12),
-                    new TextToken("E", 20)                    
+                    new TextToken("A"),
+                    new PropertyToken(nameof(value1), "{value1}", destructuring: Destructuring.Default, alignment: default(Alignment)),
+                    new TextToken("B"),
+                    new TextToken("C"),
+                    new TextToken("D"),
+                    new PropertyToken(nameof(value2), "{value2}", destructuring: Destructuring.Default, alignment: default(Alignment)),
+                    new TextToken("E")                    
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(2);
@@ -1970,7 +1970,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[] 
                 { 
-                    new TextToken(message, 0) 
+                    new TextToken(message) 
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(0);
@@ -2005,7 +2005,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[] 
                 { 
-                    new TextToken("T{es}t", 0) 
+                    new TextToken("T{es}t") 
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(0);
@@ -2040,7 +2040,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -2081,7 +2081,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value,3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 3), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value,3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 3))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -2122,7 +2122,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value:N}", format: "N", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value:N}", format: "N", destructuring: Destructuring.Default, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -2163,7 +2163,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value,6:N}", format: "N", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 6), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value,6:N}", format: "N", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 6))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -2204,7 +2204,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -2245,7 +2245,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -2286,7 +2286,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -2338,21 +2338,21 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new MessageTemplateToken[]
                 {
-                    new TextToken("ABCD", 0),
-                    new PropertyToken(nameof(arg1), "{arg1,7}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 7), startIndex: 4),
-                    new TextToken("EFGH", 12),
-                    new PropertyToken(nameof(arg2), "{arg2:N}", destructuring: Destructuring.Default, alignment: default(Alignment), format: "N", startIndex: 16),
-                    new TextToken("IJKL", 24),
-                    new PropertyToken(nameof(arg3), "{arg3,-10:F3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Left, 10), format: "F3", startIndex: 28),
-                    new TextToken("MNOP", 41),
-                    new PropertyToken(nameof(arg4), "{@arg4}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 45),
-                    new TextToken("QRST", 52),
-                    new PropertyToken(nameof(arg5), "{@arg5}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 56),
-                    new TextToken("UVWX", 63),
+                    new TextToken("ABCD"),
+                    new PropertyToken(nameof(arg1), "{arg1,7}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 7)),
+                    new TextToken("EFGH"),
+                    new PropertyToken(nameof(arg2), "{arg2:N}", destructuring: Destructuring.Default, alignment: default(Alignment), format: "N"),
+                    new TextToken("IJKL"),
+                    new PropertyToken(nameof(arg3), "{arg3,-10:F3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Left, 10), format: "F3"),
+                    new TextToken("MNOP"),
+                    new PropertyToken(nameof(arg4), "{@arg4}", destructuring: Destructuring.Destructure, alignment: default(Alignment)),
+                    new TextToken("QRST"),
+                    new PropertyToken(nameof(arg5), "{@arg5}", destructuring: Destructuring.Destructure, alignment: default(Alignment)),
+                    new TextToken("UVWX"),
                     new PropertyToken(nameof(veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg), 
                         "{veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg}", 
-                        destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 67),
-                    new TextToken("YZ", 152)
+                        destructuring: Destructuring.Default, alignment: default(Alignment)),
+                    new TextToken("YZ")
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(6);
@@ -2398,12 +2398,12 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new MessageTemplateToken[]
                 {
-                    new TextToken("Default: ", 0),
-                    new PropertyToken("default", "{default}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 9),
-                    new TextToken(", Stringified: ", 18),
-                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment), startIndex: 33),
-                    new TextToken(", Destructured: ", 39),
-                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 55)
+                    new TextToken("Default: "),
+                    new PropertyToken("default", "{default}", destructuring: Destructuring.Default, alignment: default(Alignment)),
+                    new TextToken(", Stringified: "),
+                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment)),
+                    new TextToken(", Destructured: "),
+                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(3);
@@ -2446,12 +2446,12 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new MessageTemplateToken[]
                 {
-                    new TextToken("Default: ", 0),
-                    new PropertyToken("default", "{@default}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 9),
-                    new TextToken(", Stringified: ", 19),
-                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment), startIndex: 34),
-                    new TextToken(", Destructured: ", 40),
-                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 56)
+                    new TextToken("Default: "),
+                    new PropertyToken("default", "{@default}", destructuring: Destructuring.Destructure, alignment: default(Alignment)),
+                    new TextToken(", Stringified: "),
+                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment)),
+                    new TextToken(", Destructured: "),
+                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(3);
@@ -2494,7 +2494,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[] 
                 { 
-                    new TextToken(message, 0) 
+                    new TextToken(message) 
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(0);
@@ -2529,7 +2529,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[] 
                 { 
-                    new TextToken("T{es}t", 0) 
+                    new TextToken("T{es}t") 
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(0);
@@ -2562,13 +2562,13 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new MessageTemplateToken[] 
                 { 
-                    new TextToken("A", 0),
-                    new PropertyToken(nameof(value1), "{value1}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 1),
-                    new TextToken("B", 9),
-                    new TextToken("C", 10),
-                    new TextToken("D", 11),
-                    new PropertyToken(nameof(value2), "{value2}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 12),
-                    new TextToken("E", 20)                    
+                    new TextToken("A"),
+                    new PropertyToken(nameof(value1), "{value1}", destructuring: Destructuring.Default, alignment: default(Alignment)),
+                    new TextToken("B"),
+                    new TextToken("C"),
+                    new TextToken("D"),
+                    new PropertyToken(nameof(value2), "{value2}", destructuring: Destructuring.Default, alignment: default(Alignment)),
+                    new TextToken("E")                    
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(2);
@@ -2615,7 +2615,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[] 
                 { 
-                    new TextToken(message, 0) 
+                    new TextToken(message) 
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(0);
@@ -2650,7 +2650,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[] 
                 { 
-                    new TextToken("T{es}t", 0) 
+                    new TextToken("T{es}t") 
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(0);
@@ -2685,7 +2685,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -2726,7 +2726,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value,3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 3), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value,3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 3))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -2767,7 +2767,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value:N}", format: "N", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value:N}", format: "N", destructuring: Destructuring.Default, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -2808,7 +2808,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value,6:N}", format: "N", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 6), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value,6:N}", format: "N", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 6))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -2849,7 +2849,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -2890,7 +2890,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -2931,7 +2931,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -2983,21 +2983,21 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new MessageTemplateToken[]
                 {
-                    new TextToken("ABCD", 0),
-                    new PropertyToken(nameof(arg1), "{arg1,7}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 7), startIndex: 4),
-                    new TextToken("EFGH", 12),
-                    new PropertyToken(nameof(arg2), "{arg2:N}", destructuring: Destructuring.Default, alignment: default(Alignment), format: "N", startIndex: 16),
-                    new TextToken("IJKL", 24),
-                    new PropertyToken(nameof(arg3), "{arg3,-10:F3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Left, 10), format: "F3", startIndex: 28),
-                    new TextToken("MNOP", 41),
-                    new PropertyToken(nameof(arg4), "{@arg4}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 45),
-                    new TextToken("QRST", 52),
-                    new PropertyToken(nameof(arg5), "{@arg5}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 56),
-                    new TextToken("UVWX", 63),
+                    new TextToken("ABCD"),
+                    new PropertyToken(nameof(arg1), "{arg1,7}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 7)),
+                    new TextToken("EFGH"),
+                    new PropertyToken(nameof(arg2), "{arg2:N}", destructuring: Destructuring.Default, alignment: default(Alignment), format: "N"),
+                    new TextToken("IJKL"),
+                    new PropertyToken(nameof(arg3), "{arg3,-10:F3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Left, 10), format: "F3"),
+                    new TextToken("MNOP"),
+                    new PropertyToken(nameof(arg4), "{@arg4}", destructuring: Destructuring.Destructure, alignment: default(Alignment)),
+                    new TextToken("QRST"),
+                    new PropertyToken(nameof(arg5), "{@arg5}", destructuring: Destructuring.Destructure, alignment: default(Alignment)),
+                    new TextToken("UVWX"),
                     new PropertyToken(nameof(veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg), 
                         "{veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg}", 
-                        destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 67),
-                    new TextToken("YZ", 152)
+                        destructuring: Destructuring.Default, alignment: default(Alignment)),
+                    new TextToken("YZ")
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(6);
@@ -3043,12 +3043,12 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new MessageTemplateToken[]
                 {
-                    new TextToken("Default: ", 0),
-                    new PropertyToken("default", "{default}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 9),
-                    new TextToken(", Stringified: ", 18),
-                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment), startIndex: 33),
-                    new TextToken(", Destructured: ", 39),
-                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 55)
+                    new TextToken("Default: "),
+                    new PropertyToken("default", "{default}", destructuring: Destructuring.Default, alignment: default(Alignment)),
+                    new TextToken(", Stringified: "),
+                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment)),
+                    new TextToken(", Destructured: "),
+                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(3);
@@ -3091,12 +3091,12 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new MessageTemplateToken[]
                 {
-                    new TextToken("Default: ", 0),
-                    new PropertyToken("default", "{@default}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 9),
-                    new TextToken(", Stringified: ", 19),
-                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment), startIndex: 34),
-                    new TextToken(", Destructured: ", 40),
-                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 56)
+                    new TextToken("Default: "),
+                    new PropertyToken("default", "{@default}", destructuring: Destructuring.Destructure, alignment: default(Alignment)),
+                    new TextToken(", Stringified: "),
+                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment)),
+                    new TextToken(", Destructured: "),
+                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(3);
@@ -3139,7 +3139,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[] 
                 { 
-                    new TextToken(message, 0) 
+                    new TextToken(message) 
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(0);
@@ -3174,7 +3174,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[] 
                 { 
-                    new TextToken("T{es}t", 0) 
+                    new TextToken("T{es}t") 
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(0);
@@ -3207,13 +3207,13 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new MessageTemplateToken[] 
                 { 
-                    new TextToken("A", 0),
-                    new PropertyToken(nameof(value1), "{value1}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 1),
-                    new TextToken("B", 9),
-                    new TextToken("C", 10),
-                    new TextToken("D", 11),
-                    new PropertyToken(nameof(value2), "{value2}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 12),
-                    new TextToken("E", 20)                    
+                    new TextToken("A"),
+                    new PropertyToken(nameof(value1), "{value1}", destructuring: Destructuring.Default, alignment: default(Alignment)),
+                    new TextToken("B"),
+                    new TextToken("C"),
+                    new TextToken("D"),
+                    new PropertyToken(nameof(value2), "{value2}", destructuring: Destructuring.Default, alignment: default(Alignment)),
+                    new TextToken("E")                    
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(2);
@@ -3255,7 +3255,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[] 
                 { 
-                    new TextToken(message, 0) 
+                    new TextToken(message) 
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(0);
@@ -3290,7 +3290,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[] 
                 { 
-                    new TextToken("T{es}t", 0) 
+                    new TextToken("T{es}t") 
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(0);
@@ -3325,7 +3325,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -3366,7 +3366,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value,3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 3), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value,3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 3))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -3407,7 +3407,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value:N}", format: "N", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value:N}", format: "N", destructuring: Destructuring.Default, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -3448,7 +3448,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value,6:N}", format: "N", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 6), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value,6:N}", format: "N", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 6))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -3489,7 +3489,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -3530,7 +3530,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -3571,7 +3571,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -3623,21 +3623,21 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new MessageTemplateToken[]
                 {
-                    new TextToken("ABCD", 0),
-                    new PropertyToken(nameof(arg1), "{arg1,7}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 7), startIndex: 4),
-                    new TextToken("EFGH", 12),
-                    new PropertyToken(nameof(arg2), "{arg2:N}", destructuring: Destructuring.Default, alignment: default(Alignment), format: "N", startIndex: 16),
-                    new TextToken("IJKL", 24),
-                    new PropertyToken(nameof(arg3), "{arg3,-10:F3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Left, 10), format: "F3", startIndex: 28),
-                    new TextToken("MNOP", 41),
-                    new PropertyToken(nameof(arg4), "{@arg4}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 45),
-                    new TextToken("QRST", 52),
-                    new PropertyToken(nameof(arg5), "{@arg5}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 56),
-                    new TextToken("UVWX", 63),
+                    new TextToken("ABCD"),
+                    new PropertyToken(nameof(arg1), "{arg1,7}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 7)),
+                    new TextToken("EFGH"),
+                    new PropertyToken(nameof(arg2), "{arg2:N}", destructuring: Destructuring.Default, alignment: default(Alignment), format: "N"),
+                    new TextToken("IJKL"),
+                    new PropertyToken(nameof(arg3), "{arg3,-10:F3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Left, 10), format: "F3"),
+                    new TextToken("MNOP"),
+                    new PropertyToken(nameof(arg4), "{@arg4}", destructuring: Destructuring.Destructure, alignment: default(Alignment)),
+                    new TextToken("QRST"),
+                    new PropertyToken(nameof(arg5), "{@arg5}", destructuring: Destructuring.Destructure, alignment: default(Alignment)),
+                    new TextToken("UVWX"),
                     new PropertyToken(nameof(veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg), 
                         "{veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg}", 
-                        destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 67),
-                    new TextToken("YZ", 152)
+                        destructuring: Destructuring.Default, alignment: default(Alignment)),
+                    new TextToken("YZ")
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(6);
@@ -3683,12 +3683,12 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new MessageTemplateToken[]
                 {
-                    new TextToken("Default: ", 0),
-                    new PropertyToken("default", "{default}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 9),
-                    new TextToken(", Stringified: ", 18),
-                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment), startIndex: 33),
-                    new TextToken(", Destructured: ", 39),
-                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 55)
+                    new TextToken("Default: "),
+                    new PropertyToken("default", "{default}", destructuring: Destructuring.Default, alignment: default(Alignment)),
+                    new TextToken(", Stringified: "),
+                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment)),
+                    new TextToken(", Destructured: "),
+                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(3);
@@ -3731,12 +3731,12 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new MessageTemplateToken[]
                 {
-                    new TextToken("Default: ", 0),
-                    new PropertyToken("default", "{@default}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 9),
-                    new TextToken(", Stringified: ", 19),
-                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment), startIndex: 34),
-                    new TextToken(", Destructured: ", 40),
-                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 56)
+                    new TextToken("Default: "),
+                    new PropertyToken("default", "{@default}", destructuring: Destructuring.Destructure, alignment: default(Alignment)),
+                    new TextToken(", Stringified: "),
+                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment)),
+                    new TextToken(", Destructured: "),
+                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(3);
@@ -3779,7 +3779,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[] 
                 { 
-                    new TextToken(message, 0) 
+                    new TextToken(message) 
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(0);
@@ -3814,7 +3814,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[] 
                 { 
-                    new TextToken("T{es}t", 0) 
+                    new TextToken("T{es}t") 
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(0);
@@ -3847,13 +3847,13 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new MessageTemplateToken[] 
                 { 
-                    new TextToken("A", 0),
-                    new PropertyToken(nameof(value1), "{value1}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 1),
-                    new TextToken("B", 9),
-                    new TextToken("C", 10),
-                    new TextToken("D", 11),
-                    new PropertyToken(nameof(value2), "{value2}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 12),
-                    new TextToken("E", 20)                    
+                    new TextToken("A"),
+                    new PropertyToken(nameof(value1), "{value1}", destructuring: Destructuring.Default, alignment: default(Alignment)),
+                    new TextToken("B"),
+                    new TextToken("C"),
+                    new TextToken("D"),
+                    new PropertyToken(nameof(value2), "{value2}", destructuring: Destructuring.Default, alignment: default(Alignment)),
+                    new TextToken("E")                    
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(2);
@@ -3900,7 +3900,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[] 
                 { 
-                    new TextToken(message, 0) 
+                    new TextToken(message) 
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(0);
@@ -3935,7 +3935,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[] 
                 { 
-                    new TextToken("T{es}t", 0) 
+                    new TextToken("T{es}t") 
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(0);
@@ -3970,7 +3970,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -4011,7 +4011,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value,3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 3), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value,3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 3))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -4052,7 +4052,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value:N}", format: "N", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value:N}", format: "N", destructuring: Destructuring.Default, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -4093,7 +4093,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value,6:N}", format: "N", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 6), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value,6:N}", format: "N", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 6))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -4134,7 +4134,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -4175,7 +4175,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -4216,7 +4216,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -4268,21 +4268,21 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new MessageTemplateToken[]
                 {
-                    new TextToken("ABCD", 0),
-                    new PropertyToken(nameof(arg1), "{arg1,7}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 7), startIndex: 4),
-                    new TextToken("EFGH", 12),
-                    new PropertyToken(nameof(arg2), "{arg2:N}", destructuring: Destructuring.Default, alignment: default(Alignment), format: "N", startIndex: 16),
-                    new TextToken("IJKL", 24),
-                    new PropertyToken(nameof(arg3), "{arg3,-10:F3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Left, 10), format: "F3", startIndex: 28),
-                    new TextToken("MNOP", 41),
-                    new PropertyToken(nameof(arg4), "{@arg4}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 45),
-                    new TextToken("QRST", 52),
-                    new PropertyToken(nameof(arg5), "{@arg5}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 56),
-                    new TextToken("UVWX", 63),
+                    new TextToken("ABCD"),
+                    new PropertyToken(nameof(arg1), "{arg1,7}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 7)),
+                    new TextToken("EFGH"),
+                    new PropertyToken(nameof(arg2), "{arg2:N}", destructuring: Destructuring.Default, alignment: default(Alignment), format: "N"),
+                    new TextToken("IJKL"),
+                    new PropertyToken(nameof(arg3), "{arg3,-10:F3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Left, 10), format: "F3"),
+                    new TextToken("MNOP"),
+                    new PropertyToken(nameof(arg4), "{@arg4}", destructuring: Destructuring.Destructure, alignment: default(Alignment)),
+                    new TextToken("QRST"),
+                    new PropertyToken(nameof(arg5), "{@arg5}", destructuring: Destructuring.Destructure, alignment: default(Alignment)),
+                    new TextToken("UVWX"),
                     new PropertyToken(nameof(veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg), 
                         "{veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg}", 
-                        destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 67),
-                    new TextToken("YZ", 152)
+                        destructuring: Destructuring.Default, alignment: default(Alignment)),
+                    new TextToken("YZ")
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(6);
@@ -4328,12 +4328,12 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new MessageTemplateToken[]
                 {
-                    new TextToken("Default: ", 0),
-                    new PropertyToken("default", "{default}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 9),
-                    new TextToken(", Stringified: ", 18),
-                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment), startIndex: 33),
-                    new TextToken(", Destructured: ", 39),
-                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 55)
+                    new TextToken("Default: "),
+                    new PropertyToken("default", "{default}", destructuring: Destructuring.Default, alignment: default(Alignment)),
+                    new TextToken(", Stringified: "),
+                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment)),
+                    new TextToken(", Destructured: "),
+                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(3);
@@ -4376,12 +4376,12 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new MessageTemplateToken[]
                 {
-                    new TextToken("Default: ", 0),
-                    new PropertyToken("default", "{@default}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 9),
-                    new TextToken(", Stringified: ", 19),
-                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment), startIndex: 34),
-                    new TextToken(", Destructured: ", 40),
-                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 56)
+                    new TextToken("Default: "),
+                    new PropertyToken("default", "{@default}", destructuring: Destructuring.Destructure, alignment: default(Alignment)),
+                    new TextToken(", Stringified: "),
+                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment)),
+                    new TextToken(", Destructured: "),
+                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(3);
@@ -4424,7 +4424,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[] 
                 { 
-                    new TextToken(message, 0) 
+                    new TextToken(message) 
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(0);
@@ -4459,7 +4459,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[] 
                 { 
-                    new TextToken("T{es}t", 0) 
+                    new TextToken("T{es}t") 
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(0);
@@ -4492,13 +4492,13 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new MessageTemplateToken[] 
                 { 
-                    new TextToken("A", 0),
-                    new PropertyToken(nameof(value1), "{value1}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 1),
-                    new TextToken("B", 9),
-                    new TextToken("C", 10),
-                    new TextToken("D", 11),
-                    new PropertyToken(nameof(value2), "{value2}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 12),
-                    new TextToken("E", 20)                    
+                    new TextToken("A"),
+                    new PropertyToken(nameof(value1), "{value1}", destructuring: Destructuring.Default, alignment: default(Alignment)),
+                    new TextToken("B"),
+                    new TextToken("C"),
+                    new TextToken("D"),
+                    new PropertyToken(nameof(value2), "{value2}", destructuring: Destructuring.Default, alignment: default(Alignment)),
+                    new TextToken("E")                    
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(2);
@@ -4540,7 +4540,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[] 
                 { 
-                    new TextToken(message, 0) 
+                    new TextToken(message) 
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(0);
@@ -4575,7 +4575,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[] 
                 { 
-                    new TextToken("T{es}t", 0) 
+                    new TextToken("T{es}t") 
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(0);
@@ -4610,7 +4610,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -4651,7 +4651,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value,3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 3), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value,3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 3))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -4692,7 +4692,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value:N}", format: "N", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value:N}", format: "N", destructuring: Destructuring.Default, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -4733,7 +4733,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value,6:N}", format: "N", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 6), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value,6:N}", format: "N", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 6))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -4774,7 +4774,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -4815,7 +4815,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -4856,7 +4856,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -4908,21 +4908,21 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new MessageTemplateToken[]
                 {
-                    new TextToken("ABCD", 0),
-                    new PropertyToken(nameof(arg1), "{arg1,7}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 7), startIndex: 4),
-                    new TextToken("EFGH", 12),
-                    new PropertyToken(nameof(arg2), "{arg2:N}", destructuring: Destructuring.Default, alignment: default(Alignment), format: "N", startIndex: 16),
-                    new TextToken("IJKL", 24),
-                    new PropertyToken(nameof(arg3), "{arg3,-10:F3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Left, 10), format: "F3", startIndex: 28),
-                    new TextToken("MNOP", 41),
-                    new PropertyToken(nameof(arg4), "{@arg4}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 45),
-                    new TextToken("QRST", 52),
-                    new PropertyToken(nameof(arg5), "{@arg5}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 56),
-                    new TextToken("UVWX", 63),
+                    new TextToken("ABCD"),
+                    new PropertyToken(nameof(arg1), "{arg1,7}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 7)),
+                    new TextToken("EFGH"),
+                    new PropertyToken(nameof(arg2), "{arg2:N}", destructuring: Destructuring.Default, alignment: default(Alignment), format: "N"),
+                    new TextToken("IJKL"),
+                    new PropertyToken(nameof(arg3), "{arg3,-10:F3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Left, 10), format: "F3"),
+                    new TextToken("MNOP"),
+                    new PropertyToken(nameof(arg4), "{@arg4}", destructuring: Destructuring.Destructure, alignment: default(Alignment)),
+                    new TextToken("QRST"),
+                    new PropertyToken(nameof(arg5), "{@arg5}", destructuring: Destructuring.Destructure, alignment: default(Alignment)),
+                    new TextToken("UVWX"),
                     new PropertyToken(nameof(veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg), 
                         "{veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg}", 
-                        destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 67),
-                    new TextToken("YZ", 152)
+                        destructuring: Destructuring.Default, alignment: default(Alignment)),
+                    new TextToken("YZ")
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(6);
@@ -4968,12 +4968,12 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new MessageTemplateToken[]
                 {
-                    new TextToken("Default: ", 0),
-                    new PropertyToken("default", "{default}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 9),
-                    new TextToken(", Stringified: ", 18),
-                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment), startIndex: 33),
-                    new TextToken(", Destructured: ", 39),
-                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 55)
+                    new TextToken("Default: "),
+                    new PropertyToken("default", "{default}", destructuring: Destructuring.Default, alignment: default(Alignment)),
+                    new TextToken(", Stringified: "),
+                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment)),
+                    new TextToken(", Destructured: "),
+                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(3);
@@ -5016,12 +5016,12 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new MessageTemplateToken[]
                 {
-                    new TextToken("Default: ", 0),
-                    new PropertyToken("default", "{@default}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 9),
-                    new TextToken(", Stringified: ", 19),
-                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment), startIndex: 34),
-                    new TextToken(", Destructured: ", 40),
-                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 56)
+                    new TextToken("Default: "),
+                    new PropertyToken("default", "{@default}", destructuring: Destructuring.Destructure, alignment: default(Alignment)),
+                    new TextToken(", Stringified: "),
+                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment)),
+                    new TextToken(", Destructured: "),
+                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(3);
@@ -5064,7 +5064,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[] 
                 { 
-                    new TextToken(message, 0) 
+                    new TextToken(message) 
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(0);
@@ -5099,7 +5099,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[] 
                 { 
-                    new TextToken("T{es}t", 0) 
+                    new TextToken("T{es}t") 
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(0);
@@ -5132,13 +5132,13 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new MessageTemplateToken[] 
                 { 
-                    new TextToken("A", 0),
-                    new PropertyToken(nameof(value1), "{value1}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 1),
-                    new TextToken("B", 9),
-                    new TextToken("C", 10),
-                    new TextToken("D", 11),
-                    new PropertyToken(nameof(value2), "{value2}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 12),
-                    new TextToken("E", 20)                    
+                    new TextToken("A"),
+                    new PropertyToken(nameof(value1), "{value1}", destructuring: Destructuring.Default, alignment: default(Alignment)),
+                    new TextToken("B"),
+                    new TextToken("C"),
+                    new TextToken("D"),
+                    new PropertyToken(nameof(value2), "{value2}", destructuring: Destructuring.Default, alignment: default(Alignment)),
+                    new TextToken("E")                    
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(2);
@@ -5185,7 +5185,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[] 
                 { 
-                    new TextToken(message, 0) 
+                    new TextToken(message) 
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(0);
@@ -5220,7 +5220,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[] 
                 { 
-                    new TextToken("T{es}t", 0) 
+                    new TextToken("T{es}t") 
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(0);
@@ -5255,7 +5255,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -5296,7 +5296,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value,3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 3), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value,3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 3))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -5337,7 +5337,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value:N}", format: "N", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value:N}", format: "N", destructuring: Destructuring.Default, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -5378,7 +5378,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value,6:N}", format: "N", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 6), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value,6:N}", format: "N", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 6))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -5419,7 +5419,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -5460,7 +5460,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -5501,7 +5501,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -5553,21 +5553,21 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new MessageTemplateToken[]
                 {
-                    new TextToken("ABCD", 0),
-                    new PropertyToken(nameof(arg1), "{arg1,7}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 7), startIndex: 4),
-                    new TextToken("EFGH", 12),
-                    new PropertyToken(nameof(arg2), "{arg2:N}", destructuring: Destructuring.Default, alignment: default(Alignment), format: "N", startIndex: 16),
-                    new TextToken("IJKL", 24),
-                    new PropertyToken(nameof(arg3), "{arg3,-10:F3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Left, 10), format: "F3", startIndex: 28),
-                    new TextToken("MNOP", 41),
-                    new PropertyToken(nameof(arg4), "{@arg4}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 45),
-                    new TextToken("QRST", 52),
-                    new PropertyToken(nameof(arg5), "{@arg5}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 56),
-                    new TextToken("UVWX", 63),
+                    new TextToken("ABCD"),
+                    new PropertyToken(nameof(arg1), "{arg1,7}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 7)),
+                    new TextToken("EFGH"),
+                    new PropertyToken(nameof(arg2), "{arg2:N}", destructuring: Destructuring.Default, alignment: default(Alignment), format: "N"),
+                    new TextToken("IJKL"),
+                    new PropertyToken(nameof(arg3), "{arg3,-10:F3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Left, 10), format: "F3"),
+                    new TextToken("MNOP"),
+                    new PropertyToken(nameof(arg4), "{@arg4}", destructuring: Destructuring.Destructure, alignment: default(Alignment)),
+                    new TextToken("QRST"),
+                    new PropertyToken(nameof(arg5), "{@arg5}", destructuring: Destructuring.Destructure, alignment: default(Alignment)),
+                    new TextToken("UVWX"),
                     new PropertyToken(nameof(veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg), 
                         "{veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg}", 
-                        destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 67),
-                    new TextToken("YZ", 152)
+                        destructuring: Destructuring.Default, alignment: default(Alignment)),
+                    new TextToken("YZ")
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(6);
@@ -5613,12 +5613,12 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new MessageTemplateToken[]
                 {
-                    new TextToken("Default: ", 0),
-                    new PropertyToken("default", "{default}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 9),
-                    new TextToken(", Stringified: ", 18),
-                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment), startIndex: 33),
-                    new TextToken(", Destructured: ", 39),
-                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 55)
+                    new TextToken("Default: "),
+                    new PropertyToken("default", "{default}", destructuring: Destructuring.Default, alignment: default(Alignment)),
+                    new TextToken(", Stringified: "),
+                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment)),
+                    new TextToken(", Destructured: "),
+                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(3);
@@ -5661,12 +5661,12 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new MessageTemplateToken[]
                 {
-                    new TextToken("Default: ", 0),
-                    new PropertyToken("default", "{@default}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 9),
-                    new TextToken(", Stringified: ", 19),
-                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment), startIndex: 34),
-                    new TextToken(", Destructured: ", 40),
-                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 56)
+                    new TextToken("Default: "),
+                    new PropertyToken("default", "{@default}", destructuring: Destructuring.Destructure, alignment: default(Alignment)),
+                    new TextToken(", Stringified: "),
+                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment)),
+                    new TextToken(", Destructured: "),
+                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(3);
@@ -5709,7 +5709,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[] 
                 { 
-                    new TextToken(message, 0) 
+                    new TextToken(message) 
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(0);
@@ -5744,7 +5744,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[] 
                 { 
-                    new TextToken("T{es}t", 0) 
+                    new TextToken("T{es}t") 
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(0);
@@ -5777,13 +5777,13 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new MessageTemplateToken[] 
                 { 
-                    new TextToken("A", 0),
-                    new PropertyToken(nameof(value1), "{value1}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 1),
-                    new TextToken("B", 9),
-                    new TextToken("C", 10),
-                    new TextToken("D", 11),
-                    new PropertyToken(nameof(value2), "{value2}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 12),
-                    new TextToken("E", 20)                    
+                    new TextToken("A"),
+                    new PropertyToken(nameof(value1), "{value1}", destructuring: Destructuring.Default, alignment: default(Alignment)),
+                    new TextToken("B"),
+                    new TextToken("C"),
+                    new TextToken("D"),
+                    new PropertyToken(nameof(value2), "{value2}", destructuring: Destructuring.Default, alignment: default(Alignment)),
+                    new TextToken("E")                    
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(2);
@@ -5825,7 +5825,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[] 
                 { 
-                    new TextToken(message, 0) 
+                    new TextToken(message) 
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(0);
@@ -5860,7 +5860,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[] 
                 { 
-                    new TextToken("T{es}t", 0) 
+                    new TextToken("T{es}t") 
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(0);
@@ -5895,7 +5895,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -5936,7 +5936,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value,3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 3), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value,3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 3))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -5977,7 +5977,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value:N}", format: "N", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value:N}", format: "N", destructuring: Destructuring.Default, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -6018,7 +6018,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value,6:N}", format: "N", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 6), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value,6:N}", format: "N", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 6))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -6059,7 +6059,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -6100,7 +6100,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -6141,7 +6141,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -6193,21 +6193,21 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new MessageTemplateToken[]
                 {
-                    new TextToken("ABCD", 0),
-                    new PropertyToken(nameof(arg1), "{arg1,7}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 7), startIndex: 4),
-                    new TextToken("EFGH", 12),
-                    new PropertyToken(nameof(arg2), "{arg2:N}", destructuring: Destructuring.Default, alignment: default(Alignment), format: "N", startIndex: 16),
-                    new TextToken("IJKL", 24),
-                    new PropertyToken(nameof(arg3), "{arg3,-10:F3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Left, 10), format: "F3", startIndex: 28),
-                    new TextToken("MNOP", 41),
-                    new PropertyToken(nameof(arg4), "{@arg4}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 45),
-                    new TextToken("QRST", 52),
-                    new PropertyToken(nameof(arg5), "{@arg5}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 56),
-                    new TextToken("UVWX", 63),
+                    new TextToken("ABCD"),
+                    new PropertyToken(nameof(arg1), "{arg1,7}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 7)),
+                    new TextToken("EFGH"),
+                    new PropertyToken(nameof(arg2), "{arg2:N}", destructuring: Destructuring.Default, alignment: default(Alignment), format: "N"),
+                    new TextToken("IJKL"),
+                    new PropertyToken(nameof(arg3), "{arg3,-10:F3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Left, 10), format: "F3"),
+                    new TextToken("MNOP"),
+                    new PropertyToken(nameof(arg4), "{@arg4}", destructuring: Destructuring.Destructure, alignment: default(Alignment)),
+                    new TextToken("QRST"),
+                    new PropertyToken(nameof(arg5), "{@arg5}", destructuring: Destructuring.Destructure, alignment: default(Alignment)),
+                    new TextToken("UVWX"),
                     new PropertyToken(nameof(veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg), 
                         "{veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg}", 
-                        destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 67),
-                    new TextToken("YZ", 152)
+                        destructuring: Destructuring.Default, alignment: default(Alignment)),
+                    new TextToken("YZ")
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(6);
@@ -6253,12 +6253,12 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new MessageTemplateToken[]
                 {
-                    new TextToken("Default: ", 0),
-                    new PropertyToken("default", "{default}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 9),
-                    new TextToken(", Stringified: ", 18),
-                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment), startIndex: 33),
-                    new TextToken(", Destructured: ", 39),
-                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 55)
+                    new TextToken("Default: "),
+                    new PropertyToken("default", "{default}", destructuring: Destructuring.Default, alignment: default(Alignment)),
+                    new TextToken(", Stringified: "),
+                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment)),
+                    new TextToken(", Destructured: "),
+                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(3);
@@ -6301,12 +6301,12 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new MessageTemplateToken[]
                 {
-                    new TextToken("Default: ", 0),
-                    new PropertyToken("default", "{@default}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 9),
-                    new TextToken(", Stringified: ", 19),
-                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment), startIndex: 34),
-                    new TextToken(", Destructured: ", 40),
-                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 56)
+                    new TextToken("Default: "),
+                    new PropertyToken("default", "{@default}", destructuring: Destructuring.Destructure, alignment: default(Alignment)),
+                    new TextToken(", Stringified: "),
+                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment)),
+                    new TextToken(", Destructured: "),
+                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(3);
@@ -6349,7 +6349,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[] 
                 { 
-                    new TextToken(message, 0) 
+                    new TextToken(message) 
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(0);
@@ -6384,7 +6384,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[] 
                 { 
-                    new TextToken("T{es}t", 0) 
+                    new TextToken("T{es}t") 
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(0);
@@ -6417,13 +6417,13 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new MessageTemplateToken[] 
                 { 
-                    new TextToken("A", 0),
-                    new PropertyToken(nameof(value1), "{value1}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 1),
-                    new TextToken("B", 9),
-                    new TextToken("C", 10),
-                    new TextToken("D", 11),
-                    new PropertyToken(nameof(value2), "{value2}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 12),
-                    new TextToken("E", 20)                    
+                    new TextToken("A"),
+                    new PropertyToken(nameof(value1), "{value1}", destructuring: Destructuring.Default, alignment: default(Alignment)),
+                    new TextToken("B"),
+                    new TextToken("C"),
+                    new TextToken("D"),
+                    new PropertyToken(nameof(value2), "{value2}", destructuring: Destructuring.Default, alignment: default(Alignment)),
+                    new TextToken("E")                    
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(2);
@@ -6470,7 +6470,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[] 
                 { 
-                    new TextToken(message, 0) 
+                    new TextToken(message) 
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(0);
@@ -6505,7 +6505,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[] 
                 { 
-                    new TextToken("T{es}t", 0) 
+                    new TextToken("T{es}t") 
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(0);
@@ -6540,7 +6540,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -6581,7 +6581,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value,3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 3), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value,3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 3))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -6622,7 +6622,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value:N}", format: "N", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value:N}", format: "N", destructuring: Destructuring.Default, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -6663,7 +6663,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value,6:N}", format: "N", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 6), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value,6:N}", format: "N", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 6))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -6704,7 +6704,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -6745,7 +6745,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -6786,7 +6786,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -6838,21 +6838,21 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new MessageTemplateToken[]
                 {
-                    new TextToken("ABCD", 0),
-                    new PropertyToken(nameof(arg1), "{arg1,7}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 7), startIndex: 4),
-                    new TextToken("EFGH", 12),
-                    new PropertyToken(nameof(arg2), "{arg2:N}", destructuring: Destructuring.Default, alignment: default(Alignment), format: "N", startIndex: 16),
-                    new TextToken("IJKL", 24),
-                    new PropertyToken(nameof(arg3), "{arg3,-10:F3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Left, 10), format: "F3", startIndex: 28),
-                    new TextToken("MNOP", 41),
-                    new PropertyToken(nameof(arg4), "{@arg4}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 45),
-                    new TextToken("QRST", 52),
-                    new PropertyToken(nameof(arg5), "{@arg5}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 56),
-                    new TextToken("UVWX", 63),
+                    new TextToken("ABCD"),
+                    new PropertyToken(nameof(arg1), "{arg1,7}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 7)),
+                    new TextToken("EFGH"),
+                    new PropertyToken(nameof(arg2), "{arg2:N}", destructuring: Destructuring.Default, alignment: default(Alignment), format: "N"),
+                    new TextToken("IJKL"),
+                    new PropertyToken(nameof(arg3), "{arg3,-10:F3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Left, 10), format: "F3"),
+                    new TextToken("MNOP"),
+                    new PropertyToken(nameof(arg4), "{@arg4}", destructuring: Destructuring.Destructure, alignment: default(Alignment)),
+                    new TextToken("QRST"),
+                    new PropertyToken(nameof(arg5), "{@arg5}", destructuring: Destructuring.Destructure, alignment: default(Alignment)),
+                    new TextToken("UVWX"),
                     new PropertyToken(nameof(veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg), 
                         "{veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg}", 
-                        destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 67),
-                    new TextToken("YZ", 152)
+                        destructuring: Destructuring.Default, alignment: default(Alignment)),
+                    new TextToken("YZ")
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(6);
@@ -6898,12 +6898,12 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new MessageTemplateToken[]
                 {
-                    new TextToken("Default: ", 0),
-                    new PropertyToken("default", "{default}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 9),
-                    new TextToken(", Stringified: ", 18),
-                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment), startIndex: 33),
-                    new TextToken(", Destructured: ", 39),
-                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 55)
+                    new TextToken("Default: "),
+                    new PropertyToken("default", "{default}", destructuring: Destructuring.Default, alignment: default(Alignment)),
+                    new TextToken(", Stringified: "),
+                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment)),
+                    new TextToken(", Destructured: "),
+                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(3);
@@ -6946,12 +6946,12 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new MessageTemplateToken[]
                 {
-                    new TextToken("Default: ", 0),
-                    new PropertyToken("default", "{@default}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 9),
-                    new TextToken(", Stringified: ", 19),
-                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment), startIndex: 34),
-                    new TextToken(", Destructured: ", 40),
-                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 56)
+                    new TextToken("Default: "),
+                    new PropertyToken("default", "{@default}", destructuring: Destructuring.Destructure, alignment: default(Alignment)),
+                    new TextToken(", Stringified: "),
+                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment)),
+                    new TextToken(", Destructured: "),
+                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(3);
@@ -6994,7 +6994,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[] 
                 { 
-                    new TextToken(message, 0) 
+                    new TextToken(message) 
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(0);
@@ -7029,7 +7029,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[] 
                 { 
-                    new TextToken("T{es}t", 0) 
+                    new TextToken("T{es}t") 
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(0);
@@ -7062,13 +7062,13 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new MessageTemplateToken[] 
                 { 
-                    new TextToken("A", 0),
-                    new PropertyToken(nameof(value1), "{value1}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 1),
-                    new TextToken("B", 9),
-                    new TextToken("C", 10),
-                    new TextToken("D", 11),
-                    new PropertyToken(nameof(value2), "{value2}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 12),
-                    new TextToken("E", 20)                    
+                    new TextToken("A"),
+                    new PropertyToken(nameof(value1), "{value1}", destructuring: Destructuring.Default, alignment: default(Alignment)),
+                    new TextToken("B"),
+                    new TextToken("C"),
+                    new TextToken("D"),
+                    new PropertyToken(nameof(value2), "{value2}", destructuring: Destructuring.Default, alignment: default(Alignment)),
+                    new TextToken("E")                    
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(2);
@@ -7110,7 +7110,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[] 
                 { 
-                    new TextToken(message, 0) 
+                    new TextToken(message) 
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(0);
@@ -7145,7 +7145,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[] 
                 { 
-                    new TextToken("T{es}t", 0) 
+                    new TextToken("T{es}t") 
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(0);
@@ -7180,7 +7180,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -7221,7 +7221,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value,3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 3), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value,3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 3))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -7262,7 +7262,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value:N}", format: "N", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value:N}", format: "N", destructuring: Destructuring.Default, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -7303,7 +7303,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value,6:N}", format: "N", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 6), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value,6:N}", format: "N", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 6))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -7344,7 +7344,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -7385,7 +7385,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -7426,7 +7426,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -7478,21 +7478,21 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new MessageTemplateToken[]
                 {
-                    new TextToken("ABCD", 0),
-                    new PropertyToken(nameof(arg1), "{arg1,7}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 7), startIndex: 4),
-                    new TextToken("EFGH", 12),
-                    new PropertyToken(nameof(arg2), "{arg2:N}", destructuring: Destructuring.Default, alignment: default(Alignment), format: "N", startIndex: 16),
-                    new TextToken("IJKL", 24),
-                    new PropertyToken(nameof(arg3), "{arg3,-10:F3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Left, 10), format: "F3", startIndex: 28),
-                    new TextToken("MNOP", 41),
-                    new PropertyToken(nameof(arg4), "{@arg4}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 45),
-                    new TextToken("QRST", 52),
-                    new PropertyToken(nameof(arg5), "{@arg5}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 56),
-                    new TextToken("UVWX", 63),
+                    new TextToken("ABCD"),
+                    new PropertyToken(nameof(arg1), "{arg1,7}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 7)),
+                    new TextToken("EFGH"),
+                    new PropertyToken(nameof(arg2), "{arg2:N}", destructuring: Destructuring.Default, alignment: default(Alignment), format: "N"),
+                    new TextToken("IJKL"),
+                    new PropertyToken(nameof(arg3), "{arg3,-10:F3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Left, 10), format: "F3"),
+                    new TextToken("MNOP"),
+                    new PropertyToken(nameof(arg4), "{@arg4}", destructuring: Destructuring.Destructure, alignment: default(Alignment)),
+                    new TextToken("QRST"),
+                    new PropertyToken(nameof(arg5), "{@arg5}", destructuring: Destructuring.Destructure, alignment: default(Alignment)),
+                    new TextToken("UVWX"),
                     new PropertyToken(nameof(veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg), 
                         "{veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg}", 
-                        destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 67),
-                    new TextToken("YZ", 152)
+                        destructuring: Destructuring.Default, alignment: default(Alignment)),
+                    new TextToken("YZ")
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(6);
@@ -7538,12 +7538,12 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new MessageTemplateToken[]
                 {
-                    new TextToken("Default: ", 0),
-                    new PropertyToken("default", "{default}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 9),
-                    new TextToken(", Stringified: ", 18),
-                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment), startIndex: 33),
-                    new TextToken(", Destructured: ", 39),
-                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 55)
+                    new TextToken("Default: "),
+                    new PropertyToken("default", "{default}", destructuring: Destructuring.Default, alignment: default(Alignment)),
+                    new TextToken(", Stringified: "),
+                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment)),
+                    new TextToken(", Destructured: "),
+                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(3);
@@ -7586,12 +7586,12 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new MessageTemplateToken[]
                 {
-                    new TextToken("Default: ", 0),
-                    new PropertyToken("default", "{@default}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 9),
-                    new TextToken(", Stringified: ", 19),
-                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment), startIndex: 34),
-                    new TextToken(", Destructured: ", 40),
-                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 56)
+                    new TextToken("Default: "),
+                    new PropertyToken("default", "{@default}", destructuring: Destructuring.Destructure, alignment: default(Alignment)),
+                    new TextToken(", Stringified: "),
+                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment)),
+                    new TextToken(", Destructured: "),
+                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(3);
@@ -7634,7 +7634,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[] 
                 { 
-                    new TextToken(message, 0) 
+                    new TextToken(message) 
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(0);
@@ -7669,7 +7669,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[] 
                 { 
-                    new TextToken("T{es}t", 0) 
+                    new TextToken("T{es}t") 
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(0);
@@ -7702,13 +7702,13 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new MessageTemplateToken[] 
                 { 
-                    new TextToken("A", 0),
-                    new PropertyToken(nameof(value1), "{value1}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 1),
-                    new TextToken("B", 9),
-                    new TextToken("C", 10),
-                    new TextToken("D", 11),
-                    new PropertyToken(nameof(value2), "{value2}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 12),
-                    new TextToken("E", 20)                    
+                    new TextToken("A"),
+                    new PropertyToken(nameof(value1), "{value1}", destructuring: Destructuring.Default, alignment: default(Alignment)),
+                    new TextToken("B"),
+                    new TextToken("C"),
+                    new TextToken("D"),
+                    new PropertyToken(nameof(value2), "{value2}", destructuring: Destructuring.Default, alignment: default(Alignment)),
+                    new TextToken("E")                    
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(2);
@@ -7753,7 +7753,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[] 
                 { 
-                    new TextToken(message, 0) 
+                    new TextToken(message) 
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(0);
@@ -7786,7 +7786,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[] 
                 { 
-                    new TextToken("T{es}t", 0) 
+                    new TextToken("T{es}t") 
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(0);
@@ -7819,7 +7819,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -7858,7 +7858,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value,3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 3), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value,3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 3))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -7897,7 +7897,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value:N}", format: "N", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value:N}", format: "N", destructuring: Destructuring.Default, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -7936,7 +7936,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value,6:N}", format: "N", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 6), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value,6:N}", format: "N", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 6))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -7975,7 +7975,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -8014,7 +8014,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -8053,7 +8053,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -8103,21 +8103,21 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new MessageTemplateToken[]
                 {
-                    new TextToken("ABCD", 0),
-                    new PropertyToken(nameof(arg1), "{arg1,7}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 7), startIndex: 4),
-                    new TextToken("EFGH", 12),
-                    new PropertyToken(nameof(arg2), "{arg2:N}", destructuring: Destructuring.Default, alignment: default(Alignment), format: "N", startIndex: 16),
-                    new TextToken("IJKL", 24),
-                    new PropertyToken(nameof(arg3), "{arg3,-10:F3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Left, 10), format: "F3", startIndex: 28),
-                    new TextToken("MNOP", 41),
-                    new PropertyToken(nameof(arg4), "{@arg4}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 45),
-                    new TextToken("QRST", 52),
-                    new PropertyToken(nameof(arg5), "{@arg5}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 56),
-                    new TextToken("UVWX", 63),
+                    new TextToken("ABCD"),
+                    new PropertyToken(nameof(arg1), "{arg1,7}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 7)),
+                    new TextToken("EFGH"),
+                    new PropertyToken(nameof(arg2), "{arg2:N}", destructuring: Destructuring.Default, alignment: default(Alignment), format: "N"),
+                    new TextToken("IJKL"),
+                    new PropertyToken(nameof(arg3), "{arg3,-10:F3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Left, 10), format: "F3"),
+                    new TextToken("MNOP"),
+                    new PropertyToken(nameof(arg4), "{@arg4}", destructuring: Destructuring.Destructure, alignment: default(Alignment)),
+                    new TextToken("QRST"),
+                    new PropertyToken(nameof(arg5), "{@arg5}", destructuring: Destructuring.Destructure, alignment: default(Alignment)),
+                    new TextToken("UVWX"),
                     new PropertyToken(nameof(veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg), 
                         "{veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg}", 
-                        destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 67),
-                    new TextToken("YZ", 152)
+                        destructuring: Destructuring.Default, alignment: default(Alignment)),
+                    new TextToken("YZ")
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(6);
@@ -8161,12 +8161,12 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new MessageTemplateToken[]
                 {
-                    new TextToken("Default: ", 0),
-                    new PropertyToken("default", "{default}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 9),
-                    new TextToken(", Stringified: ", 18),
-                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment), startIndex: 33),
-                    new TextToken(", Destructured: ", 39),
-                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 55)
+                    new TextToken("Default: "),
+                    new PropertyToken("default", "{default}", destructuring: Destructuring.Default, alignment: default(Alignment)),
+                    new TextToken(", Stringified: "),
+                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment)),
+                    new TextToken(", Destructured: "),
+                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(3);
@@ -8207,12 +8207,12 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new MessageTemplateToken[]
                 {
-                    new TextToken("Default: ", 0),
-                    new PropertyToken("default", "{@default}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 9),
-                    new TextToken(", Stringified: ", 19),
-                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment), startIndex: 34),
-                    new TextToken(", Destructured: ", 40),
-                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 56)
+                    new TextToken("Default: "),
+                    new PropertyToken("default", "{@default}", destructuring: Destructuring.Destructure, alignment: default(Alignment)),
+                    new TextToken(", Stringified: "),
+                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment)),
+                    new TextToken(", Destructured: "),
+                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(3);
@@ -8253,7 +8253,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[] 
                 { 
-                    new TextToken(message, 0) 
+                    new TextToken(message) 
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(0);
@@ -8286,7 +8286,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[] 
                 { 
-                    new TextToken("T{es}t", 0) 
+                    new TextToken("T{es}t") 
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(0);
@@ -8317,13 +8317,13 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new MessageTemplateToken[] 
                 { 
-                    new TextToken("A", 0),
-                    new PropertyToken(nameof(value1), "{value1}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 1),
-                    new TextToken("B", 9),
-                    new TextToken("C", 10),
-                    new TextToken("D", 11),
-                    new PropertyToken(nameof(value2), "{value2}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 12),
-                    new TextToken("E", 20)                    
+                    new TextToken("A"),
+                    new PropertyToken(nameof(value1), "{value1}", destructuring: Destructuring.Default, alignment: default(Alignment)),
+                    new TextToken("B"),
+                    new TextToken("C"),
+                    new TextToken("D"),
+                    new PropertyToken(nameof(value2), "{value2}", destructuring: Destructuring.Default, alignment: default(Alignment)),
+                    new TextToken("E")                    
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(2);
@@ -8363,7 +8363,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[] 
                 { 
-                    new TextToken(message, 0) 
+                    new TextToken(message) 
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(0);
@@ -8396,7 +8396,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[] 
                 { 
-                    new TextToken("T{es}t", 0) 
+                    new TextToken("T{es}t") 
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(0);
@@ -8429,7 +8429,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -8468,7 +8468,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value,3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 3), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value,3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 3))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -8507,7 +8507,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value:N}", format: "N", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value:N}", format: "N", destructuring: Destructuring.Default, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -8546,7 +8546,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value,6:N}", format: "N", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 6), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value,6:N}", format: "N", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 6))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -8585,7 +8585,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -8624,7 +8624,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{@value}", destructuring: Destructuring.Destructure, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -8663,7 +8663,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[]
                 {
-                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 0)
+                    new PropertyToken(nameof(value), "{value}", destructuring: Destructuring.Default, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(1);
@@ -8713,21 +8713,21 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new MessageTemplateToken[]
                 {
-                    new TextToken("ABCD", 0),
-                    new PropertyToken(nameof(arg1), "{arg1,7}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 7), startIndex: 4),
-                    new TextToken("EFGH", 12),
-                    new PropertyToken(nameof(arg2), "{arg2:N}", destructuring: Destructuring.Default, alignment: default(Alignment), format: "N", startIndex: 16),
-                    new TextToken("IJKL", 24),
-                    new PropertyToken(nameof(arg3), "{arg3,-10:F3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Left, 10), format: "F3", startIndex: 28),
-                    new TextToken("MNOP", 41),
-                    new PropertyToken(nameof(arg4), "{@arg4}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 45),
-                    new TextToken("QRST", 52),
-                    new PropertyToken(nameof(arg5), "{@arg5}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 56),
-                    new TextToken("UVWX", 63),
+                    new TextToken("ABCD"),
+                    new PropertyToken(nameof(arg1), "{arg1,7}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Right, 7)),
+                    new TextToken("EFGH"),
+                    new PropertyToken(nameof(arg2), "{arg2:N}", destructuring: Destructuring.Default, alignment: default(Alignment), format: "N"),
+                    new TextToken("IJKL"),
+                    new PropertyToken(nameof(arg3), "{arg3,-10:F3}", destructuring: Destructuring.Default, alignment: new Alignment(AlignmentDirection.Left, 10), format: "F3"),
+                    new TextToken("MNOP"),
+                    new PropertyToken(nameof(arg4), "{@arg4}", destructuring: Destructuring.Destructure, alignment: default(Alignment)),
+                    new TextToken("QRST"),
+                    new PropertyToken(nameof(arg5), "{@arg5}", destructuring: Destructuring.Destructure, alignment: default(Alignment)),
+                    new TextToken("UVWX"),
                     new PropertyToken(nameof(veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg), 
                         "{veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongArg}", 
-                        destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 67),
-                    new TextToken("YZ", 152)
+                        destructuring: Destructuring.Default, alignment: default(Alignment)),
+                    new TextToken("YZ")
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(6);
@@ -8771,12 +8771,12 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new MessageTemplateToken[]
                 {
-                    new TextToken("Default: ", 0),
-                    new PropertyToken("default", "{default}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 9),
-                    new TextToken(", Stringified: ", 18),
-                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment), startIndex: 33),
-                    new TextToken(", Destructured: ", 39),
-                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 55)
+                    new TextToken("Default: "),
+                    new PropertyToken("default", "{default}", destructuring: Destructuring.Default, alignment: default(Alignment)),
+                    new TextToken(", Stringified: "),
+                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment)),
+                    new TextToken(", Destructured: "),
+                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(3);
@@ -8817,12 +8817,12 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new MessageTemplateToken[]
                 {
-                    new TextToken("Default: ", 0),
-                    new PropertyToken("default", "{@default}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 9),
-                    new TextToken(", Stringified: ", 19),
-                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment), startIndex: 34),
-                    new TextToken(", Destructured: ", 40),
-                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment), startIndex: 56)
+                    new TextToken("Default: "),
+                    new PropertyToken("default", "{@default}", destructuring: Destructuring.Destructure, alignment: default(Alignment)),
+                    new TextToken(", Stringified: "),
+                    new PropertyToken("str", "{$str}", destructuring: Destructuring.Stringify, alignment: default(Alignment)),
+                    new TextToken(", Destructured: "),
+                    new PropertyToken("destructured", "{@destructured}", destructuring: Destructuring.Destructure, alignment: default(Alignment))
                 },
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(3);
@@ -8863,7 +8863,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[] 
                 { 
-                    new TextToken(message, 0) 
+                    new TextToken(message) 
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(0);
@@ -8896,7 +8896,7 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new[] 
                 { 
-                    new TextToken("T{es}t", 0) 
+                    new TextToken("T{es}t") 
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(0);
@@ -8927,13 +8927,13 @@ public class LoggerExtensionsTests : BaseFixture
             logEvent.MessageTemplate.Tokens.Should().BeEquivalentTo(
                 new MessageTemplateToken[] 
                 { 
-                    new TextToken("A", 0),
-                    new PropertyToken(nameof(value1), "{value1}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 1),
-                    new TextToken("B", 9),
-                    new TextToken("C", 10),
-                    new TextToken("D", 11),
-                    new PropertyToken(nameof(value2), "{value2}", destructuring: Destructuring.Default, alignment: default(Alignment), startIndex: 12),
-                    new TextToken("E", 20)                    
+                    new TextToken("A"),
+                    new PropertyToken(nameof(value1), "{value1}", destructuring: Destructuring.Default, alignment: default(Alignment)),
+                    new TextToken("B"),
+                    new TextToken("C"),
+                    new TextToken("D"),
+                    new PropertyToken(nameof(value2), "{value2}", destructuring: Destructuring.Default, alignment: default(Alignment)),
+                    new TextToken("E")                    
                 }, 
                 MessageTemplateTokenEquivalency);
             logEvent.Properties.Count.Should().Be(2);
