@@ -52,7 +52,7 @@ public class VerboseLogInterpolatedStringHandlerTests : BaseFixture
         handler.AppendLiteral("A{B}C");
         var logEvent = handler.GetLogEventAndReset();
         logEvent.MessageTemplate.Text.Should().Be("A{{B}}C");
-        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C", 0));
+        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C"));
         logEvent.Properties.Count.Should().Be(0);
         logEvent.RenderMessage().Should().Be("A{B}C");
     }
@@ -353,7 +353,7 @@ public class VerboseLogInterpolatedStringHandlerTests : BaseFixture
         handler.AppendFormatted((LiteralValue) "A{B}C");
         var logEvent = handler.GetLogEventAndReset();
         logEvent.MessageTemplate.Text.Should().Be("A{{B}}C");
-        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C", 0));
+        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C"));
         logEvent.Properties.Count.Should().Be(0);
         logEvent.RenderMessage().Should().Be("A{B}C");
     }
@@ -518,7 +518,7 @@ public class VerboseLogInterpolatedStringHandlerTests : BaseFixture
         handler.AppendFormatted(new LiteralValue("A{B}C", cacheable));
         var logEvent = handler.GetLogEventAndReset();
         logEvent.MessageTemplate.Text.Should().Be("A{{B}}C");
-        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C", 0));
+        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C"));
         logEvent.Properties.Count.Should().Be(0);
         logEvent.RenderMessage().Should().Be("A{B}C");
     }
@@ -570,7 +570,7 @@ public class DebugLogInterpolatedStringHandlerTests : BaseFixture
         handler.AppendLiteral("A{B}C");
         var logEvent = handler.GetLogEventAndReset();
         logEvent.MessageTemplate.Text.Should().Be("A{{B}}C");
-        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C", 0));
+        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C"));
         logEvent.Properties.Count.Should().Be(0);
         logEvent.RenderMessage().Should().Be("A{B}C");
     }
@@ -871,7 +871,7 @@ public class DebugLogInterpolatedStringHandlerTests : BaseFixture
         handler.AppendFormatted((LiteralValue) "A{B}C");
         var logEvent = handler.GetLogEventAndReset();
         logEvent.MessageTemplate.Text.Should().Be("A{{B}}C");
-        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C", 0));
+        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C"));
         logEvent.Properties.Count.Should().Be(0);
         logEvent.RenderMessage().Should().Be("A{B}C");
     }
@@ -1036,7 +1036,7 @@ public class DebugLogInterpolatedStringHandlerTests : BaseFixture
         handler.AppendFormatted(new LiteralValue("A{B}C", cacheable));
         var logEvent = handler.GetLogEventAndReset();
         logEvent.MessageTemplate.Text.Should().Be("A{{B}}C");
-        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C", 0));
+        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C"));
         logEvent.Properties.Count.Should().Be(0);
         logEvent.RenderMessage().Should().Be("A{B}C");
     }
@@ -1088,7 +1088,7 @@ public class InformationLogInterpolatedStringHandlerTests : BaseFixture
         handler.AppendLiteral("A{B}C");
         var logEvent = handler.GetLogEventAndReset();
         logEvent.MessageTemplate.Text.Should().Be("A{{B}}C");
-        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C", 0));
+        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C"));
         logEvent.Properties.Count.Should().Be(0);
         logEvent.RenderMessage().Should().Be("A{B}C");
     }
@@ -1389,7 +1389,7 @@ public class InformationLogInterpolatedStringHandlerTests : BaseFixture
         handler.AppendFormatted((LiteralValue) "A{B}C");
         var logEvent = handler.GetLogEventAndReset();
         logEvent.MessageTemplate.Text.Should().Be("A{{B}}C");
-        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C", 0));
+        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C"));
         logEvent.Properties.Count.Should().Be(0);
         logEvent.RenderMessage().Should().Be("A{B}C");
     }
@@ -1554,7 +1554,7 @@ public class InformationLogInterpolatedStringHandlerTests : BaseFixture
         handler.AppendFormatted(new LiteralValue("A{B}C", cacheable));
         var logEvent = handler.GetLogEventAndReset();
         logEvent.MessageTemplate.Text.Should().Be("A{{B}}C");
-        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C", 0));
+        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C"));
         logEvent.Properties.Count.Should().Be(0);
         logEvent.RenderMessage().Should().Be("A{B}C");
     }
@@ -1606,7 +1606,7 @@ public class WarningLogInterpolatedStringHandlerTests : BaseFixture
         handler.AppendLiteral("A{B}C");
         var logEvent = handler.GetLogEventAndReset();
         logEvent.MessageTemplate.Text.Should().Be("A{{B}}C");
-        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C", 0));
+        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C"));
         logEvent.Properties.Count.Should().Be(0);
         logEvent.RenderMessage().Should().Be("A{B}C");
     }
@@ -1907,7 +1907,7 @@ public class WarningLogInterpolatedStringHandlerTests : BaseFixture
         handler.AppendFormatted((LiteralValue) "A{B}C");
         var logEvent = handler.GetLogEventAndReset();
         logEvent.MessageTemplate.Text.Should().Be("A{{B}}C");
-        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C", 0));
+        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C"));
         logEvent.Properties.Count.Should().Be(0);
         logEvent.RenderMessage().Should().Be("A{B}C");
     }
@@ -2072,7 +2072,7 @@ public class WarningLogInterpolatedStringHandlerTests : BaseFixture
         handler.AppendFormatted(new LiteralValue("A{B}C", cacheable));
         var logEvent = handler.GetLogEventAndReset();
         logEvent.MessageTemplate.Text.Should().Be("A{{B}}C");
-        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C", 0));
+        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C"));
         logEvent.Properties.Count.Should().Be(0);
         logEvent.RenderMessage().Should().Be("A{B}C");
     }
@@ -2124,7 +2124,7 @@ public class ErrorLogInterpolatedStringHandlerTests : BaseFixture
         handler.AppendLiteral("A{B}C");
         var logEvent = handler.GetLogEventAndReset();
         logEvent.MessageTemplate.Text.Should().Be("A{{B}}C");
-        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C", 0));
+        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C"));
         logEvent.Properties.Count.Should().Be(0);
         logEvent.RenderMessage().Should().Be("A{B}C");
     }
@@ -2425,7 +2425,7 @@ public class ErrorLogInterpolatedStringHandlerTests : BaseFixture
         handler.AppendFormatted((LiteralValue) "A{B}C");
         var logEvent = handler.GetLogEventAndReset();
         logEvent.MessageTemplate.Text.Should().Be("A{{B}}C");
-        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C", 0));
+        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C"));
         logEvent.Properties.Count.Should().Be(0);
         logEvent.RenderMessage().Should().Be("A{B}C");
     }
@@ -2590,7 +2590,7 @@ public class ErrorLogInterpolatedStringHandlerTests : BaseFixture
         handler.AppendFormatted(new LiteralValue("A{B}C", cacheable));
         var logEvent = handler.GetLogEventAndReset();
         logEvent.MessageTemplate.Text.Should().Be("A{{B}}C");
-        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C", 0));
+        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C"));
         logEvent.Properties.Count.Should().Be(0);
         logEvent.RenderMessage().Should().Be("A{B}C");
     }
@@ -2642,7 +2642,7 @@ public class FatalLogInterpolatedStringHandlerTests : BaseFixture
         handler.AppendLiteral("A{B}C");
         var logEvent = handler.GetLogEventAndReset();
         logEvent.MessageTemplate.Text.Should().Be("A{{B}}C");
-        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C", 0));
+        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C"));
         logEvent.Properties.Count.Should().Be(0);
         logEvent.RenderMessage().Should().Be("A{B}C");
     }
@@ -2943,7 +2943,7 @@ public class FatalLogInterpolatedStringHandlerTests : BaseFixture
         handler.AppendFormatted((LiteralValue) "A{B}C");
         var logEvent = handler.GetLogEventAndReset();
         logEvent.MessageTemplate.Text.Should().Be("A{{B}}C");
-        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C", 0));
+        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C"));
         logEvent.Properties.Count.Should().Be(0);
         logEvent.RenderMessage().Should().Be("A{B}C");
     }
@@ -3108,7 +3108,7 @@ public class FatalLogInterpolatedStringHandlerTests : BaseFixture
         handler.AppendFormatted(new LiteralValue("A{B}C", cacheable));
         var logEvent = handler.GetLogEventAndReset();
         logEvent.MessageTemplate.Text.Should().Be("A{{B}}C");
-        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C", 0));
+        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C"));
         logEvent.Properties.Count.Should().Be(0);
         logEvent.RenderMessage().Should().Be("A{B}C");
     }
@@ -3159,7 +3159,7 @@ public class LogInterpolatedStringHandlerTests : BaseFixture
         handler.AppendLiteral("A{B}C");
         var logEvent = handler.GetLogEventAndReset();
         logEvent.MessageTemplate.Text.Should().Be("A{{B}}C");
-        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C", 0));
+        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C"));
         logEvent.Properties.Count.Should().Be(0);
         logEvent.RenderMessage().Should().Be("A{B}C");
     }
@@ -3460,7 +3460,7 @@ public class LogInterpolatedStringHandlerTests : BaseFixture
         handler.AppendFormatted((LiteralValue) "A{B}C");
         var logEvent = handler.GetLogEventAndReset();
         logEvent.MessageTemplate.Text.Should().Be("A{{B}}C");
-        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C", 0));
+        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C"));
         logEvent.Properties.Count.Should().Be(0);
         logEvent.RenderMessage().Should().Be("A{B}C");
     }
@@ -3625,7 +3625,7 @@ public class LogInterpolatedStringHandlerTests : BaseFixture
         handler.AppendFormatted(new LiteralValue("A{B}C", cacheable));
         var logEvent = handler.GetLogEventAndReset();
         logEvent.MessageTemplate.Text.Should().Be("A{{B}}C");
-        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C", 0));
+        logEvent.MessageTemplate.Tokens.Single().Should().BeEquivalentTo(new TextToken("A{B}C"));
         logEvent.Properties.Count.Should().Be(0);
         logEvent.RenderMessage().Should().Be("A{B}C");
     }

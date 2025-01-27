@@ -18,7 +18,7 @@ parameters:
 variables:
   BuildConfiguration: 'Release'
   MajorVersion: 1
-  MinorVersion: 5
+  MinorVersion: 6
   ${{ if eq(parameters.IsRelease, false) }}:
     Suffix: 'pre' 
   ${{ else }}:
@@ -28,10 +28,31 @@ name: '$(MajorVersion).$(MinorVersion).$(rev:r)'
 
 steps:
 - task: UseDotNet@2
+  displayName: 'Install .Net 3.1'
+  inputs:
+    packageType: sdk
+    version: '3.1.x'
+    performMultiLevelLookup: true
+
+- task: UseDotNet@2
+  displayName: 'Install .Net 5'
+  inputs:
+    packageType: sdk
+    version: '5.x'
+    performMultiLevelLookup: true    
+
+- task: UseDotNet@2
   displayName: 'Install .Net 7'
   inputs:
     packageType: sdk
     version: '7.x'
+    performMultiLevelLookup: true  
+
+- task: UseDotNet@2
+  displayName: 'Install .Net 8'
+  inputs:
+    packageType: sdk
+    version: '8.x'
     performMultiLevelLookup: true    
 
 - task: DotNetCoreCLI@2
