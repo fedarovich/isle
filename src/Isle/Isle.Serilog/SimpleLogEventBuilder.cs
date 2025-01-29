@@ -23,8 +23,6 @@ internal sealed class SimpleLogEventBuilder : LogEventBuilder
     private LogEventProperty[] _properties = null!;
     private ILogger _logger = null!;
     private StringBuilder _messageTemplateBuilder = null!;
-    private IsleConfiguration _configuration = null!;
-    private int _currentPosition;
     private int _propertyIndex;
 
     private SimpleLogEventBuilder()

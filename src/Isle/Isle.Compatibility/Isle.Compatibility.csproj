@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net5.0;netstandard2.1;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.1;netstandard2.0</TargetFrameworks>
     <LangVersion>LatestMajor</LangVersion>
     <RootNamespace>Isle</RootNamespace>
     <Nullable>Enable</Nullable>
-    <Copyright>© Pavel Fedarovich, 2022</Copyright>
+    <Copyright>© Pavel Fedarovich, 2022-$([System.DateTime]::Now.Year)</Copyright>
     <PackageProjectUrl>https://github.com/fedarovich/isle</PackageProjectUrl>
     <RepositoryUrl>https://github.com/fedarovich/isle.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
