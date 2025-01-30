@@ -44,6 +44,7 @@ internal sealed class CachingLogEventBuilder : LogEventBuilder
         _propertyIndex = 0;
     }
 
+    [MethodImpl(MethodImplOptions.NoInlining)]
     public override LogEvent BuildAndReset(LogEventLevel level, Exception? exception = null)
     {
         var templateNode = _lastNode.GetTemplateNode();
@@ -81,6 +82,7 @@ internal sealed class CachingLogEventBuilder : LogEventBuilder
         _lastNode = _lastNode.GetOrAddTextNode(str);
     }
 
+    [MethodImpl(MethodImplOptions.NoInlining)]
     public override void AppendLiteralValue(in LiteralValue literalValue)
     {
         var str = literalValue.Value!;
@@ -99,18 +101,21 @@ internal sealed class CachingLogEventBuilder : LogEventBuilder
         AppendFormatted(value.Named(CoreConfiguration.ConvertValueName(name), false), alignment, format);
     }
 
+    [MethodImpl(MethodImplOptions.NoInlining)]
     public override void AppendFormatted(in NamedLogValue namedLogValue)
     {
         _lastNode = _lastNode.GetOrAddPropertyNode(namedLogValue.Name, namedLogValue.RawName);
         _propertyValues[_propertyIndex++] = namedLogValue.Value;
     }
 
+    [MethodImpl(MethodImplOptions.NoInlining)]
     public override void AppendFormatted(in NamedLogValue namedLogValue, int alignment, string? format)
     {
         _lastNode = _lastNode.GetOrAddPropertyNode(namedLogValue.Name, namedLogValue.RawName, alignment, format);
         _propertyValues[_propertyIndex++] = namedLogValue.Value;
     }
 
+    [MethodImpl(MethodImplOptions.NoInlining)]
     private LogEventProperty BindLogEventProperty(PropertyNode node, object? value)
     {
         if (node.Token.Destructuring != Destructuring.Stringify)

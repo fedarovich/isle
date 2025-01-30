@@ -59,6 +59,7 @@ internal sealed class SimpleLogEventBuilder : LogEventBuilder
         }
     }
 
+    [MethodImpl(MethodImplOptions.NoInlining)]
     public override LogEvent BuildAndReset(LogEventLevel level, Exception? exception = null)
     {
         var logEvent = new LogEvent(
@@ -89,6 +90,7 @@ internal sealed class SimpleLogEventBuilder : LogEventBuilder
         }
     }
 
+    [MethodImpl(MethodImplOptions.NoInlining)]
     public override void AppendLiteral(string literal)
     {
         _tokens.Add(new TextToken(literal));
@@ -97,6 +99,7 @@ internal sealed class SimpleLogEventBuilder : LogEventBuilder
         var end = _messageTemplateBuilder.Length;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override void AppendLiteralValue(in LiteralValue literalValue)
     {
         AppendLiteral(literalValue.Value!);
@@ -156,6 +159,7 @@ internal sealed class SimpleLogEventBuilder : LogEventBuilder
         AppendProperty(name, value, alignment, format, rawText, destructuring);
     }
 
+    [MethodImpl(MethodImplOptions.NoInlining)]
     public override void AppendFormatted(in NamedLogValue namedLogValue)
     {
         var destructuring = Destructuring.Default;
@@ -180,6 +184,7 @@ internal sealed class SimpleLogEventBuilder : LogEventBuilder
         AppendProperty(name, namedLogValue.Value, 0, null, rawText, destructuring);
     }
 
+    [MethodImpl(MethodImplOptions.NoInlining)]
     public override void AppendFormatted(in NamedLogValue namedLogValue, int alignment, string? format)
     {
         var destructuring = Destructuring.Default;

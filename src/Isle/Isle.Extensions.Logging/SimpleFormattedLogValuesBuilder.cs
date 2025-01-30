@@ -84,6 +84,7 @@ internal sealed class SimpleFormattedLogValuesBuilder : IFormattedLogValuesBuild
         }
     }
 
+    [MethodImpl(MethodImplOptions.NoInlining)]
     public void AppendLiteral(string str)
     {
         var start = _originalFormatBuilder.Length;
@@ -120,6 +121,7 @@ internal sealed class SimpleFormattedLogValuesBuilder : IFormattedLogValuesBuild
         AppendLiteral(literalValue.Value!);
     }
 
+    [MethodImpl(MethodImplOptions.NoInlining)]
     public void AppendFormatted(string name, object? value)
     {
         _originalFormatBuilder.Append('{');
@@ -129,6 +131,7 @@ internal sealed class SimpleFormattedLogValuesBuilder : IFormattedLogValuesBuild
         _formattedLogValues.Values[_valueIndex++] = new(name, value);
     }
 
+    [MethodImpl(MethodImplOptions.NoInlining)]
     public void AppendFormatted(string name, object? value, int alignment, string? format)
     {
         _originalFormatBuilder.Append('{');

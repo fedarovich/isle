@@ -56,7 +56,7 @@ internal sealed class CachingFormattedLogValuesBuilder : IFormattedLogValuesBuil
         _lastNode = _lastNode.GetOrAddLiteralNode(str);
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl(MethodImplOptions.NoInlining)]
     public void AppendLiteralValue(in LiteralValue literalValue)
     {
         var str = literalValue.Value!;
@@ -65,14 +65,14 @@ internal sealed class CachingFormattedLogValuesBuilder : IFormattedLogValuesBuil
             : _lastNode.CreateNotCachedLiteralNode(str);
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl(MethodImplOptions.NoInlining)]
     public void AppendFormatted(string name, object? value)
     {
         _lastNode = _lastNode.GetOrAddHoleNode(name);
         _formattedLogValues.Values[_valueIndex++] = new(name, value);
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl(MethodImplOptions.NoInlining)]
     public void AppendFormatted(string name, object? value, int alignment, string? format)
     {
         _lastNode = _lastNode.GetOrAddFormattedHoleNode(name, alignment, format);
