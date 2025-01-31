@@ -23,7 +23,7 @@ variables:
   VersionPrefix: $[format('{0}.{1}.{2}', variables.MajorVersion, variables.MinorVersion, variables.Patch )]
   FileVersion: $(Build.BuildNumber)
   ${{ if eq(parameters.IsRelease, false) }}:
-    VersionSuffix: $[format('pre.{0}', last(split(variables['Build.BuildNumber'], '.')))]
+    VersionSuffix: $[format('pre.{0}', split(variables['Build.BuildNumber'], '.')[3])]
   ${{ else }}:
     VersionSuffix: ''
 
