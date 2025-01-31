@@ -25,7 +25,11 @@ public static class SerilogConfigurationExtensions
     /// Adds and configures the parameters for integration with <see cref="ILogger"/>.
     /// </summary>
     /// <seealso cref="AddSerilog" />
-    [Obsolete($"Use {nameof(AddSerilog)} method instead.")]
+    [Obsolete($"Use {nameof(AddSerilog)} method instead."
+#if NETCOREAPP
+        , DiagnosticId = "ISLE2000"
+#endif
+    )]
     public static IIsleConfigurationBuilder ConfigureSerilog(this IIsleConfigurationBuilder @this, Action<ISerilogConfigurationBuilder>? buildConfiguration = null)
     {
         return @this.AddSerilog(buildConfiguration);

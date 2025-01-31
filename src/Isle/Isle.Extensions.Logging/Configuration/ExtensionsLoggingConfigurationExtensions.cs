@@ -25,7 +25,11 @@ public static class ExtensionsLoggingConfigurationExtensions
     /// Adds and configures the ISLE extension for integration with <see cref="ILogger"/>.
     /// </summary>
     /// <seealso cref="AddExtensionsLogging"/>
-    [Obsolete($"Use {nameof(AddExtensionsLogging)} method instead.")]
+    [Obsolete($"Use {nameof(AddExtensionsLogging)} method instead."
+#if NETCOREAPP
+        , DiagnosticId = "ISLE1000"
+#endif
+        )]
     public static IIsleConfigurationBuilder ConfigureExtensionsLogging(this IIsleConfigurationBuilder @this,
         Action<IExtensionsLoggingConfigurationBuilder>? buildConfiguration = null)
     {
