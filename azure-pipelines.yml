@@ -10,10 +10,14 @@ pool:
   vmImage: windows-2022
 
 parameters:
-  - name: IsRelease
-    displayName: 'Is Release'
-    default: false
-    type: boolean
+  - name: BuildType
+    displayName: 'Build Type'
+    type: string
+    default: CI
+    values:
+    - CI
+    - Pre-release
+    - Release
 
 variables:
   BuildConfiguration: 'Release'
@@ -21,8 +25,7 @@ variables:
   MinorVersion: 0
   Patch: 0
   VersionPrefix: $[format('{0}.{1}.{2}', variables.MajorVersion, variables.MinorVersion, variables.Patch )]
-  FileVersion: $(Build.BuildNumber)
-  ${{ if eq(parameters.IsRelease, false) }}:
+  ${{ if ne(parameters.BuildType, 'Release') }}:
     VersionSuffix: $[format('pre.{0}', split(variables['Build.BuildNumber'], '.')[3])]
   ${{ else }}:
     VersionSuffix: ''
@@ -33,6 +36,7 @@ name: '$(MajorVersion).$(MinorVersion).$(Patch).$(rev:r)'
 steps:
 - script: |
     echo "FileVersion:   $(Build.BuildNumber)"
+    echo "SourceVersion: $(Build.SourceVersion)"
     echo "VersionPrefix: $(VersionPrefix)"
     echo "VersionSuffix: $(VersionSuffix)"
   displayName: 'Print Variables'
@@ -56,7 +60,7 @@ steps:
   inputs:
     command: build    
     projects: 'src/Isle/Isle.sln'
-    arguments: '-c $(BuildConfiguration) -p:FileVersion=$(FileVersion) -p:InformationalVersion="$(Build.BuildNumber)-$(Build.SourceVersion)"'
+    arguments: '-c $(BuildConfiguration) -p:FileVersion=$(Build.BuildNumber) -p:InformationalVersion="$(Build.BuildNumber)-$(Build.SourceVersion)"'
 
 - task: DotNetCoreCLI@2
   displayName: 'dotnet test'
@@ -107,7 +111,7 @@ steps:
 
 - task: NuGetCommand@2
   displayName: 'MyGet push'
-  condition: ${{ eq(parameters.IsRelease, false) }}
+  condition: ${{ eq(parameters.BuildType, 'CI') }}
   inputs:
     command: push
     nuGetFeedType: external
@@ -116,7 +120,7 @@ steps:
 
 - task: NuGetCommand@2
   displayName: 'NuGet push'
-  condition: ${{ eq(parameters.IsRelease, true) }}
+  condition: ${{ ne(parameters.BuildType, 'CI') }}
   inputs:
     command: push
     nuGetFeedType: external
