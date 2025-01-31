@@ -91,7 +91,7 @@ public static class LoggerExtensions
     /// {
     /// }
     /// </example>
-    public static IDisposable BeginScopeInterpolated(this ILogger logger, [InterpolatedStringHandlerArgument("logger")] ref ScopeLogInterpolatedStringHandler handler)
+    public static IDisposable? BeginScopeInterpolated(this ILogger logger, [InterpolatedStringHandlerArgument("logger")] ref ScopeLogInterpolatedStringHandler handler)
 	{
 		return logger.BeginScope(handler.GetFormattedLogValuesAndReset());
 	}

@@ -1,23 +1,29 @@
-﻿namespace Isle.Serilog.Configuration;
+﻿using System.Runtime.CompilerServices;
+
+namespace Isle.Serilog.Configuration;
 
 internal class SerilogConfiguration
 {
-    private static SerilogConfiguration? _current;
+    internal static readonly bool IsResettable;
 
-    public static SerilogConfiguration Current
+    private static readonly bool _enableMessageTemplateCaching;
+
+    static SerilogConfiguration()
     {
-        get => _current ?? DefaultConfiguration.Value;
-        set => _current = value;
+        if (SerilogConfigurationSnapshot.TryGetCurrent(out var snapshot) && !snapshot.IsResettable)
+        {
+            IsResettable = false;
+            _enableMessageTemplateCaching = snapshot.EnableMessageTemplateCaching;
+        }
+        else
+        {
+            IsResettable = true;
+        }
     }
 
-    public bool EnableMessageTemplateCaching { get; init; } = true;
-
-    internal static class DefaultConfiguration
+    public static bool EnableMessageTemplateCaching
     {
-        public static readonly SerilogConfiguration Value = new();
-
-        static DefaultConfiguration()
-        {
-        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => IsResettable ? SerilogConfigurationSnapshot.Current.EnableMessageTemplateCaching : _enableMessageTemplateCaching;
     }
 }

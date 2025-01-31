@@ -9,10 +9,9 @@ namespace Isle.Extensions.Logging.Benchmarks;
 
 [MemoryDiagnoser]
 [SuppressMessage("ReSharper", "InconsistentNaming")]
-[SimpleJob(RuntimeMoniker.Net70)]
+[SimpleJob(RuntimeMoniker.Net90)]
+[SimpleJob(RuntimeMoniker.Net80)]
 [SimpleJob(RuntimeMoniker.Net60)]
-[SimpleJob(RuntimeMoniker.Net50)]
-[SimpleJob(RuntimeMoniker.NetCoreApp31)]
 [SimpleJob(RuntimeMoniker.Net48)]
 public class MELBenchmarks
 {
@@ -32,26 +31,29 @@ public class MELBenchmarks
     [ParamsAllValues]
     public bool RenderMessage { get; set; }
 
+    [ParamsAllValues]
+    public bool IsResettable { get; set; }
+
     [GlobalSetup(Target = nameof(Standard))]
     public void GlobalSetupStandard()
     {
         GlobalSetup();
     }
 
-    [GlobalSetup(Targets = new [] { nameof(InterpolatedWithManualDestructuring), nameof(InterpolatedWithNamed), nameof(InterpolatedWithLiteralValue) })]
+    [GlobalSetup(Targets = new[] { nameof(InterpolatedWithManualDestructuring), nameof(InterpolatedWithNamed), nameof(InterpolatedWithLiteralValue) })]
     public void GlobalSetupWithManualDestructuring()
     {
         GlobalSetup();
-        IsleConfiguration.Configure(builder => builder
-            .ConfigureExtensionsLogging(cfg => cfg.EnableMessageTemplateCaching = EnableCaching));
+        IsleConfiguration.Configure(builder => builder.IsResettable(IsResettable)
+            .AddExtensionsLogging(cfg => cfg.EnableMessageTemplateCaching = EnableCaching));
     }
 
     [GlobalSetup(Targets = new[] { nameof(InterpolatedWithExplicitAutomaticDestructuring), nameof(InterpolatedWithImplicitAutomaticDestructuring) })]
     public void GlobalSetupWithAutoDestructuring()
     {
         GlobalSetup();
-        IsleConfiguration.Configure(builder => builder.WithAutomaticDestructuring()
-            .ConfigureExtensionsLogging(cfg => cfg.EnableMessageTemplateCaching = EnableCaching));
+        IsleConfiguration.Configure(builder => builder.WithAutomaticDestructuring().IsResettable(IsResettable)
+            .AddExtensionsLogging(cfg => cfg.EnableMessageTemplateCaching = EnableCaching));
     }
 
     private void GlobalSetup()

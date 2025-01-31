@@ -26,6 +26,7 @@ internal abstract class FormattedLogValuesBase : IReadOnlyList<KeyValuePair<stri
         _segments = segments;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static FormattedLogValuesBase Create(int formattedCount) =>
 #if NETCOREAPP || NETSTANDARD2_1
         formattedCount switch

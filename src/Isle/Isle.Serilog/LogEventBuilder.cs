@@ -13,7 +13,7 @@ internal abstract class LogEventBuilder
     [MethodImpl(MethodImplOptions.NoInlining)]
     public static LogEventBuilder Acquire(int literalLength, int formattedCount, ILogger logger)
     {
-        bool enableCaching = SerilogConfiguration.Current.EnableMessageTemplateCaching;
+        bool enableCaching = SerilogConfiguration.EnableMessageTemplateCaching;
 
         LogEventBuilder builder = enableCaching
             ? CachingLogEventBuilder.AcquireAndInitialize(formattedCount, logger)

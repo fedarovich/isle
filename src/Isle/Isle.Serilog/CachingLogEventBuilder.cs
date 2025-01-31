@@ -18,7 +18,6 @@ internal sealed class CachingLogEventBuilder : LogEventBuilder
     private ILogger _logger = null!;
     private Node _lastNode = null!;
     private object?[] _propertyValues = null!;
-    private IsleConfiguration _configuration = null!;
     private int _propertyIndex;
 
     private CachingLogEventBuilder()
@@ -43,9 +42,9 @@ internal sealed class CachingLogEventBuilder : LogEventBuilder
             ? ArrayPool<object?>.Shared.Rent(formattedCount)
             : Array.Empty<object?>();
         _propertyIndex = 0;
-        _configuration = IsleConfiguration.Current;
     }
 
+    [MethodImpl(MethodImplOptions.NoInlining)]
     public override LogEvent BuildAndReset(LogEventLevel level, Exception? exception = null)
     {
         var templateNode = _lastNode.GetTemplateNode();
@@ -71,18 +70,19 @@ internal sealed class CachingLogEventBuilder : LogEventBuilder
             ArrayPool<object?>.Shared.Return(_propertyValues, true);
         }
         _propertyValues = null!;
-        _configuration = null!;
 
         _cachedInstance ??= this;
 
         return logEvent;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override void AppendLiteral(string str)
     {
         _lastNode = _lastNode.GetOrAddTextNode(str);
     }
 
+    [MethodImpl(MethodImplOptions.NoInlining)]
     public override void AppendLiteralValue(in LiteralValue literalValue)
     {
         var str = literalValue.Value!;
@@ -93,26 +93,29 @@ internal sealed class CachingLogEventBuilder : LogEventBuilder
 
     public override void AppendFormatted<T>(string name, T value)
     {
-        AppendFormatted(value.Named(_configuration.ConvertValueName(name), false, _configuration));
+        AppendFormatted(value.Named(CoreConfiguration.ConvertValueName(name), false));
     }
 
     public override void AppendFormatted<T>(string name, T value, int alignment, string? format)
     {
-        AppendFormatted(value.Named(_configuration.ConvertValueName(name), false, _configuration), alignment, format);
+        AppendFormatted(value.Named(CoreConfiguration.ConvertValueName(name), false), alignment, format);
     }
 
+    [MethodImpl(MethodImplOptions.NoInlining)]
     public override void AppendFormatted(in NamedLogValue namedLogValue)
     {
         _lastNode = _lastNode.GetOrAddPropertyNode(namedLogValue.Name, namedLogValue.RawName);
         _propertyValues[_propertyIndex++] = namedLogValue.Value;
     }
 
+    [MethodImpl(MethodImplOptions.NoInlining)]
     public override void AppendFormatted(in NamedLogValue namedLogValue, int alignment, string? format)
     {
         _lastNode = _lastNode.GetOrAddPropertyNode(namedLogValue.Name, namedLogValue.RawName, alignment, format);
         _propertyValues[_propertyIndex++] = namedLogValue.Value;
     }
 
+    [MethodImpl(MethodImplOptions.NoInlining)]
     private LogEventProperty BindLogEventProperty(PropertyNode node, object? value)
     {
         if (node.Token.Destructuring != Destructuring.Stringify)

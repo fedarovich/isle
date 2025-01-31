@@ -3,7 +3,7 @@ using System.Text;
 
 namespace Isle.Extensions.Logging;
 
-internal sealed class SimpleFormattedLogValuesBuilder : FormattedLogValuesBuilder
+internal sealed class SimpleFormattedLogValuesBuilder : IFormattedLogValuesBuilder
 {
     [ThreadStatic]
     private static SimpleFormattedLogValuesBuilder? _cachedInstance;
@@ -22,20 +22,20 @@ internal sealed class SimpleFormattedLogValuesBuilder : FormattedLogValuesBuilde
     {
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static FormattedLogValuesBuilder AcquireAndInitialize(int literalLength, int formattedCount)
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    public static SimpleFormattedLogValuesBuilder AcquireAndInitialize(int literalLength, int formattedCount, FormattedLogValuesBase formattedLogValues)
     {
         var instance = _cachedInstance ?? new SimpleFormattedLogValuesBuilder();
         _cachedInstance = null;
-        instance.Initialize(literalLength, formattedCount);
+        instance.Initialize(literalLength, formattedCount, formattedLogValues);
         return instance;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private void Initialize(int literalLength, int formattedCount)
+    private void Initialize(int literalLength, int formattedCount, FormattedLogValuesBase formattedLogValues)
     {
         _originalFormatBuilder = AcquireStringBuilder();
-        _formattedLogValues = FormattedLogValuesBase.Create(formattedCount);
+        _formattedLogValues = formattedLogValues;
         _segments = new Segment[formattedCount * 2 + 1];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -51,10 +51,11 @@ internal sealed class SimpleFormattedLogValuesBuilder : FormattedLogValuesBuilde
         }
     }
 
-    public override FormattedLogValuesBase BuildAndReset()
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    public FormattedLogValuesBase BuildAndReset()
     {
         var result = _formattedLogValues;
-        result.Values[_valueIndex] = new KeyValuePair<string, object?>(OriginalFormatName, GetStringAndRelease(_originalFormatBuilder));
+        result.Values[_valueIndex] = new KeyValuePair<string, object?>(FormattedLogValuesBuilder.OriginalFormatName, GetStringAndRelease(_originalFormatBuilder));
         result.Count = _valueIndex + 1;
         result.SetSegments(_segments.AsMemory(0, _segmentIndex));
         
@@ -83,7 +84,8 @@ internal sealed class SimpleFormattedLogValuesBuilder : FormattedLogValuesBuilde
         }
     }
 
-    public override void AppendLiteral(string str)
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    public void AppendLiteral(string str)
     {
         var start = _originalFormatBuilder.Length;
         _originalFormatBuilder.EscapeAndAppend(str.AsSpan());
@@ -113,12 +115,14 @@ internal sealed class SimpleFormattedLogValuesBuilder : FormattedLogValuesBuilde
         }
     }
 
-    public override void AppendLiteralValue(in LiteralValue literalValue)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public  void AppendLiteralValue(in LiteralValue literalValue)
     {
         AppendLiteral(literalValue.Value!);
     }
 
-    public override void AppendFormatted(string name, object? value)
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    public void AppendFormatted(string name, object? value)
     {
         _originalFormatBuilder.Append('{');
         _originalFormatBuilder.Append(name);
@@ -127,7 +131,8 @@ internal sealed class SimpleFormattedLogValuesBuilder : FormattedLogValuesBuilde
         _formattedLogValues.Values[_valueIndex++] = new(name, value);
     }
 
-    public override void AppendFormatted(string name, object? value, int alignment, string? format)
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    public void AppendFormatted(string name, object? value, int alignment, string? format)
     {
         _originalFormatBuilder.Append('{');
 

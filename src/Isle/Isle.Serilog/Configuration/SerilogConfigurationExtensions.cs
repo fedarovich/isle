@@ -10,17 +10,29 @@ namespace Isle.Configuration;
 public static class SerilogConfigurationExtensions
 {
     /// <summary>
-    /// Configures the parameters for integration with <see cref="ILogger"/>.
+    /// Adds and configures the ISLE extension for integration with <see cref="ILogger"/>.
     /// </summary>
-    /// <param name="this"></param>
-    /// <param name="buildConfiguration"></param>
-    /// <returns></returns>
-    public static IIsleConfigurationBuilder ConfigureSerilog(this IIsleConfigurationBuilder @this, Action<ISerilogConfigurationBuilder>? buildConfiguration = null)
+    public static IIsleConfigurationBuilder AddSerilog(this IIsleConfigurationBuilder @this,
+        Action<ISerilogConfigurationBuilder>? buildConfiguration = null)
     {
         var builder = new ConfigurationBuilder();
         @this.RegisterExtensionConfigurationHook(builder);
         buildConfiguration?.Invoke(builder);
         return @this;
+    }
+
+    /// <summary>
+    /// Adds and configures the parameters for integration with <see cref="ILogger"/>.
+    /// </summary>
+    /// <seealso cref="AddSerilog" />
+    [Obsolete($"Use {nameof(AddSerilog)} method instead."
+#if NETCOREAPP
+        , DiagnosticId = "ISLE2000"
+#endif
+    )]
+    public static IIsleConfigurationBuilder ConfigureSerilog(this IIsleConfigurationBuilder @this, Action<ISerilogConfigurationBuilder>? buildConfiguration = null)
+    {
+        return @this.AddSerilog(buildConfiguration);
     }
 
     private class ConfigurationBuilder : ISerilogConfigurationBuilder, IIsleExtensionConfigurationHook
@@ -29,15 +41,12 @@ public static class SerilogConfigurationExtensions
 
         public void ApplyExtensionConfiguration()
         {
-            SerilogConfiguration.Current = new SerilogConfiguration
-            {
-                EnableMessageTemplateCaching = EnableMessageTemplateCaching
-            };
+            SerilogConfigurationSnapshot.Current = new (this);
         }
 
         public void ResetExtensionConfiguration()
         {
-            SerilogConfiguration.Current = null!;
+            SerilogConfigurationSnapshot.Reset();
         }
     }
 }

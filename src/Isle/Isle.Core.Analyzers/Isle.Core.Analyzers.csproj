@@ -5,6 +5,7 @@
     <IsPackable>false</IsPackable>
     <LangVersion>LatestMajor</LangVersion>
     <IsRoslynComponent>true</IsRoslynComponent>
+    <Copyright>© Pavel Fedarovich, 2022-$([System.DateTime]::Now.Year)</Copyright>
 
     <!-- Avoid ID conflicts with the package project. -->
     <PackageId>*$(MSBuildProjectFile)*</PackageId>

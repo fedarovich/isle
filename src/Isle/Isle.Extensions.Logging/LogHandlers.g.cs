@@ -2,6 +2,7 @@
 using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
 using Isle.Configuration;
+using Isle.Extensions.Logging.Configuration;
 
 namespace Isle.Extensions.Logging;
 
@@ -15,8 +16,7 @@ namespace Isle.Extensions.Logging;
 [InterpolatedStringHandler]
 public ref partial struct TraceLogInterpolatedStringHandler
 {
-    private FormattedLogValuesBuilder _builder = null!;
-    private IsleConfiguration _configuration = null!;
+    private IFormattedLogValuesBuilder _builder = null!;
 
     /// <summary>
     /// Creates a new instance of <see cref="TraceLogInterpolatedStringHandler" />.
@@ -32,7 +32,6 @@ public ref partial struct TraceLogInterpolatedStringHandler
         if (isEnabled)
         {
             _builder = FormattedLogValuesBuilder.Acquire(literalLength, formattedCount);
-            _configuration = IsleConfiguration.Current;
         }
     }
 
@@ -49,7 +48,18 @@ public ref partial struct TraceLogInterpolatedStringHandler
     {
         if (!string.IsNullOrEmpty(str))
         {
-            _builder.AppendLiteral(str!);
+            if (ExtensionsLoggingConfiguration.IsResettable)
+            {
+                _builder.AppendLiteral(str!);
+            }
+            else if (ExtensionsLoggingConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingFormattedLogValuesBuilder>(_builder).AppendLiteral(str!); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleFormattedLogValuesBuilder>(_builder).AppendLiteral(str!); // Devirtualize the call
+            }
         }
     }
 
@@ -61,7 +71,18 @@ public ref partial struct TraceLogInterpolatedStringHandler
     {
         if (!string.IsNullOrEmpty(literal.Value))
         {
-            _builder.AppendLiteralValue(literal);
+            if (ExtensionsLoggingConfiguration.IsResettable)
+            {
+                _builder.AppendLiteralValue(literal);
+            }
+            else if (ExtensionsLoggingConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingFormattedLogValuesBuilder>(_builder).AppendLiteralValue(literal); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleFormattedLogValuesBuilder>(_builder).AppendLiteralValue(literal); // Devirtualize the call
+            }
         }
     }
 
@@ -71,14 +92,37 @@ public ref partial struct TraceLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string nameExpression = "")
     {
-        var name = nameExpression.GetNameFromCallerArgumentExpression<T>(_configuration);
+        var name = nameExpression.GetNameFromCallerArgumentExpression<T>();
+
         if (alignment == 0 && string.IsNullOrEmpty(format))
         {
-            _builder.AppendFormatted(name, value);
+            if (ExtensionsLoggingConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(name, value);
+            }
+            else if (ExtensionsLoggingConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingFormattedLogValuesBuilder>(_builder).AppendFormatted(name, value); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleFormattedLogValuesBuilder>(_builder).AppendFormatted(name, value); // Devirtualize the call
+            }
         }
         else
         {
-            _builder.AppendFormatted(name, value, alignment, format);
+            if (ExtensionsLoggingConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(name, value, alignment, format);
+            }
+            else if (ExtensionsLoggingConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingFormattedLogValuesBuilder>(_builder).AppendFormatted(name, value, alignment, format); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleFormattedLogValuesBuilder>(_builder).AppendFormatted(name, value, alignment, format); // Devirtualize the call
+            }
         }
     } 
 
@@ -90,18 +134,52 @@ public ref partial struct TraceLogInterpolatedStringHandler
     {
         if (alignment == 0 && string.IsNullOrEmpty(format))
         {
-            _builder.AppendFormatted(namedLogValue.Name, namedLogValue.Value);
+            if (ExtensionsLoggingConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(namedLogValue.Name, namedLogValue.Value);
+            }
+            else if (ExtensionsLoggingConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingFormattedLogValuesBuilder>(_builder).AppendFormatted(namedLogValue.Name, namedLogValue.Value); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleFormattedLogValuesBuilder>(_builder).AppendFormatted(namedLogValue.Name, namedLogValue.Value); // Devirtualize the call
+            }
         }
         else
         {
-            _builder.AppendFormatted(namedLogValue.Name, namedLogValue.Value, alignment, format);
+            if (ExtensionsLoggingConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(namedLogValue.Name, namedLogValue.Value, alignment, format);
+            }
+            else if (ExtensionsLoggingConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingFormattedLogValuesBuilder>(_builder).AppendFormatted(namedLogValue.Name, namedLogValue.Value, alignment, format); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleFormattedLogValuesBuilder>(_builder).AppendFormatted(namedLogValue.Name, namedLogValue.Value, alignment, format); // Devirtualize the call
+            }
         }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal FormattedLogValuesBase GetFormattedLogValuesAndReset()
     {
-        var result = _builder.BuildAndReset();
+        FormattedLogValuesBase result;
+        if (ExtensionsLoggingConfiguration.IsResettable)
+        {
+            result = _builder.BuildAndReset();
+        }
+        else if (ExtensionsLoggingConfiguration.EnableMessageTemplateCaching)
+        {
+            result = Unsafe.As<CachingFormattedLogValuesBuilder>(_builder).BuildAndReset();
+        }
+        else
+        {
+            result = Unsafe.As<SimpleFormattedLogValuesBuilder>(_builder).BuildAndReset();
+        }
         _builder = null!;
         return result;
     }
@@ -117,8 +195,7 @@ public ref partial struct TraceLogInterpolatedStringHandler
 [InterpolatedStringHandler]
 public ref partial struct DebugLogInterpolatedStringHandler
 {
-    private FormattedLogValuesBuilder _builder = null!;
-    private IsleConfiguration _configuration = null!;
+    private IFormattedLogValuesBuilder _builder = null!;
 
     /// <summary>
     /// Creates a new instance of <see cref="DebugLogInterpolatedStringHandler" />.
@@ -134,7 +211,6 @@ public ref partial struct DebugLogInterpolatedStringHandler
         if (isEnabled)
         {
             _builder = FormattedLogValuesBuilder.Acquire(literalLength, formattedCount);
-            _configuration = IsleConfiguration.Current;
         }
     }
 
@@ -151,7 +227,18 @@ public ref partial struct DebugLogInterpolatedStringHandler
     {
         if (!string.IsNullOrEmpty(str))
         {
-            _builder.AppendLiteral(str!);
+            if (ExtensionsLoggingConfiguration.IsResettable)
+            {
+                _builder.AppendLiteral(str!);
+            }
+            else if (ExtensionsLoggingConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingFormattedLogValuesBuilder>(_builder).AppendLiteral(str!); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleFormattedLogValuesBuilder>(_builder).AppendLiteral(str!); // Devirtualize the call
+            }
         }
     }
 
@@ -163,7 +250,18 @@ public ref partial struct DebugLogInterpolatedStringHandler
     {
         if (!string.IsNullOrEmpty(literal.Value))
         {
-            _builder.AppendLiteralValue(literal);
+            if (ExtensionsLoggingConfiguration.IsResettable)
+            {
+                _builder.AppendLiteralValue(literal);
+            }
+            else if (ExtensionsLoggingConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingFormattedLogValuesBuilder>(_builder).AppendLiteralValue(literal); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleFormattedLogValuesBuilder>(_builder).AppendLiteralValue(literal); // Devirtualize the call
+            }
         }
     }
 
@@ -173,14 +271,37 @@ public ref partial struct DebugLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string nameExpression = "")
     {
-        var name = nameExpression.GetNameFromCallerArgumentExpression<T>(_configuration);
+        var name = nameExpression.GetNameFromCallerArgumentExpression<T>();
+
         if (alignment == 0 && string.IsNullOrEmpty(format))
         {
-            _builder.AppendFormatted(name, value);
+            if (ExtensionsLoggingConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(name, value);
+            }
+            else if (ExtensionsLoggingConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingFormattedLogValuesBuilder>(_builder).AppendFormatted(name, value); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleFormattedLogValuesBuilder>(_builder).AppendFormatted(name, value); // Devirtualize the call
+            }
         }
         else
         {
-            _builder.AppendFormatted(name, value, alignment, format);
+            if (ExtensionsLoggingConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(name, value, alignment, format);
+            }
+            else if (ExtensionsLoggingConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingFormattedLogValuesBuilder>(_builder).AppendFormatted(name, value, alignment, format); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleFormattedLogValuesBuilder>(_builder).AppendFormatted(name, value, alignment, format); // Devirtualize the call
+            }
         }
     } 
 
@@ -192,18 +313,52 @@ public ref partial struct DebugLogInterpolatedStringHandler
     {
         if (alignment == 0 && string.IsNullOrEmpty(format))
         {
-            _builder.AppendFormatted(namedLogValue.Name, namedLogValue.Value);
+            if (ExtensionsLoggingConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(namedLogValue.Name, namedLogValue.Value);
+            }
+            else if (ExtensionsLoggingConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingFormattedLogValuesBuilder>(_builder).AppendFormatted(namedLogValue.Name, namedLogValue.Value); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleFormattedLogValuesBuilder>(_builder).AppendFormatted(namedLogValue.Name, namedLogValue.Value); // Devirtualize the call
+            }
         }
         else
         {
-            _builder.AppendFormatted(namedLogValue.Name, namedLogValue.Value, alignment, format);
+            if (ExtensionsLoggingConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(namedLogValue.Name, namedLogValue.Value, alignment, format);
+            }
+            else if (ExtensionsLoggingConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingFormattedLogValuesBuilder>(_builder).AppendFormatted(namedLogValue.Name, namedLogValue.Value, alignment, format); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleFormattedLogValuesBuilder>(_builder).AppendFormatted(namedLogValue.Name, namedLogValue.Value, alignment, format); // Devirtualize the call
+            }
         }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal FormattedLogValuesBase GetFormattedLogValuesAndReset()
     {
-        var result = _builder.BuildAndReset();
+        FormattedLogValuesBase result;
+        if (ExtensionsLoggingConfiguration.IsResettable)
+        {
+            result = _builder.BuildAndReset();
+        }
+        else if (ExtensionsLoggingConfiguration.EnableMessageTemplateCaching)
+        {
+            result = Unsafe.As<CachingFormattedLogValuesBuilder>(_builder).BuildAndReset();
+        }
+        else
+        {
+            result = Unsafe.As<SimpleFormattedLogValuesBuilder>(_builder).BuildAndReset();
+        }
         _builder = null!;
         return result;
     }
@@ -219,8 +374,7 @@ public ref partial struct DebugLogInterpolatedStringHandler
 [InterpolatedStringHandler]
 public ref partial struct InformationLogInterpolatedStringHandler
 {
-    private FormattedLogValuesBuilder _builder = null!;
-    private IsleConfiguration _configuration = null!;
+    private IFormattedLogValuesBuilder _builder = null!;
 
     /// <summary>
     /// Creates a new instance of <see cref="InformationLogInterpolatedStringHandler" />.
@@ -236,7 +390,6 @@ public ref partial struct InformationLogInterpolatedStringHandler
         if (isEnabled)
         {
             _builder = FormattedLogValuesBuilder.Acquire(literalLength, formattedCount);
-            _configuration = IsleConfiguration.Current;
         }
     }
 
@@ -253,7 +406,18 @@ public ref partial struct InformationLogInterpolatedStringHandler
     {
         if (!string.IsNullOrEmpty(str))
         {
-            _builder.AppendLiteral(str!);
+            if (ExtensionsLoggingConfiguration.IsResettable)
+            {
+                _builder.AppendLiteral(str!);
+            }
+            else if (ExtensionsLoggingConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingFormattedLogValuesBuilder>(_builder).AppendLiteral(str!); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleFormattedLogValuesBuilder>(_builder).AppendLiteral(str!); // Devirtualize the call
+            }
         }
     }
 
@@ -265,7 +429,18 @@ public ref partial struct InformationLogInterpolatedStringHandler
     {
         if (!string.IsNullOrEmpty(literal.Value))
         {
-            _builder.AppendLiteralValue(literal);
+            if (ExtensionsLoggingConfiguration.IsResettable)
+            {
+                _builder.AppendLiteralValue(literal);
+            }
+            else if (ExtensionsLoggingConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingFormattedLogValuesBuilder>(_builder).AppendLiteralValue(literal); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleFormattedLogValuesBuilder>(_builder).AppendLiteralValue(literal); // Devirtualize the call
+            }
         }
     }
 
@@ -275,14 +450,37 @@ public ref partial struct InformationLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string nameExpression = "")
     {
-        var name = nameExpression.GetNameFromCallerArgumentExpression<T>(_configuration);
+        var name = nameExpression.GetNameFromCallerArgumentExpression<T>();
+
         if (alignment == 0 && string.IsNullOrEmpty(format))
         {
-            _builder.AppendFormatted(name, value);
+            if (ExtensionsLoggingConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(name, value);
+            }
+            else if (ExtensionsLoggingConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingFormattedLogValuesBuilder>(_builder).AppendFormatted(name, value); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleFormattedLogValuesBuilder>(_builder).AppendFormatted(name, value); // Devirtualize the call
+            }
         }
         else
         {
-            _builder.AppendFormatted(name, value, alignment, format);
+            if (ExtensionsLoggingConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(name, value, alignment, format);
+            }
+            else if (ExtensionsLoggingConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingFormattedLogValuesBuilder>(_builder).AppendFormatted(name, value, alignment, format); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleFormattedLogValuesBuilder>(_builder).AppendFormatted(name, value, alignment, format); // Devirtualize the call
+            }
         }
     } 
 
@@ -294,18 +492,52 @@ public ref partial struct InformationLogInterpolatedStringHandler
     {
         if (alignment == 0 && string.IsNullOrEmpty(format))
         {
-            _builder.AppendFormatted(namedLogValue.Name, namedLogValue.Value);
+            if (ExtensionsLoggingConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(namedLogValue.Name, namedLogValue.Value);
+            }
+            else if (ExtensionsLoggingConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingFormattedLogValuesBuilder>(_builder).AppendFormatted(namedLogValue.Name, namedLogValue.Value); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleFormattedLogValuesBuilder>(_builder).AppendFormatted(namedLogValue.Name, namedLogValue.Value); // Devirtualize the call
+            }
         }
         else
         {
-            _builder.AppendFormatted(namedLogValue.Name, namedLogValue.Value, alignment, format);
+            if (ExtensionsLoggingConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(namedLogValue.Name, namedLogValue.Value, alignment, format);
+            }
+            else if (ExtensionsLoggingConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingFormattedLogValuesBuilder>(_builder).AppendFormatted(namedLogValue.Name, namedLogValue.Value, alignment, format); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleFormattedLogValuesBuilder>(_builder).AppendFormatted(namedLogValue.Name, namedLogValue.Value, alignment, format); // Devirtualize the call
+            }
         }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal FormattedLogValuesBase GetFormattedLogValuesAndReset()
     {
-        var result = _builder.BuildAndReset();
+        FormattedLogValuesBase result;
+        if (ExtensionsLoggingConfiguration.IsResettable)
+        {
+            result = _builder.BuildAndReset();
+        }
+        else if (ExtensionsLoggingConfiguration.EnableMessageTemplateCaching)
+        {
+            result = Unsafe.As<CachingFormattedLogValuesBuilder>(_builder).BuildAndReset();
+        }
+        else
+        {
+            result = Unsafe.As<SimpleFormattedLogValuesBuilder>(_builder).BuildAndReset();
+        }
         _builder = null!;
         return result;
     }
@@ -321,8 +553,7 @@ public ref partial struct InformationLogInterpolatedStringHandler
 [InterpolatedStringHandler]
 public ref partial struct WarningLogInterpolatedStringHandler
 {
-    private FormattedLogValuesBuilder _builder = null!;
-    private IsleConfiguration _configuration = null!;
+    private IFormattedLogValuesBuilder _builder = null!;
 
     /// <summary>
     /// Creates a new instance of <see cref="WarningLogInterpolatedStringHandler" />.
@@ -338,7 +569,6 @@ public ref partial struct WarningLogInterpolatedStringHandler
         if (isEnabled)
         {
             _builder = FormattedLogValuesBuilder.Acquire(literalLength, formattedCount);
-            _configuration = IsleConfiguration.Current;
         }
     }
 
@@ -355,7 +585,18 @@ public ref partial struct WarningLogInterpolatedStringHandler
     {
         if (!string.IsNullOrEmpty(str))
         {
-            _builder.AppendLiteral(str!);
+            if (ExtensionsLoggingConfiguration.IsResettable)
+            {
+                _builder.AppendLiteral(str!);
+            }
+            else if (ExtensionsLoggingConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingFormattedLogValuesBuilder>(_builder).AppendLiteral(str!); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleFormattedLogValuesBuilder>(_builder).AppendLiteral(str!); // Devirtualize the call
+            }
         }
     }
 
@@ -367,7 +608,18 @@ public ref partial struct WarningLogInterpolatedStringHandler
     {
         if (!string.IsNullOrEmpty(literal.Value))
         {
-            _builder.AppendLiteralValue(literal);
+            if (ExtensionsLoggingConfiguration.IsResettable)
+            {
+                _builder.AppendLiteralValue(literal);
+            }
+            else if (ExtensionsLoggingConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingFormattedLogValuesBuilder>(_builder).AppendLiteralValue(literal); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleFormattedLogValuesBuilder>(_builder).AppendLiteralValue(literal); // Devirtualize the call
+            }
         }
     }
 
@@ -377,14 +629,37 @@ public ref partial struct WarningLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string nameExpression = "")
     {
-        var name = nameExpression.GetNameFromCallerArgumentExpression<T>(_configuration);
+        var name = nameExpression.GetNameFromCallerArgumentExpression<T>();
+
         if (alignment == 0 && string.IsNullOrEmpty(format))
         {
-            _builder.AppendFormatted(name, value);
+            if (ExtensionsLoggingConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(name, value);
+            }
+            else if (ExtensionsLoggingConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingFormattedLogValuesBuilder>(_builder).AppendFormatted(name, value); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleFormattedLogValuesBuilder>(_builder).AppendFormatted(name, value); // Devirtualize the call
+            }
         }
         else
         {
-            _builder.AppendFormatted(name, value, alignment, format);
+            if (ExtensionsLoggingConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(name, value, alignment, format);
+            }
+            else if (ExtensionsLoggingConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingFormattedLogValuesBuilder>(_builder).AppendFormatted(name, value, alignment, format); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleFormattedLogValuesBuilder>(_builder).AppendFormatted(name, value, alignment, format); // Devirtualize the call
+            }
         }
     } 
 
@@ -396,18 +671,52 @@ public ref partial struct WarningLogInterpolatedStringHandler
     {
         if (alignment == 0 && string.IsNullOrEmpty(format))
         {
-            _builder.AppendFormatted(namedLogValue.Name, namedLogValue.Value);
+            if (ExtensionsLoggingConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(namedLogValue.Name, namedLogValue.Value);
+            }
+            else if (ExtensionsLoggingConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingFormattedLogValuesBuilder>(_builder).AppendFormatted(namedLogValue.Name, namedLogValue.Value); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleFormattedLogValuesBuilder>(_builder).AppendFormatted(namedLogValue.Name, namedLogValue.Value); // Devirtualize the call
+            }
         }
         else
         {
-            _builder.AppendFormatted(namedLogValue.Name, namedLogValue.Value, alignment, format);
+            if (ExtensionsLoggingConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(namedLogValue.Name, namedLogValue.Value, alignment, format);
+            }
+            else if (ExtensionsLoggingConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingFormattedLogValuesBuilder>(_builder).AppendFormatted(namedLogValue.Name, namedLogValue.Value, alignment, format); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleFormattedLogValuesBuilder>(_builder).AppendFormatted(namedLogValue.Name, namedLogValue.Value, alignment, format); // Devirtualize the call
+            }
         }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal FormattedLogValuesBase GetFormattedLogValuesAndReset()
     {
-        var result = _builder.BuildAndReset();
+        FormattedLogValuesBase result;
+        if (ExtensionsLoggingConfiguration.IsResettable)
+        {
+            result = _builder.BuildAndReset();
+        }
+        else if (ExtensionsLoggingConfiguration.EnableMessageTemplateCaching)
+        {
+            result = Unsafe.As<CachingFormattedLogValuesBuilder>(_builder).BuildAndReset();
+        }
+        else
+        {
+            result = Unsafe.As<SimpleFormattedLogValuesBuilder>(_builder).BuildAndReset();
+        }
         _builder = null!;
         return result;
     }
@@ -423,8 +732,7 @@ public ref partial struct WarningLogInterpolatedStringHandler
 [InterpolatedStringHandler]
 public ref partial struct ErrorLogInterpolatedStringHandler
 {
-    private FormattedLogValuesBuilder _builder = null!;
-    private IsleConfiguration _configuration = null!;
+    private IFormattedLogValuesBuilder _builder = null!;
 
     /// <summary>
     /// Creates a new instance of <see cref="ErrorLogInterpolatedStringHandler" />.
@@ -440,7 +748,6 @@ public ref partial struct ErrorLogInterpolatedStringHandler
         if (isEnabled)
         {
             _builder = FormattedLogValuesBuilder.Acquire(literalLength, formattedCount);
-            _configuration = IsleConfiguration.Current;
         }
     }
 
@@ -457,7 +764,18 @@ public ref partial struct ErrorLogInterpolatedStringHandler
     {
         if (!string.IsNullOrEmpty(str))
         {
-            _builder.AppendLiteral(str!);
+            if (ExtensionsLoggingConfiguration.IsResettable)
+            {
+                _builder.AppendLiteral(str!);
+            }
+            else if (ExtensionsLoggingConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingFormattedLogValuesBuilder>(_builder).AppendLiteral(str!); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleFormattedLogValuesBuilder>(_builder).AppendLiteral(str!); // Devirtualize the call
+            }
         }
     }
 
@@ -469,7 +787,18 @@ public ref partial struct ErrorLogInterpolatedStringHandler
     {
         if (!string.IsNullOrEmpty(literal.Value))
         {
-            _builder.AppendLiteralValue(literal);
+            if (ExtensionsLoggingConfiguration.IsResettable)
+            {
+                _builder.AppendLiteralValue(literal);
+            }
+            else if (ExtensionsLoggingConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingFormattedLogValuesBuilder>(_builder).AppendLiteralValue(literal); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleFormattedLogValuesBuilder>(_builder).AppendLiteralValue(literal); // Devirtualize the call
+            }
         }
     }
 
@@ -479,14 +808,37 @@ public ref partial struct ErrorLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string nameExpression = "")
     {
-        var name = nameExpression.GetNameFromCallerArgumentExpression<T>(_configuration);
+        var name = nameExpression.GetNameFromCallerArgumentExpression<T>();
+
         if (alignment == 0 && string.IsNullOrEmpty(format))
         {
-            _builder.AppendFormatted(name, value);
+            if (ExtensionsLoggingConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(name, value);
+            }
+            else if (ExtensionsLoggingConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingFormattedLogValuesBuilder>(_builder).AppendFormatted(name, value); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleFormattedLogValuesBuilder>(_builder).AppendFormatted(name, value); // Devirtualize the call
+            }
         }
         else
         {
-            _builder.AppendFormatted(name, value, alignment, format);
+            if (ExtensionsLoggingConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(name, value, alignment, format);
+            }
+            else if (ExtensionsLoggingConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingFormattedLogValuesBuilder>(_builder).AppendFormatted(name, value, alignment, format); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleFormattedLogValuesBuilder>(_builder).AppendFormatted(name, value, alignment, format); // Devirtualize the call
+            }
         }
     } 
 
@@ -498,18 +850,52 @@ public ref partial struct ErrorLogInterpolatedStringHandler
     {
         if (alignment == 0 && string.IsNullOrEmpty(format))
         {
-            _builder.AppendFormatted(namedLogValue.Name, namedLogValue.Value);
+            if (ExtensionsLoggingConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(namedLogValue.Name, namedLogValue.Value);
+            }
+            else if (ExtensionsLoggingConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingFormattedLogValuesBuilder>(_builder).AppendFormatted(namedLogValue.Name, namedLogValue.Value); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleFormattedLogValuesBuilder>(_builder).AppendFormatted(namedLogValue.Name, namedLogValue.Value); // Devirtualize the call
+            }
         }
         else
         {
-            _builder.AppendFormatted(namedLogValue.Name, namedLogValue.Value, alignment, format);
+            if (ExtensionsLoggingConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(namedLogValue.Name, namedLogValue.Value, alignment, format);
+            }
+            else if (ExtensionsLoggingConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingFormattedLogValuesBuilder>(_builder).AppendFormatted(namedLogValue.Name, namedLogValue.Value, alignment, format); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleFormattedLogValuesBuilder>(_builder).AppendFormatted(namedLogValue.Name, namedLogValue.Value, alignment, format); // Devirtualize the call
+            }
         }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal FormattedLogValuesBase GetFormattedLogValuesAndReset()
     {
-        var result = _builder.BuildAndReset();
+        FormattedLogValuesBase result;
+        if (ExtensionsLoggingConfiguration.IsResettable)
+        {
+            result = _builder.BuildAndReset();
+        }
+        else if (ExtensionsLoggingConfiguration.EnableMessageTemplateCaching)
+        {
+            result = Unsafe.As<CachingFormattedLogValuesBuilder>(_builder).BuildAndReset();
+        }
+        else
+        {
+            result = Unsafe.As<SimpleFormattedLogValuesBuilder>(_builder).BuildAndReset();
+        }
         _builder = null!;
         return result;
     }
@@ -525,8 +911,7 @@ public ref partial struct ErrorLogInterpolatedStringHandler
 [InterpolatedStringHandler]
 public ref partial struct CriticalLogInterpolatedStringHandler
 {
-    private FormattedLogValuesBuilder _builder = null!;
-    private IsleConfiguration _configuration = null!;
+    private IFormattedLogValuesBuilder _builder = null!;
 
     /// <summary>
     /// Creates a new instance of <see cref="CriticalLogInterpolatedStringHandler" />.
@@ -542,7 +927,6 @@ public ref partial struct CriticalLogInterpolatedStringHandler
         if (isEnabled)
         {
             _builder = FormattedLogValuesBuilder.Acquire(literalLength, formattedCount);
-            _configuration = IsleConfiguration.Current;
         }
     }
 
@@ -559,7 +943,18 @@ public ref partial struct CriticalLogInterpolatedStringHandler
     {
         if (!string.IsNullOrEmpty(str))
         {
-            _builder.AppendLiteral(str!);
+            if (ExtensionsLoggingConfiguration.IsResettable)
+            {
+                _builder.AppendLiteral(str!);
+            }
+            else if (ExtensionsLoggingConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingFormattedLogValuesBuilder>(_builder).AppendLiteral(str!); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleFormattedLogValuesBuilder>(_builder).AppendLiteral(str!); // Devirtualize the call
+            }
         }
     }
 
@@ -571,7 +966,18 @@ public ref partial struct CriticalLogInterpolatedStringHandler
     {
         if (!string.IsNullOrEmpty(literal.Value))
         {
-            _builder.AppendLiteralValue(literal);
+            if (ExtensionsLoggingConfiguration.IsResettable)
+            {
+                _builder.AppendLiteralValue(literal);
+            }
+            else if (ExtensionsLoggingConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingFormattedLogValuesBuilder>(_builder).AppendLiteralValue(literal); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleFormattedLogValuesBuilder>(_builder).AppendLiteralValue(literal); // Devirtualize the call
+            }
         }
     }
 
@@ -581,14 +987,37 @@ public ref partial struct CriticalLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string nameExpression = "")
     {
-        var name = nameExpression.GetNameFromCallerArgumentExpression<T>(_configuration);
+        var name = nameExpression.GetNameFromCallerArgumentExpression<T>();
+
         if (alignment == 0 && string.IsNullOrEmpty(format))
         {
-            _builder.AppendFormatted(name, value);
+            if (ExtensionsLoggingConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(name, value);
+            }
+            else if (ExtensionsLoggingConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingFormattedLogValuesBuilder>(_builder).AppendFormatted(name, value); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleFormattedLogValuesBuilder>(_builder).AppendFormatted(name, value); // Devirtualize the call
+            }
         }
         else
         {
-            _builder.AppendFormatted(name, value, alignment, format);
+            if (ExtensionsLoggingConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(name, value, alignment, format);
+            }
+            else if (ExtensionsLoggingConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingFormattedLogValuesBuilder>(_builder).AppendFormatted(name, value, alignment, format); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleFormattedLogValuesBuilder>(_builder).AppendFormatted(name, value, alignment, format); // Devirtualize the call
+            }
         }
     } 
 
@@ -600,18 +1029,52 @@ public ref partial struct CriticalLogInterpolatedStringHandler
     {
         if (alignment == 0 && string.IsNullOrEmpty(format))
         {
-            _builder.AppendFormatted(namedLogValue.Name, namedLogValue.Value);
+            if (ExtensionsLoggingConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(namedLogValue.Name, namedLogValue.Value);
+            }
+            else if (ExtensionsLoggingConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingFormattedLogValuesBuilder>(_builder).AppendFormatted(namedLogValue.Name, namedLogValue.Value); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleFormattedLogValuesBuilder>(_builder).AppendFormatted(namedLogValue.Name, namedLogValue.Value); // Devirtualize the call
+            }
         }
         else
         {
-            _builder.AppendFormatted(namedLogValue.Name, namedLogValue.Value, alignment, format);
+            if (ExtensionsLoggingConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(namedLogValue.Name, namedLogValue.Value, alignment, format);
+            }
+            else if (ExtensionsLoggingConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingFormattedLogValuesBuilder>(_builder).AppendFormatted(namedLogValue.Name, namedLogValue.Value, alignment, format); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleFormattedLogValuesBuilder>(_builder).AppendFormatted(namedLogValue.Name, namedLogValue.Value, alignment, format); // Devirtualize the call
+            }
         }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal FormattedLogValuesBase GetFormattedLogValuesAndReset()
     {
-        var result = _builder.BuildAndReset();
+        FormattedLogValuesBase result;
+        if (ExtensionsLoggingConfiguration.IsResettable)
+        {
+            result = _builder.BuildAndReset();
+        }
+        else if (ExtensionsLoggingConfiguration.EnableMessageTemplateCaching)
+        {
+            result = Unsafe.As<CachingFormattedLogValuesBuilder>(_builder).BuildAndReset();
+        }
+        else
+        {
+            result = Unsafe.As<SimpleFormattedLogValuesBuilder>(_builder).BuildAndReset();
+        }
         _builder = null!;
         return result;
     }
@@ -627,8 +1090,7 @@ public ref partial struct CriticalLogInterpolatedStringHandler
 [InterpolatedStringHandler]
 public ref partial struct LogInterpolatedStringHandler
 {
-    private FormattedLogValuesBuilder _builder = null!;
-    private IsleConfiguration _configuration = null!;
+    private IFormattedLogValuesBuilder _builder = null!;
 
     /// <summary>
     /// Creates a new instance of <see cref="LogInterpolatedStringHandler" />.
@@ -645,7 +1107,6 @@ public ref partial struct LogInterpolatedStringHandler
         if (isEnabled)
         {
             _builder = FormattedLogValuesBuilder.Acquire(literalLength, formattedCount);
-            _configuration = IsleConfiguration.Current;
         }
     }
 
@@ -662,7 +1123,18 @@ public ref partial struct LogInterpolatedStringHandler
     {
         if (!string.IsNullOrEmpty(str))
         {
-            _builder.AppendLiteral(str!);
+            if (ExtensionsLoggingConfiguration.IsResettable)
+            {
+                _builder.AppendLiteral(str!);
+            }
+            else if (ExtensionsLoggingConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingFormattedLogValuesBuilder>(_builder).AppendLiteral(str!); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleFormattedLogValuesBuilder>(_builder).AppendLiteral(str!); // Devirtualize the call
+            }
         }
     }
 
@@ -674,7 +1146,18 @@ public ref partial struct LogInterpolatedStringHandler
     {
         if (!string.IsNullOrEmpty(literal.Value))
         {
-            _builder.AppendLiteralValue(literal);
+            if (ExtensionsLoggingConfiguration.IsResettable)
+            {
+                _builder.AppendLiteralValue(literal);
+            }
+            else if (ExtensionsLoggingConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingFormattedLogValuesBuilder>(_builder).AppendLiteralValue(literal); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleFormattedLogValuesBuilder>(_builder).AppendLiteralValue(literal); // Devirtualize the call
+            }
         }
     }
 
@@ -684,14 +1167,37 @@ public ref partial struct LogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string nameExpression = "")
     {
-        var name = nameExpression.GetNameFromCallerArgumentExpression<T>(_configuration);
+        var name = nameExpression.GetNameFromCallerArgumentExpression<T>();
+
         if (alignment == 0 && string.IsNullOrEmpty(format))
         {
-            _builder.AppendFormatted(name, value);
+            if (ExtensionsLoggingConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(name, value);
+            }
+            else if (ExtensionsLoggingConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingFormattedLogValuesBuilder>(_builder).AppendFormatted(name, value); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleFormattedLogValuesBuilder>(_builder).AppendFormatted(name, value); // Devirtualize the call
+            }
         }
         else
         {
-            _builder.AppendFormatted(name, value, alignment, format);
+            if (ExtensionsLoggingConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(name, value, alignment, format);
+            }
+            else if (ExtensionsLoggingConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingFormattedLogValuesBuilder>(_builder).AppendFormatted(name, value, alignment, format); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleFormattedLogValuesBuilder>(_builder).AppendFormatted(name, value, alignment, format); // Devirtualize the call
+            }
         }
     } 
 
@@ -703,18 +1209,52 @@ public ref partial struct LogInterpolatedStringHandler
     {
         if (alignment == 0 && string.IsNullOrEmpty(format))
         {
-            _builder.AppendFormatted(namedLogValue.Name, namedLogValue.Value);
+            if (ExtensionsLoggingConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(namedLogValue.Name, namedLogValue.Value);
+            }
+            else if (ExtensionsLoggingConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingFormattedLogValuesBuilder>(_builder).AppendFormatted(namedLogValue.Name, namedLogValue.Value); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleFormattedLogValuesBuilder>(_builder).AppendFormatted(namedLogValue.Name, namedLogValue.Value); // Devirtualize the call
+            }
         }
         else
         {
-            _builder.AppendFormatted(namedLogValue.Name, namedLogValue.Value, alignment, format);
+            if (ExtensionsLoggingConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(namedLogValue.Name, namedLogValue.Value, alignment, format);
+            }
+            else if (ExtensionsLoggingConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingFormattedLogValuesBuilder>(_builder).AppendFormatted(namedLogValue.Name, namedLogValue.Value, alignment, format); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleFormattedLogValuesBuilder>(_builder).AppendFormatted(namedLogValue.Name, namedLogValue.Value, alignment, format); // Devirtualize the call
+            }
         }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal FormattedLogValuesBase GetFormattedLogValuesAndReset()
     {
-        var result = _builder.BuildAndReset();
+        FormattedLogValuesBase result;
+        if (ExtensionsLoggingConfiguration.IsResettable)
+        {
+            result = _builder.BuildAndReset();
+        }
+        else if (ExtensionsLoggingConfiguration.EnableMessageTemplateCaching)
+        {
+            result = Unsafe.As<CachingFormattedLogValuesBuilder>(_builder).BuildAndReset();
+        }
+        else
+        {
+            result = Unsafe.As<SimpleFormattedLogValuesBuilder>(_builder).BuildAndReset();
+        }
         _builder = null!;
         return result;
     }
@@ -730,8 +1270,7 @@ public ref partial struct LogInterpolatedStringHandler
 [InterpolatedStringHandler]
 public ref partial struct ScopeLogInterpolatedStringHandler
 {
-    private FormattedLogValuesBuilder _builder = null!;
-    private IsleConfiguration _configuration = null!;
+    private IFormattedLogValuesBuilder _builder = null!;
 
     /// <summary>
     /// Creates a new instance of <see cref="ScopeLogInterpolatedStringHandler" />.
@@ -742,7 +1281,6 @@ public ref partial struct ScopeLogInterpolatedStringHandler
         ILogger logger    )
     {
             _builder = FormattedLogValuesBuilder.Acquire(literalLength, formattedCount);
-            _configuration = IsleConfiguration.Current;
     }
 
 
@@ -754,7 +1292,18 @@ public ref partial struct ScopeLogInterpolatedStringHandler
     {
         if (!string.IsNullOrEmpty(str))
         {
-            _builder.AppendLiteral(str!);
+            if (ExtensionsLoggingConfiguration.IsResettable)
+            {
+                _builder.AppendLiteral(str!);
+            }
+            else if (ExtensionsLoggingConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingFormattedLogValuesBuilder>(_builder).AppendLiteral(str!); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleFormattedLogValuesBuilder>(_builder).AppendLiteral(str!); // Devirtualize the call
+            }
         }
     }
 
@@ -766,7 +1315,18 @@ public ref partial struct ScopeLogInterpolatedStringHandler
     {
         if (!string.IsNullOrEmpty(literal.Value))
         {
-            _builder.AppendLiteralValue(literal);
+            if (ExtensionsLoggingConfiguration.IsResettable)
+            {
+                _builder.AppendLiteralValue(literal);
+            }
+            else if (ExtensionsLoggingConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingFormattedLogValuesBuilder>(_builder).AppendLiteralValue(literal); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleFormattedLogValuesBuilder>(_builder).AppendLiteralValue(literal); // Devirtualize the call
+            }
         }
     }
 
@@ -776,14 +1336,37 @@ public ref partial struct ScopeLogInterpolatedStringHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string nameExpression = "")
     {
-        var name = nameExpression.GetNameFromCallerArgumentExpression<T>(_configuration);
+        var name = nameExpression.GetNameFromCallerArgumentExpression<T>();
+
         if (alignment == 0 && string.IsNullOrEmpty(format))
         {
-            _builder.AppendFormatted(name, value);
+            if (ExtensionsLoggingConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(name, value);
+            }
+            else if (ExtensionsLoggingConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingFormattedLogValuesBuilder>(_builder).AppendFormatted(name, value); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleFormattedLogValuesBuilder>(_builder).AppendFormatted(name, value); // Devirtualize the call
+            }
         }
         else
         {
-            _builder.AppendFormatted(name, value, alignment, format);
+            if (ExtensionsLoggingConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(name, value, alignment, format);
+            }
+            else if (ExtensionsLoggingConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingFormattedLogValuesBuilder>(_builder).AppendFormatted(name, value, alignment, format); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleFormattedLogValuesBuilder>(_builder).AppendFormatted(name, value, alignment, format); // Devirtualize the call
+            }
         }
     } 
 
@@ -795,18 +1378,52 @@ public ref partial struct ScopeLogInterpolatedStringHandler
     {
         if (alignment == 0 && string.IsNullOrEmpty(format))
         {
-            _builder.AppendFormatted(namedLogValue.Name, namedLogValue.Value);
+            if (ExtensionsLoggingConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(namedLogValue.Name, namedLogValue.Value);
+            }
+            else if (ExtensionsLoggingConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingFormattedLogValuesBuilder>(_builder).AppendFormatted(namedLogValue.Name, namedLogValue.Value); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleFormattedLogValuesBuilder>(_builder).AppendFormatted(namedLogValue.Name, namedLogValue.Value); // Devirtualize the call
+            }
         }
         else
         {
-            _builder.AppendFormatted(namedLogValue.Name, namedLogValue.Value, alignment, format);
+            if (ExtensionsLoggingConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(namedLogValue.Name, namedLogValue.Value, alignment, format);
+            }
+            else if (ExtensionsLoggingConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingFormattedLogValuesBuilder>(_builder).AppendFormatted(namedLogValue.Name, namedLogValue.Value, alignment, format); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleFormattedLogValuesBuilder>(_builder).AppendFormatted(namedLogValue.Name, namedLogValue.Value, alignment, format); // Devirtualize the call
+            }
         }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal FormattedLogValuesBase GetFormattedLogValuesAndReset()
     {
-        var result = _builder.BuildAndReset();
+        FormattedLogValuesBase result;
+        if (ExtensionsLoggingConfiguration.IsResettable)
+        {
+            result = _builder.BuildAndReset();
+        }
+        else if (ExtensionsLoggingConfiguration.EnableMessageTemplateCaching)
+        {
+            result = Unsafe.As<CachingFormattedLogValuesBuilder>(_builder).BuildAndReset();
+        }
+        else
+        {
+            result = Unsafe.As<SimpleFormattedLogValuesBuilder>(_builder).BuildAndReset();
+        }
         _builder = null!;
         return result;
     }

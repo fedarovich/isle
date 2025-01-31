@@ -13,6 +13,7 @@
 #>
 #nullable enable
 using System.Runtime.CompilerServices;
+using Isle.Serilog.Configuration;
 using Serilog;
 using Serilog.Events;
 
@@ -71,7 +72,18 @@ public ref partial struct <#= GetTypeName(logEventLevel) #>
     {
         if (!string.IsNullOrEmpty(str))
         {
-            _builder.AppendLiteral(str!);
+            if (SerilogConfiguration.IsResettable)
+            {
+                _builder.AppendLiteral(str!);
+            }
+            else if (SerilogConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingLogEventBuilder>(_builder).AppendLiteral(str!); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleLogEventBuilder>(_builder).AppendLiteral(str!); // Devirtualize the call
+            }
         }
     }
 
@@ -83,7 +95,18 @@ public ref partial struct <#= GetTypeName(logEventLevel) #>
     {
         if (!string.IsNullOrEmpty(literal.Value))
         {
-            _builder.AppendLiteralValue(literal);
+            if (SerilogConfiguration.IsResettable)
+            {
+                _builder.AppendLiteralValue(literal);
+            }
+            else if (SerilogConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingLogEventBuilder>(_builder).AppendLiteralValue(literal); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleLogEventBuilder>(_builder).AppendLiteralValue(literal); // Devirtualize the call
+            }
         }
     }
 
@@ -95,11 +118,33 @@ public ref partial struct <#= GetTypeName(logEventLevel) #>
     {
         if (alignment == 0 && string.IsNullOrEmpty(format))
         {
-            _builder.AppendFormatted(name, value);
+            if (SerilogConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(name, value);
+            }
+            else if (SerilogConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingLogEventBuilder>(_builder).AppendFormatted(name, value); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleLogEventBuilder>(_builder).AppendFormatted(name, value); // Devirtualize the call
+            }
         }
         else
         {
-            _builder.AppendFormatted(name, value, alignment, format);
+            if (SerilogConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(name, value, alignment, format);
+            }
+            else if (SerilogConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingLogEventBuilder>(_builder).AppendFormatted(name, value, alignment, format); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleLogEventBuilder>(_builder).AppendFormatted(name, value, alignment, format); // Devirtualize the call
+            }
         }
     }
 
@@ -111,18 +156,52 @@ public ref partial struct <#= GetTypeName(logEventLevel) #>
     {
         if (alignment == 0 && string.IsNullOrEmpty(format))
         {
-            _builder.AppendFormatted(namedLogValue);
+            if (SerilogConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(namedLogValue);
+            }
+            else if (SerilogConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingLogEventBuilder>(_builder).AppendFormatted(namedLogValue); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleLogEventBuilder>(_builder).AppendFormatted(namedLogValue); // Devirtualize the call
+            }
         }
         else
         {
-            _builder.AppendFormatted(namedLogValue, alignment, format);
+            if (SerilogConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(namedLogValue, alignment, format);
+            }
+            else if (SerilogConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingLogEventBuilder>(_builder).AppendFormatted(namedLogValue, alignment, format); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleLogEventBuilder>(_builder).AppendFormatted(namedLogValue, alignment, format); // Devirtualize the call
+            }
         }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal LogEvent GetLogEventAndReset(Exception? exception = null)
     {
-        var result = _builder.BuildAndReset(<#= logEventLevel != null ? $"LogEventLevel.{logEventLevel}" : "_logEventLevel" #>, exception);
+        LogEvent result;
+        if (SerilogConfiguration.IsResettable)
+        {
+            result = _builder.BuildAndReset(<#= logEventLevel != null ? $"LogEventLevel.{logEventLevel}" : "_logEventLevel" #>, exception);
+        }
+        else if (SerilogConfiguration.EnableMessageTemplateCaching)
+        {
+            result = Unsafe.As<CachingLogEventBuilder>(_builder).BuildAndReset(<#= logEventLevel != null ? $"LogEventLevel.{logEventLevel}" : "_logEventLevel" #>, exception); // Devirtualize the call
+        }
+        else
+        {
+            result = Unsafe.As<SimpleLogEventBuilder>(_builder).BuildAndReset(<#= logEventLevel != null ? $"LogEventLevel.{logEventLevel}" : "_logEventLevel" #>, exception); // Devirtualize the call
+        }
         _builder = null!;
         return result;
     }

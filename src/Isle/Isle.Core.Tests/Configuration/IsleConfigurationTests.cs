@@ -18,8 +18,8 @@ internal class IsleConfigurationTests
     [Test]
     public void ThrowIfAlreadyConfigured()
     {
-        IsleConfiguration.Configure(_ => { });
-        var act = () => IsleConfiguration.Configure(_ => { });
+        IsleConfiguration.Configure(b => b.IsResettable());
+        var act = () => IsleConfiguration.Configure(b => b.IsResettable());
         act.Should().Throw<InvalidOperationException>();
     }
 
@@ -33,7 +33,7 @@ internal class IsleConfigurationTests
     [Test]
     public void DefaultConfiguration()
     {
-        IsleConfiguration.Configure(_ => {});
+        IsleConfiguration.Configure(b => b.IsResettable());
         IsleConfiguration.Current.ValueRepresentationPolicy.Should().Be(DefaultValueRepresentationPolicy.Instance);
         IsleConfiguration.Current.PreserveDefaultValueRepresentationForExplicitNames.Should().BeFalse();
         IsleConfiguration.Current.CacheLiteralValues.Should().BeFalse();
@@ -51,6 +51,7 @@ internal class IsleConfigurationTests
             builder.ValueRepresentationPolicy = AutoDestructuringValueRepresentationPolicy.Instance;
             builder.PreserveDefaultValueRepresentationForExplicitNames = true;
             builder.CacheLiteralValues = true;
+            builder.IsResettable = true;
             builder.RegisterExtensionConfigurationHook(hook);
         });
         hook.Received(1).ApplyExtensionConfiguration();

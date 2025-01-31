@@ -32,7 +32,7 @@ public readonly ref struct LiteralValue
     /// will cause memory leaks.
     /// </para>
     /// </remarks>
-    public LiteralValue(string? value) : this(value, IsleConfiguration.Current.CacheLiteralValues)
+    public LiteralValue(string? value) : this(value, CoreConfiguration.CacheLiteralValues)
     {
     }
 
