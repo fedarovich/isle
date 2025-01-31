@@ -20,14 +20,14 @@ variables:
   MajorVersion: 2
   MinorVersion: 0
   Patch: 0
-  VersionPrefix: '$(MajorVersion).$(MinorVersion).$(Patch)'
-  FileVersion: '$(VersionPrefix).$(rev:r)'
+  VersionPrefix: ${{format('{0}.{1}.{2}', variables.MajorVersion, variables.MinorVersion, variables.Patch )}}
+  FileVersion: ${{format('{0}.{1:r}', variables.VersionPrefix, variables.rev )}}
   ${{ if eq(parameters.IsRelease, false) }}:
-    VersionSuffix: 'pre.$(rev:r)'
-    BuildName: '$(VersionPrefix)-$(VersionSuffix)'
+    VersionSuffix: ${{format('pre.{0:r}', variables.rev )}}
+    BuildName: ${{format('{0}-{1}', variables.VersionPrefix, variables.VersionSuffuc )}}
   ${{ else }}:
     VersionSuffix: ''
-    BuildName: '$(VersionPrefix)'
+    BuildName: variables.VersionPrefix
 
 name: '$(BuildName)'
 
