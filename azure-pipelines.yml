@@ -21,17 +21,21 @@ variables:
   MinorVersion: 0
   Patch: 0
   VersionPrefix: $[format('{0}.{1}.{2}', variables.MajorVersion, variables.MinorVersion, variables.Patch )]
-  FileVersion: $[format('{0}.{1:r}', variables.VersionPrefix, variables.rev )]
+  FileVersion: $(Build.BuildNumber)
   ${{ if eq(parameters.IsRelease, false) }}:
-    VersionSuffix: $[format('pre.{0:r}', variables.rev )]
-    BuildName: $[format('{0}-{1}', variables.VersionPrefix, variables.VersionSuffuc )]
+    VersionSuffix: $[format('pre.{0}', last(split(variables['Build.BuildNumber'], '.')))]
   ${{ else }}:
     VersionSuffix: ''
-    BuildName: variables.VersionPrefix
 
-name: '$(BuildName)'
+name: '$(MajorVersion).${MinorVersion}.${Patch}.{$rev:r}'
 
 steps:
+- script: |
+    echo "FileVersion:   $(Build.BuildNumber)"
+    echo "VersionPrefix: $(VersionPrefix)"
+    echo "VersionSuffix: $(VersionSuffix)"
+- displayName: 'Print Variables'
+
 - task: UseDotNet@2
   displayName: 'Install .Net 3.1'
   inputs:
