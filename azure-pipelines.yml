@@ -27,7 +27,8 @@ variables:
   ${{ else }}:
     VersionSuffix: ''
 
-name: '$(MajorVersion).${MinorVersion}.${Patch}.{$rev:r}'
+
+name: '$(MajorVersion).$(MinorVersion).$(Patch).$(rev:r)'
 
 steps:
 - script: |
