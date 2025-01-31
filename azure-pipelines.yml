@@ -34,7 +34,7 @@ steps:
     echo "FileVersion:   $(Build.BuildNumber)"
     echo "VersionPrefix: $(VersionPrefix)"
     echo "VersionSuffix: $(VersionSuffix)"
-- displayName: 'Print Variables'
+  displayName: 'Print Variables'
 
 - task: UseDotNet@2
   displayName: 'Install .Net 3.1'
