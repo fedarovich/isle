@@ -28,6 +28,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Isle.Compatibility", "Isle.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Isle.Core.Analyzers", "Isle.Core.Analyzers\Isle.Core.Analyzers.csproj", "{DFF2F6F9-67AD-4D76-B6BC-3B7E5E215883}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Isle.Converters.Roslyn", "Isle.Converters.Roslyn\Isle.Converters.Roslyn.csproj", "{8823BF5C-1318-4C1F-A17D-4454593E6055}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Isle.Converters.Roslyn.Tests", "Isle.Converters.Roslyn.Tests\Isle.Converters.Roslyn.Tests.csproj", "{38C4B4BD-A137-4A2B-A41C-65259CF56F94}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -74,6 +78,14 @@ Global
 		{DFF2F6F9-67AD-4D76-B6BC-3B7E5E215883}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DFF2F6F9-67AD-4D76-B6BC-3B7E5E215883}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DFF2F6F9-67AD-4D76-B6BC-3B7E5E215883}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8823BF5C-1318-4C1F-A17D-4454593E6055}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8823BF5C-1318-4C1F-A17D-4454593E6055}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8823BF5C-1318-4C1F-A17D-4454593E6055}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8823BF5C-1318-4C1F-A17D-4454593E6055}.Release|Any CPU.Build.0 = Release|Any CPU
+		{38C4B4BD-A137-4A2B-A41C-65259CF56F94}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{38C4B4BD-A137-4A2B-A41C-65259CF56F94}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{38C4B4BD-A137-4A2B-A41C-65259CF56F94}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{38C4B4BD-A137-4A2B-A41C-65259CF56F94}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
