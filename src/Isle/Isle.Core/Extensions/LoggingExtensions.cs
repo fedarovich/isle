@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using Isle.Configuration;
 
 namespace Isle.Extensions;
@@ -34,7 +35,7 @@ public static class LoggingExtensions
     /// </remarks>
     /// <seealso cref="Named{T}(T,string,bool)"/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static NamedLogValue Named<T>(this T value, string name)
+    public static NamedLogValue Named<T>(this T value, [ConstantExpected] string name)
     {
         return Named(value, name, CoreConfiguration.PreserveDefaultValueRepresentationForExplicitNames);
     }
@@ -51,7 +52,7 @@ public static class LoggingExtensions
     /// </param>
     /// <exception cref="ArgumentException"><paramref name="name"/> is null or blank string.</exception>
     /// <seealso cref="Named{T}(T,string)"/>
-    public static NamedLogValue Named<T>(this T value, string name, bool preserveDefaultValueRepresentation)
+    public static NamedLogValue Named<T>(this T value, [ConstantExpected] string name, bool preserveDefaultValueRepresentation)
     {
         if (string.IsNullOrWhiteSpace(name))
             throw new ArgumentException("The name cannot be null or empty string.", nameof(name));

@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <RootNamespace>Isle.Converters.Roslyn.Analyzers</RootNamespace>
+    <Nullable>Enable</Nullable>
+    <Copyright>© Pavel Fedarovich, 2022-$([System.DateTime]::Now.Year)</Copyright>
+    <PackageProjectUrl>https://github.com/fedarovich/isle</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/fedarovich/isle.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>structured logging; semantic logging; interpolated strings</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <LangVersion>LatestMajor</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Isle.Converters.Roslyn.Analyzers\Isle.Converters.Roslyn.Analyzers.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="CodeFixResources.Designer.cs" DesignTime="True" AutoGen="True" DependentUpon="CodeFixResources.resx" />
+    <EmbeddedResource Update="CodeFixResources.resx" Generator="ResXFileCodeGenerator" LastGenOutput="CodeFixResources.Designer.cs" />
+  </ItemGroup>
+
+</Project>
