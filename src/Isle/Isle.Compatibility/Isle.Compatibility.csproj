@@ -19,6 +19,7 @@
     <InternalsVisibleTo Include="Isle.Core" />
     <InternalsVisibleTo Include="Isle.Extensions.Logging" />
     <InternalsVisibleTo Include="Isle.Serilog" />
+    <InternalsVisibleTo Include="Isle.Converters.Roslyn" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.1'">

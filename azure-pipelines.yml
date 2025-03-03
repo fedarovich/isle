@@ -102,6 +102,22 @@ steps:
     projects: 'src/Isle/Isle.Serilog/Isle.Serilog.csproj'
     arguments: '-c $(BuildConfiguration) -p:VersionPrefix=$(VersionPrefix) --version-suffix "$(VersionSuffix)" --no-build --include-symbols -o "$(Build.ArtifactStagingDirectory)"'
 
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet pack Isle.Converters.Roslyn'
+  inputs:
+    command: custom
+    custom: pack
+    projects: 'src/Isle/Isle.Converters.Roslyn/Isle.Converters.Roslyn.csproj'
+    arguments: '-c $(BuildConfiguration) -p:VersionPrefix=$(VersionPrefix) --version-suffix "$(VersionSuffix)" --no-build --include-symbols -o "$(Build.ArtifactStagingDirectory)"'
+
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet pack Isle.Converters.Roslyn.Analyzers'
+  inputs:
+    command: custom
+    custom: pack
+    projects: 'src/Isle/Isle.Converters.Roslyn.Analyzers/Isle.Converters.Roslyn.Analyzers.Package/Isle.Converters.Roslyn.Analyzers.Package.csproj'
+    arguments: '-c $(BuildConfiguration) -p:VersionPrefix=$(VersionPrefix) --version-suffix "$(VersionSuffix)" --no-build --include-symbols -o "$(Build.ArtifactStagingDirectory)"'
+
 - task: PublishBuildArtifacts@1
 
 - task: NuGetToolInstaller@1

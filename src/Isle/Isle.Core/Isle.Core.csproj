@@ -24,6 +24,7 @@
     <InternalsVisibleTo Include="Isle.Extensions.Logging.Tests" />
     <InternalsVisibleTo Include="Isle.Serilog" />
     <InternalsVisibleTo Include="Isle.Serilog.Tests" />
+    <InternalsVisibleTo Include="Isle.Converters.Roslyn" />
   </ItemGroup>
 
   <ItemGroup>
