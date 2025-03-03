@@ -116,7 +116,7 @@ steps:
     command: custom
     custom: pack
     projects: 'src/Isle/Isle.Converters.Roslyn.Analyzers/Isle.Converters.Roslyn.Analyzers.Package/Isle.Converters.Roslyn.Analyzers.Package.csproj'
-    arguments: '-c $(BuildConfiguration) -p:VersionPrefix=$(VersionPrefix) --version-suffix "$(VersionSuffix)" --no-build --include-symbols -o "$(Build.ArtifactStagingDirectory)"'
+    arguments: '-c $(BuildConfiguration) -p:VersionPrefix=$(VersionPrefix) --version-suffix "$(VersionSuffix)" --no-build'
 
 - task: PublishBuildArtifacts@1
 
