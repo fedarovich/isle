@@ -5,11 +5,19 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Isle.Converters.Roslyn;
 
+/// <summary>
+/// A name converter that extracts a property or method name from C# expression using Roslyn parser.
+/// </summary>
 public class RoslynNameConverter
 {
     private readonly Func<string, string> _fallback;
     private readonly Func<string, NameExpressionType, string>[] _transformations;
 
+    /// <summary>
+    /// Initializes a new instance of <see cref="RoslynNameConverter"/>.
+    /// </summary>
+    /// <param name="fallback">A fallback to be used if this converter cannot produce a meaningful value.</param>
+    /// <param name="transformations">Additional custom transformations to be applied to the converted name.</param>
     public RoslynNameConverter(Func<string, string> fallback, IEnumerable<Func<string, NameExpressionType, string>> transformations)
     {
 #if NET6_0_OR_GREATER

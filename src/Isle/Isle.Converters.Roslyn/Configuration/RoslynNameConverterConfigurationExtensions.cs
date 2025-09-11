@@ -1,8 +1,13 @@
 ﻿using Isle.Converters;
 using Isle.Converters.Roslyn;
 
+#pragma warning disable IDE0130
+
 namespace Isle.Configuration;
 
+/// <summary>
+/// Provides extension methods to simplify adding <see cref="RoslynNameConverter"/> to Isle configuration.
+/// </summary>
 public static class RoslynNameConverterConfigurationExtensions
 {
     /// <summary>

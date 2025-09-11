@@ -4,6 +4,8 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 
+#pragma warning disable CA1857 // The argument should be a constant for optimal performance
+
 namespace Isle.Extensions.Logging.Tests;
 
 [TestFixtureSource(nameof(FixtureArgs))]

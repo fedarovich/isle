@@ -91,6 +91,8 @@ internal sealed class CachingLogEventBuilder : LogEventBuilder
             : _lastNode.CreateNotCachedTextNode(str);
     }
 
+#pragma warning disable CA1857  // The argument should be a constant for optimal performance
+
     public override void AppendFormatted<T>(string name, T value)
     {
         AppendFormatted(value.Named(CoreConfiguration.ConvertValueName(name), false));
@@ -100,6 +102,8 @@ internal sealed class CachingLogEventBuilder : LogEventBuilder
     {
         AppendFormatted(value.Named(CoreConfiguration.ConvertValueName(name), false), alignment, format);
     }
+
+#pragma warning restore CA1857  // The argument should be a constant for optimal performance
 
     [MethodImpl(MethodImplOptions.NoInlining)]
     public override void AppendFormatted(in NamedLogValue namedLogValue)

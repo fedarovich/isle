@@ -4,6 +4,8 @@ using Isle.Configuration;
 using Isle.Extensions;
 using NUnit.Framework;
 
+#pragma warning disable CA1857 // The argument should be a constant for optimal performance
+
 namespace Isle.Core.Tests.Extensions;
 
 public class LoggingExtensionsTests
