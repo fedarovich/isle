@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq.Expressions;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Isle.Configuration;
 
 namespace Isle.Converters.Roslyn.Tests;

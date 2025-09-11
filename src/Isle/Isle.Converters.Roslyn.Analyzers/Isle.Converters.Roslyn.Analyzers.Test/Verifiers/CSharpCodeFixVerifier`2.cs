@@ -5,7 +5,6 @@ using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Testing;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 namespace Isle.Converters.Roslyn.Analyzers.Test
 {
@@ -13,6 +12,12 @@ namespace Isle.Converters.Roslyn.Analyzers.Test
         where TAnalyzer : DiagnosticAnalyzer, new()
         where TCodeFix : CodeFixProvider, new()
     {
+        private static string CapturedNamesAnalyzerEditorConfig =
+            """
+            [*.cs]
+            IsleRoslynNameConverterRemoveMethodPrefixes = Get
+            """;
+
         /// <inheritdoc cref="CodeFixVerifier{TAnalyzer, TCodeFix, TTest, TVerifier}.Diagnostic()"/>
         public static DiagnosticResult Diagnostic()
             => CSharpCodeFixVerifier<TAnalyzer, TCodeFix, DefaultVerifier>.Diagnostic();
@@ -31,7 +36,14 @@ namespace Isle.Converters.Roslyn.Analyzers.Test
             var test = new Test
             {
                 TestCode = source,
-                ReferenceAssemblies = ReferenceAssemblies.Net.Net90
+                ReferenceAssemblies = ReferenceAssemblies.Net.Net90,
+                TestState =
+                {
+                    AnalyzerConfigFiles =
+                    {
+                        ("/CapturedNamesAnalyzer.editorconfig", CapturedNamesAnalyzerEditorConfig)
+                    }
+                }
             };
 
             test.ExpectedDiagnostics.AddRange(expected);
@@ -53,7 +65,14 @@ namespace Isle.Converters.Roslyn.Analyzers.Test
             {
                 TestCode = source,
                 FixedCode = fixedSource,
-                ReferenceAssemblies = ReferenceAssemblies.Net.Net90
+                ReferenceAssemblies = ReferenceAssemblies.Net.Net90,
+                TestState =
+                {
+                    AnalyzerConfigFiles =
+                    {
+                        ("/CapturedNamesAnalyzer.editorconfig", CapturedNamesAnalyzerEditorConfig)
+                    }
+                }
             };
 
             test.ExpectedDiagnostics.AddRange(expected);

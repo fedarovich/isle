@@ -33,10 +33,18 @@
     <None Update="tools\*.ps1" CopyToOutputDirectory="PreserveNewest" Pack="true" PackagePath="" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="buildTransitive\Isle.Converters.Roslyn.Analyzers.targets">
+      <PackagePath>/</PackagePath>
+      <Pack>True</Pack>
+    </None>
+  </ItemGroup>
+
   <Target Name="_AddAnalyzersToOutput">
     <ItemGroup>
       <TfmSpecificPackageFile Include="$(OutputPath)\Isle.Converters.Roslyn.Analyzers.dll" PackagePath="analyzers/dotnet/cs" />
       <TfmSpecificPackageFile Include="$(OutputPath)\Isle.Converters.Roslyn.Analyzers.CodeFixes.dll" PackagePath="analyzers/dotnet/cs" />
+      <TfmSpecificPackageFile Include="buildTransitive/**" PackagePath="buildTransitive" />
     </ItemGroup>
   </Target>
 

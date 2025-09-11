@@ -1380,6 +1380,322 @@ public class CapturedNamesAnalyzerMELTests
         await VerifyCapturedNamesCS.VerifyAnalyzerAsync(test, expected);
     }
 
+    [Test]
+    public async Task Log_WithMatchingPropertyAndMethod_CapturedNameMustBeUniqueDiagnosticId(
+        [ValueSource(nameof(LogLevels))] LogLevel level)
+    {
+        var test =
+            $$$"""
+               {{{Usings}}}
+
+               namespace Test
+               {
+                   {{{SharedCode}}}
+                   
+                   class TestClass
+                   {
+                       public int Value { get; set; }
+                       
+                       public int GetValue() => 0;
+                   
+                       public void TestLog(ILogger logger, int value, int x, int y, int z)
+                       {
+                           logger.Log{{{level}}}(
+                               $"Test {{|#0:value|}}, {{|#1:Value|}}, {{|#2:GetValue()|}}.");
+                       }
+                   }
+               }
+
+               """;
+
+        DiagnosticResult[] expected = [
+            VerifyCapturedNamesCS.Diagnostic("ISLE4001").WithLocation(1).WithArguments("Value"),
+            VerifyCapturedNamesCS.Diagnostic("ISLE4001").WithLocation(2).WithArguments("Value")
+        ];
+        await VerifyCapturedNamesCS.VerifyAnalyzerAsync(test, expected);
+    }
+
+    [Test]
+    public async Task LogEventId_WithMatchingPropertyAndMethod_CapturedNameMustBeUniqueDiagnosticId(
+        [ValueSource(nameof(LogLevels))] LogLevel level)
+    {
+        var test =
+            $$$"""
+               {{{Usings}}}
+
+               namespace Test
+               {
+                   {{{SharedCode}}}
+                   
+                   class TestClass
+                   {
+                       public int Value { get; set; }
+                       
+                       public int GetValue() => 0;
+                   
+                       public void TestLog(ILogger logger, int value, int x, int y, int z)
+                       {
+                           logger.Log{{{level}}}(42,
+                               $"Test {{|#0:value|}}, {{|#1:Value|}}, {{|#2:GetValue()|}}.");
+                       }
+                   }
+               }
+
+               """;
+
+        DiagnosticResult[] expected = [
+            VerifyCapturedNamesCS.Diagnostic("ISLE4001").WithLocation(1).WithArguments("Value"),
+            VerifyCapturedNamesCS.Diagnostic("ISLE4001").WithLocation(2).WithArguments("Value")
+        ];
+        await VerifyCapturedNamesCS.VerifyAnalyzerAsync(test, expected);
+    }
+
+    [Test]
+    public async Task LogException_WithMatchingPropertyAndMethod_CapturedNameMustBeUniqueDiagnosticId(
+        [ValueSource(nameof(LogLevels))] LogLevel level)
+    {
+        var test =
+            $$$"""
+               {{{Usings}}}
+
+               namespace Test
+               {
+                   {{{SharedCode}}}
+                   
+                   class TestClass
+                   {
+                       public int Value { get; set; }
+                       
+                       public int GetValue() => 0;
+                   
+                       public void TestLog(ILogger logger, int value, int x, int y, int z, Exception ex)
+                       {
+                           logger.Log{{{level}}}(ex,
+                               $"Test {{|#0:value|}}, {{|#1:Value|}}, {{|#2:GetValue()|}}.");
+                       }
+                   }
+               }
+
+               """;
+
+        DiagnosticResult[] expected = [
+            VerifyCapturedNamesCS.Diagnostic("ISLE4001").WithLocation(1).WithArguments("Value"),
+            VerifyCapturedNamesCS.Diagnostic("ISLE4001").WithLocation(2).WithArguments("Value")
+        ];
+        await VerifyCapturedNamesCS.VerifyAnalyzerAsync(test, expected);
+    }
+
+    [Test]
+    public async Task LogExceptionEventId_WithMatchingPropertyAndMethod_CapturedNameMustBeUniqueDiagnosticId(
+        [ValueSource(nameof(LogLevels))] LogLevel level)
+    {
+        var test =
+            $$$"""
+               {{{Usings}}}
+
+               namespace Test
+               {
+                   {{{SharedCode}}}
+                   
+                   class TestClass
+                   {
+                       public int Value { get; set; }
+                       
+                       public int GetValue() => 0;
+                   
+                       public void TestLog(ILogger logger, int value, int x, int y, int z, Exception ex)
+                       {
+                           logger.Log{{{level}}}(42, ex,
+                               $"Test {{|#0:value|}}, {{|#1:Value|}}, {{|#2:GetValue()|}}.");
+                       }
+                   }
+               }
+
+               """;
+
+        DiagnosticResult[] expected = [
+            VerifyCapturedNamesCS.Diagnostic("ISLE4001").WithLocation(1).WithArguments("Value"),
+            VerifyCapturedNamesCS.Diagnostic("ISLE4001").WithLocation(2).WithArguments("Value")
+        ];
+        await VerifyCapturedNamesCS.VerifyAnalyzerAsync(test, expected);
+    }
+
+    [Test]
+    public async Task LogLevel_WithMatchingPropertyAndMethod_CapturedNameMustBeUniqueDiagnosticId(
+        [ValueSource(nameof(LogLevels))] LogLevel level)
+    {
+        var test =
+            $$$"""
+               {{{Usings}}}
+
+               namespace Test
+               {
+                   {{{SharedCode}}}
+                   
+                   class TestClass
+                   {
+                       public int Value { get; set; }
+                       
+                       public int GetValue() => 0;
+                   
+                       public void TestLog(ILogger logger, int value, int x, int y, int z)
+                       {
+                           logger.Log(LogLevel.{{{level}}},
+                               $"Test {{|#0:value|}}, {{|#1:Value|}}, {{|#2:GetValue()|}}.");
+                       }
+                   }
+               }
+
+               """;
+
+        DiagnosticResult[] expected = [
+            VerifyCapturedNamesCS.Diagnostic("ISLE4001").WithLocation(1).WithArguments("Value"),
+            VerifyCapturedNamesCS.Diagnostic("ISLE4001").WithLocation(2).WithArguments("Value")
+        ];
+        await VerifyCapturedNamesCS.VerifyAnalyzerAsync(test, expected);
+    }
+
+    [Test]
+    public async Task LogLevelEventId_WithMatchingPropertyAndMethod_CapturedNameMustBeUniqueDiagnosticId(
+        [ValueSource(nameof(LogLevels))] LogLevel level)
+    {
+        var test =
+            $$$"""
+               {{{Usings}}}
+
+               namespace Test
+               {
+                   {{{SharedCode}}}
+                   
+                   class TestClass
+                   {
+                       public int Value { get; set; }
+                       
+                       public int GetValue() => 0;
+                   
+                       public void TestLog(ILogger logger, int value, int x, int y, int z)
+                       {
+                           logger.Log(LogLevel.{{{level}}}, 42,
+                               $"Test {{|#0:value|}}, {{|#1:Value|}}, {{|#2:GetValue()|}}.");
+                       }
+                   }
+               }
+
+               """;
+
+        DiagnosticResult[] expected = [
+            VerifyCapturedNamesCS.Diagnostic("ISLE4001").WithLocation(1).WithArguments("Value"),
+            VerifyCapturedNamesCS.Diagnostic("ISLE4001").WithLocation(2).WithArguments("Value")
+        ];
+        await VerifyCapturedNamesCS.VerifyAnalyzerAsync(test, expected);
+    }
+
+    [Test]
+    public async Task LogLevelException_WithMatchingPropertyAndMethod_CapturedNameMustBeUniqueDiagnosticId(
+        [ValueSource(nameof(LogLevels))] LogLevel level)
+    {
+        var test =
+            $$$"""
+               {{{Usings}}}
+
+               namespace Test
+               {
+                   {{{SharedCode}}}
+                   
+                   class TestClass
+                   {
+                       public int Value { get; set; }
+                       
+                       public int GetValue() => 0;
+                   
+                       public void TestLog(ILogger logger, int value, int x, int y, int z, Exception ex)
+                       {
+                           logger.Log(LogLevel.{{{level}}},ex,
+                               $"Test {{|#0:value|}}, {{|#1:Value|}}, {{|#2:GetValue()|}}.");
+                       }
+                   }
+               }
+
+               """;
+
+        DiagnosticResult[] expected = [
+            VerifyCapturedNamesCS.Diagnostic("ISLE4001").WithLocation(1).WithArguments("Value"),
+            VerifyCapturedNamesCS.Diagnostic("ISLE4001").WithLocation(2).WithArguments("Value")
+        ];
+        await VerifyCapturedNamesCS.VerifyAnalyzerAsync(test, expected);
+    }
+
+    [Test]
+    public async Task LogLevelExceptionEventId_WithMatchingPropertyAndMethod_CapturedNameMustBeUniqueDiagnosticId(
+        [ValueSource(nameof(LogLevels))] LogLevel level)
+    {
+        var test =
+            $$$"""
+               {{{Usings}}}
+
+               namespace Test
+               {
+                   {{{SharedCode}}}
+                   
+                   class TestClass
+                   {
+                       public int Value { get; set; }
+                       
+                       public int GetValue() => 0;
+                   
+                       public void TestLog(ILogger logger, int value, int x, int y, int z, Exception ex)
+                       {
+                           logger.Log(LogLevel.{{{level}}}, 42, ex,
+                               $"Test {{|#0:value|}}, {{|#1:Value|}}, {{|#2:GetValue()|}}.");
+                       }
+                   }
+               }
+
+               """;
+
+        DiagnosticResult[] expected = [
+            VerifyCapturedNamesCS.Diagnostic("ISLE4001").WithLocation(1).WithArguments("Value"),
+            VerifyCapturedNamesCS.Diagnostic("ISLE4001").WithLocation(2).WithArguments("Value")
+        ];
+        await VerifyCapturedNamesCS.VerifyAnalyzerAsync(test, expected);
+    }
+
+    [Test]
+    public async Task BeginScopeInterpolated_WithMatchingPropertyAndMethod_CapturedNameMustBeUniqueDiagnosticId()
+    {
+        var test =
+            $$$"""
+               {{{Usings}}}
+
+               namespace Test
+               {
+                   {{{SharedCode}}}
+                   
+                   class TestClass
+                   {
+                       public int Value { get; set; }
+                       
+                       public int GetValue() => 0;
+                   
+                       public void TestLog(ILogger logger, int value, int x, int y, int z, Exception ex)
+                       {
+                           using (logger.BeginScopeInterpolated(
+                               $"Test {{|#0:value|}}, {{|#1:Value|}}, {{|#2:GetValue()|}}."))
+                           {
+                           }
+                       }
+                   }
+               }
+
+               """;
+
+        DiagnosticResult[] expected = [
+            VerifyCapturedNamesCS.Diagnostic("ISLE4001").WithLocation(1).WithArguments("Value"),
+            VerifyCapturedNamesCS.Diagnostic("ISLE4001").WithLocation(2).WithArguments("Value")
+        ];
+        await VerifyCapturedNamesCS.VerifyAnalyzerAsync(test, expected);
+    }
+
     #endregion
 
     #region ISLE4002: ExplicitNameShouldBeConstantDiagnosticId

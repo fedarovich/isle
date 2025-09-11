@@ -13,6 +13,10 @@ namespace Isle.Converters.Roslyn.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class CapturedNamesAnalyzer : DiagnosticAnalyzer
 {
+    private static readonly string[] RemoveMethodPrefixesSeparators = [";", " "];
+    private const string RemoveMethodPrefixesOptionName = "IsleRoslynNameConverterRemoveMethodPrefixes";
+    private const string RemoveMethodPrefixesStringComparisonOptionName = "IsleRoslynNameConverterRemoveMethodPrefixesStringComparison";
+
     public const string CapturedNameMustBeValidIdentifierDiagnosticId = "ISLE4000";
     private static readonly LocalizableString CapturedNameMustBeValidIdentifierTitle = GetResourceString(nameof(Resources.CapturedNameMustBeValidIdentifierTitle));
     private static readonly LocalizableString CapturedNameMustBeValidIdentifierMessageFormat = GetResourceString(nameof(Resources.CapturedNameMustBeValidIdentifierMessageFormat));
@@ -70,11 +74,7 @@ public class CapturedNamesAnalyzer : DiagnosticAnalyzer
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
         context.EnableConcurrentExecution();
 
-        //context.RegisterOperationAction(AnalyzeMethodCall, OperationKind.Invocation);
-
         context.RegisterCompilationStartAction(OnCompilationStart);
-        // See https://github.com/dotnet/roslyn/blob/main/docs/analyzers/Analyzer%20Actions%20Semantics.md for more information
-        //context.RegisterSymbolAction(AnalyzeSymbol, SymbolKind.NamedType);
     }
 
     private void OnCompilationStart(CompilationStartAnalysisContext compilationContext)
@@ -127,7 +127,7 @@ public class CapturedNamesAnalyzer : DiagnosticAnalyzer
                         .SelectMany(s => s.ChildNodes().OfType<InterpolationSyntax>());
                     foreach (var interpolation in interpolations)
                     {
-                        if (!TryGetName(interpolation.Expression, out var name))
+                        if (!TryGetName(interpolation.Expression, out var name, out var expressionType))
                         {
                             context.ReportDiagnostic(Diagnostic.Create(
                                 CapturedNameMustBeValidIdentifierRule,
@@ -139,6 +139,25 @@ public class CapturedNamesAnalyzer : DiagnosticAnalyzer
                             continue;
 
                         name = name.TrimStart('@', '$');
+
+                        var options = context.Options.AnalyzerConfigOptionsProvider.GetOptions(context.Operation.Syntax.SyntaxTree);
+                        if (expressionType == NameExpressionType.Method &&
+                            options.TryGetValue(RemoveMethodPrefixesOptionName, out var removeMethodPrefixesValue) &&
+                            !string.IsNullOrWhiteSpace(removeMethodPrefixesValue))
+                        {
+                            var prefixes = removeMethodPrefixesValue.Split(RemoveMethodPrefixesSeparators, StringSplitOptions.RemoveEmptyEntries);
+                            if (prefixes.Length > 0)
+                            {
+                                const StringComparison defaultStringComparison = StringComparison.Ordinal;
+                                var stringComparison = options.TryGetValue(RemoveMethodPrefixesStringComparisonOptionName, out var comparisonString)
+                                    ? Enum.TryParse(comparisonString, true, out StringComparison comparison)
+                                        ? comparison
+                                        : defaultStringComparison
+                                    : defaultStringComparison;
+                                name = RemoveMethodPrefixes(name, prefixes, stringComparison);
+                            }
+                        }
+
                         if (!usedNames.Add(name))
                         {
                             context.ReportDiagnostic(Diagnostic.Create(
@@ -148,11 +167,12 @@ public class CapturedNamesAnalyzer : DiagnosticAnalyzer
                         }
                     }
 
-                    bool TryGetName(ExpressionSyntax? syntax, out string? name)
+                    bool TryGetName(ExpressionSyntax? syntax, out string? name, out NameExpressionType expressionType)
                     {
                         var semanticModel = invocation.SemanticModel;
 
                         name = null;
+                        expressionType = NameExpressionType.Identifier;
                         var currentSyntax = syntax;
 
                         while (currentSyntax is not null)
@@ -167,16 +187,21 @@ public class CapturedNamesAnalyzer : DiagnosticAnalyzer
                                     break;
                                 case MemberAccessExpressionSyntax memberAccess:
                                     currentSyntax = memberAccess.Name;
+                                    expressionType = NameExpressionType.Property;
                                     break;
                                 case ConditionalAccessExpressionSyntax { WhenNotNull: var whenNotNull }:
                                     currentSyntax = whenNotNull;
+                                    expressionType = NameExpressionType.Property;
                                     break;
                                 case MemberBindingExpressionSyntax memberBinding:
                                     currentSyntax = memberBinding.Name;
                                     break;
                                 case InvocationExpressionSyntax invocationExpression:
                                     if (invocationExpression.Expression is IdentifierNameSyntax { Identifier.Text: "nameof" })
+                                    {
+                                        expressionType = NameExpressionType.Invalid;
                                         return false;
+                                    }
 
                                     if (invocationExpression.Expression is MemberAccessExpressionSyntax { Name: IdentifierNameSyntax { Identifier.Text: "Named" } })
                                     {
@@ -231,6 +256,7 @@ public class CapturedNamesAnalyzer : DiagnosticAnalyzer
                                                         nameArgumentValue.Syntax.GetLocation()));
                                                 }
 
+                                                expressionType = NameExpressionType.Explicit;
                                                 return true;
                                             }
                                         }
@@ -242,6 +268,7 @@ public class CapturedNamesAnalyzer : DiagnosticAnalyzer
                                         MemberBindingExpressionSyntax invocationMemberBinding => invocationMemberBinding.Name,
                                         _ => invocationExpression.Expression
                                     };
+                                    expressionType = NameExpressionType.Method;
                                     break;
                                 case PrefixUnaryExpressionSyntax
                                 {
@@ -272,11 +299,25 @@ public class CapturedNamesAnalyzer : DiagnosticAnalyzer
                                     var createdTypeInfo = semanticModel.GetTypeInfo(objectCreation);
                                     return SymbolEqualityComparer.Default.Equals(createdTypeInfo.Type, literalValueSymbol);
                                 default:
+                                    expressionType = NameExpressionType.Invalid;
                                     return false;
                             }
                         }
 
                         return false;
+                    }
+
+                    string RemoveMethodPrefixes(string name, string[] prefixes, StringComparison stringComparison)
+                    {
+                        foreach (var prefix in prefixes)
+                        {
+                            if (name.StartsWith(prefix, stringComparison))
+                            {
+                                return name.Substring(prefix.Length);
+                            }
+                        }
+
+                        return name;
                     }
                 },
                 OperationKind.Invocation);
@@ -307,5 +348,14 @@ public class CapturedNamesAnalyzer : DiagnosticAnalyzer
         }
 
         return result;
+    }
+
+    private enum NameExpressionType
+    {
+        Invalid,
+        Identifier,
+        Property,
+        Method,
+        Explicit
     }
 }
