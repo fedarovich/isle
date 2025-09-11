@@ -17,6 +17,10 @@
     <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);AddPackageFiles</TargetsForTfmSpecificContentInPackage>
 	</PropertyGroup>
 
+  <PropertyGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net7.0'))">
+    <IsAotCompatible>True</IsAotCompatible>
+  </PropertyGroup>
+
   <ItemGroup>
     <InternalsVisibleTo Include="$(AssemblyName).Tests" />
     <InternalsVisibleTo Include="$(AssemblyName).Benchmarks" />
