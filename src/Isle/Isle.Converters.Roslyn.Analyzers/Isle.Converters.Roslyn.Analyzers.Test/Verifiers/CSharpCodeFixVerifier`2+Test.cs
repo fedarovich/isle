@@ -26,8 +26,10 @@ namespace Isle.Converters.Roslyn.Analyzers.Test
                             projectId,
                             [
                                 CreateMetadataReference<Microsoft.Extensions.Logging.ILogger>(),
+                                CreateMetadataReference<global::Serilog.ILogger>(),
                                 CreateMetadataReference<Isle.NamedLogValue>(),
-                                CreateMetadataReference<Isle.Extensions.Logging.InformationLogInterpolatedStringHandler>()
+                                CreateMetadataReference<Isle.Extensions.Logging.InformationLogInterpolatedStringHandler>(),
+                                CreateMetadataReference<Isle.Serilog.InformationLogInterpolatedStringHandler>()
                             ]);
 
                     return solution;
