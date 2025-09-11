@@ -26,8 +26,7 @@ public sealed class CapturedNameMustBeValidIdentifierCodeFixProvider : CodeFixPr
         var diagnostic = context.Diagnostics.First();
         var diagnosticSpan = diagnostic.Location.SourceSpan;
 
-        var interpolationExpression = root.FindNode(diagnosticSpan) as ExpressionSyntax;
-        if (interpolationExpression is null)
+        if (root.FindNode(diagnosticSpan) is not ExpressionSyntax interpolationExpression)
             return;
 
         context.RegisterCodeFix(

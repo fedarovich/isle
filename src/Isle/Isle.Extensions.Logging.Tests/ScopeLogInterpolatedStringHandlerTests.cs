@@ -9,12 +9,9 @@ using NUnit.Framework;
 namespace Isle.Extensions.Logging.Tests;
 
 [TestFixtureSource(nameof(FixtureArgs))]
-public class ScopeLogInterpolatedStringHandlerTests : BaseFixture
+public class ScopeLogInterpolatedStringHandlerTests(LogLevel minLogLevel, bool enableCaching)
+    : BaseFixture(minLogLevel, enableCaching)
 {
-    public ScopeLogInterpolatedStringHandlerTests(LogLevel minLogLevel, bool enableCaching) : base(minLogLevel, enableCaching)
-    {
-    }
-
     [Test]
     public void CreateHandler()
     {

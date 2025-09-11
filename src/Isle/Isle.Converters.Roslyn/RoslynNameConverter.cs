@@ -82,7 +82,7 @@ public class RoslynNameConverter
         }
     }
 
-    private (SimpleNameSyntax? syntax, NameExpressionType type) Unwrap(ExpressionSyntax? syntax)
+    private static (SimpleNameSyntax? syntax, NameExpressionType type) Unwrap(ExpressionSyntax? syntax)
     {
         var currentSyntax = syntax;
         var type = NameExpressionType.Identifier;
@@ -152,7 +152,7 @@ public class RoslynNameConverter
     /// <summary>Throws an <see cref="ArgumentNullException"/> if <paramref name="argument"/> is null.</summary>
     /// <param name="argument">The reference type argument to validate as non-null.</param>
     /// <param name="paramName">The name of the parameter with which <paramref name="argument"/> corresponds.</param>
-    private static void ThrowIfNull([NotNull] object? argument, [CallerArgumentExpression("argument")] string? paramName = null)
+    private static void ThrowIfNull([NotNull] object? argument, [CallerArgumentExpression(nameof(argument))] string? paramName = null)
     {
         if (argument is null)
         {

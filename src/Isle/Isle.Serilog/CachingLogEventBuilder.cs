@@ -40,7 +40,7 @@ internal sealed class CachingLogEventBuilder : LogEventBuilder
         _lastNode = NodeCache.Instance;
         _propertyValues = formattedCount > 0 
             ? ArrayPool<object?>.Shared.Rent(formattedCount)
-            : Array.Empty<object?>();
+            : [];
         _propertyIndex = 0;
     }
 
