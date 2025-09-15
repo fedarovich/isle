@@ -34,7 +34,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="buildTransitive\Isle.Converters.Roslyn.Analyzers.targets">
+    <None Update="buildTransitive\*">
       <PackagePath>/</PackagePath>
       <Pack>True</Pack>
     </None>
@@ -44,7 +44,6 @@
     <ItemGroup>
       <TfmSpecificPackageFile Include="$(OutputPath)\Isle.Converters.Roslyn.Analyzers.dll" PackagePath="analyzers/dotnet/cs" />
       <TfmSpecificPackageFile Include="$(OutputPath)\Isle.Converters.Roslyn.Analyzers.CodeFixes.dll" PackagePath="analyzers/dotnet/cs" />
-      <TfmSpecificPackageFile Include="buildTransitive/**" PackagePath="buildTransitive" />
     </ItemGroup>
   </Target>
 
