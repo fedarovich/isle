@@ -17,6 +17,8 @@ public sealed class CapturedNameMustBeValidIdentifierCodeFixProvider : CodeFixPr
     public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
         CapturedNamesAnalyzer.CapturedNameMustBeValidIdentifierDiagnosticId);
 
+    public override FixAllProvider? GetFixAllProvider() => null; // Fix all is not supported
+
     public override async Task RegisterCodeFixesAsync(CodeFixContext context)
     {
         var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
