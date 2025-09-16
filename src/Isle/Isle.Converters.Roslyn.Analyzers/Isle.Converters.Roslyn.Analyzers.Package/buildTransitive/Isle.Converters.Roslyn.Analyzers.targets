@@ -4,4 +4,22 @@
     <CompilerVisibleProperty Include="IsleRoslynNameConverterRemoveMethodPrefixes" />
     <CompilerVisibleProperty Include="IsleRoslynNameConverterRemoveMethodPrefixesStringComparison" />
   </ItemGroup>
+  <UsingTask TaskName="IsleReplaceSeparators"
+             TaskFactory="RoslynCodeTaskFactory"
+             AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <In ParameterType="System.String" Required="true" />
+      <Out ParameterType="System.String" Output="true" />
+    </ParameterGroup>
+    <Task>
+      <CodeFactory Type="Fragment" Language="C#">Out = In.Replace(';', ' ').Replace('\r', ' ').Replace('\n', ' ');</CodeFactory>
+    </Task>
+  </UsingTask>
+  <Target Name="ReplaceSeparatorsInIsleRoslynNameConverterRemoveMethodPrefixes"
+          BeforeTargets="BeforeCompile"
+          Condition=" '$(IsleRoslynNameConverterRemoveMethodPrefixes)' != '' ">
+    <IsleReplaceSeparators In="$(IsleRoslynNameConverterRemoveMethodPrefixes)">
+      <Output TaskParameter="Out" PropertyName="IsleRoslynNameConverterRemoveMethodPrefixes" />
+    </IsleReplaceSeparators>
+  </Target>
 </Project>

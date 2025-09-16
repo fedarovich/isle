@@ -12,10 +12,11 @@ namespace Isle.Converters.Roslyn.Analyzers.Test
         where TAnalyzer : DiagnosticAnalyzer, new()
         where TCodeFix : CodeFixProvider, new()
     {
-        private static string CapturedNamesAnalyzerEditorConfig =
+        private const string CapturedNamesAnalyzerEditorConfig =
             """
-            [*.cs]
-            IsleRoslynNameConverterRemoveMethodPrefixes = Get
+            is_global = true
+            
+            build_property.IsleRoslynNameConverterRemoveMethodPrefixes = Is Get
             """;
 
         /// <inheritdoc cref="CodeFixVerifier{TAnalyzer, TCodeFix, TTest, TVerifier}.Diagnostic()"/>

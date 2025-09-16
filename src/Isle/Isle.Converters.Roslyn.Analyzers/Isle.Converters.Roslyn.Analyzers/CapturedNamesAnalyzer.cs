@@ -14,8 +14,8 @@ namespace Isle.Converters.Roslyn.Analyzers;
 public class CapturedNamesAnalyzer : DiagnosticAnalyzer
 {
     private static readonly string[] RemoveMethodPrefixesSeparators = [";", " "];
-    private const string RemoveMethodPrefixesOptionName = "IsleRoslynNameConverterRemoveMethodPrefixes";
-    private const string RemoveMethodPrefixesStringComparisonOptionName = "IsleRoslynNameConverterRemoveMethodPrefixesStringComparison";
+    private const string RemoveMethodPrefixesOptionName = "build_property.IsleRoslynNameConverterRemoveMethodPrefixes";
+    private const string RemoveMethodPrefixesStringComparisonOptionName = "build_property.IsleRoslynNameConverterRemoveMethodPrefixesStringComparison";
 
     public const string CapturedNameMustBeValidIdentifierDiagnosticId = "ISLE4000";
     private static readonly LocalizableString CapturedNameMustBeValidIdentifierTitle = GetResourceString(nameof(Resources.CapturedNameMustBeValidIdentifierTitle));
