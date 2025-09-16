@@ -16,7 +16,7 @@
     </Task>
   </UsingTask>
   <Target Name="ReplaceSeparatorsInIsleRoslynNameConverterRemoveMethodPrefixes"
-          BeforeTargets="BeforeCompile"
+          BeforeTargets="GenerateMSBuildEditorConfigFileCore;BeforeCompile"
           Condition=" '$(IsleRoslynNameConverterRemoveMethodPrefixes)' != '' ">
     <IsleReplaceSeparators In="$(IsleRoslynNameConverterRemoveMethodPrefixes)">
       <Output TaskParameter="Out" PropertyName="IsleRoslynNameConverterRemoveMethodPrefixes" />
