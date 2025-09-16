@@ -12,7 +12,7 @@
       <Out ParameterType="System.String" Output="true" />
     </ParameterGroup>
     <Task>
-      <CodeFactory Type="Fragment" Language="C#">Out = In.Replace(';', ' ').Replace('\r', ' ').Replace('\n', ' ');</CodeFactory>
+      <Code Type="Fragment" Language="C#">Out = In.Replace(';', ' ').Replace('\r', ' ').Replace('\n', ' ');</Code>
     </Task>
   </UsingTask>
   <Target Name="ReplaceSeparatorsInIsleRoslynNameConverterRemoveMethodPrefixes"
