@@ -1,35 +1,51 @@
 # ISLE
 
+![Isle logo](/IsleLogo.png)
+
 ISLE (Interpolated String Logging Extensions) is a library that allows developers to perform structured logging using interpolated strings in C# 10 or later.
 
-| Package | Release | Prerelease |
-| ------- | ---------- | ------- |
-| Isle.Core | [![nuget](https://img.shields.io/nuget/v/Isle.Core.svg?label=nuget)](https://www.nuget.org/packages/Isle.Core) | [![myget](https://img.shields.io/myget/fedarovich/vpre/Isle.Core.svg?label=myget)](https://www.myget.org/feed/fedarovich/package/nuget/Isle.Core) |
-| Isle.Extensions.Logging | [![nuget](https://img.shields.io/nuget/v/Isle.Extensions.Logging.svg?label=nuget)](https://www.nuget.org/packages/Isle.Extensions.Logging) | [![myget](https://img.shields.io/myget/fedarovich/vpre/Isle.Extensions.Logging.svg?label=myget)](https://www.myget.org/feed/fedarovich/package/nuget/Isle.Extensions.Logging) |
-| Isle.Serilog | [![nuget](https://img.shields.io/nuget/v/Isle.Serilog.svg?label=nuget)](https://www.nuget.org/packages/Isle.Serilog) | [![myget](https://img.shields.io/myget/fedarovich/vpre/Isle.Serilog.svg?label=myget)](https://www.myget.org/feed/fedarovich/package/nuget/Isle.Serilog) |
+| Package | Release | Prerelease | Dev Build |
+| ------- | ---------- | ------- | --------- |
+| Isle.Core | [![nuget](https://img.shields.io/nuget/v/Isle.Core.svg?label=nuget)](https://www.nuget.org/packages/Isle.Core) | [![nuget](https://img.shields.io/nuget/vpre/Isle.Core.svg?label=nuget)](https://www.nuget.org/packages/Isle.Core) | [![myget](https://img.shields.io/myget/fedarovich/vpre/Isle.Core.svg?label=myget)](https://www.myget.org/feed/fedarovich/package/nuget/Isle.Core) |
+| Isle.Extensions.Logging | [![nuget](https://img.shields.io/nuget/v/Isle.Extensions.Logging.svg?label=nuget)](https://www.nuget.org/packages/Isle.Extensions.Logging) | [![nuget](https://img.shields.io/nuget/vpre/Isle.Extensions.Logging.svg?label=nuget)](https://www.nuget.org/packages/Isle.Extensions.Logging) | [![myget](https://img.shields.io/myget/fedarovich/vpre/Isle.Extensions.Logging.svg?label=myget)](https://www.myget.org/feed/fedarovich/package/nuget/Isle.Extensions.Logging) |
+| Isle.Serilog | [![nuget](https://img.shields.io/nuget/v/Isle.Serilog.svg?label=nuget)](https://www.nuget.org/packages/Isle.Serilog) | [![nuget](https://img.shields.io/nuget/vpre/Isle.Serilog.svg?label=nuget)](https://www.nuget.org/packages/Isle.Serilog) | [![myget](https://img.shields.io/myget/fedarovich/vpre/Isle.Serilog.svg?label=myget)](https://www.myget.org/feed/fedarovich/package/nuget/Isle.Serilog) |
+| Isle.Converters.Roslyn | [![nuget](https://img.shields.io/nuget/v/Isle.Converters.Roslyn.svg?label=nuget)](https://www.nuget.org/packages/Isle.Converters.Roslyn) | [![nuget](https://img.shields.io/nuget/vpre/Isle.Converters.Roslyn.svg?label=nuget)](https://www.nuget.org/packages/Isle.Converters.Roslyn) | [![myget](https://img.shields.io/myget/fedarovich/vpre/Isle.Converters.Roslyn.svg?label=myget)](https://www.myget.org/feed/fedarovich/package/nuget/Isle.Converters.Roslyn) |
+| Isle.Converters.Roslyn.Analyzers | [![nuget](https://img.shields.io/nuget/v/Isle.Converters.Roslyn.Analyzers.svg?label=nuget)](https://www.nuget.org/packages/Isle.Converters.Roslyn.Analyzers) | [![nuget](https://img.shields.io/nuget/vpre/Isle.Converters.Roslyn.Analyzers.svg?label=nuget)](https://www.nuget.org/packages/Isle.Converters.Roslyn.Analyzers) | [![myget](https://img.shields.io/myget/fedarovich/vpre/Isle.Converters.Roslyn.Analyzers.svg?label=myget)](https://www.myget.org/feed/fedarovich/package/nuget/Isle.Converters.Roslyn.Analyzers) |
 
 [![Build Status](https://dev.azure.com/pavelfedarovich/ISLE/_apis/build/status/fedarovich.isle?branchName=main)](https://dev.azure.com/pavelfedarovich/ISLE/_build/latest?definitionId=12&branchName=main)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/fedarovich/isle/blob/master/LICENSE)
 
-While originally supported on .Net 6 or later, starting from version 1.5 ISLE has been backported to .Net Standard 2.0 and thus can also be used with .Net Framework 4.6.1 or later, .Net Core 2.0 or later, and .Net 5.
+ISLE works on any modern .Net version and also supports .Net Standard 2.0, thus can be used with .Net Framework 4.6.2 or later.
+
+## Table of Contents
+
++ [Getting Started](#getting-started)
 
 ## Getting Started
 
-The current version of ISLE provides a set of extensions methods for:
-+ [`Microsoft.Extensions.Logging.ILogger`](https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.logging.ilogger?view=dotnet-plat-ext-6.0) interface by [Isle.Extensions.Logging](https://www.nuget.org/packages/Isle.Extensions.Logging) package
-+ `Serilog.ILogger` interface by [Isle.Serilog](https://www.nuget.org/packages/Isle.Serilog) package. 
+ISLE provides a set of extension methods to be used in combination with well-known logging libraries. The following extensions are supported at the moment:
+
+| Logging Library | Target Interface | Package | Extension Methods |
+| --------------- | ---------------- | ------- | ----------------- |
+| Microsoft.Extensions.Logging | [`Microsoft.Extensions.Logging.ILogger`](https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.logging.ilogger) | [![nuget](https://img.shields.io/nuget/v/Isle.Extensions.Logging.svg?label=Isle.Extensions.Logging)](https://www.nuget.org/packages/Isle.Extensions.Logging) | `Log` <br/> `LogTrace` <br/> `LogDebug` <br/> `LogInformation` <br/> `LogWarning` <br/> `LogError` <br/> `LogCritical` <br/> `BeginScopeInterpolated` |
+| Serilog | `Serilog.ILogger` | [![nuget](https://img.shields.io/nuget/v/Isle.Serilog.svg?label=Isle.Serilog)](https://www.nuget.org/packages/Isle.Serilog) | `WriteInterpolated` <br/> `VerboseInterpolated` <br/> `DebugInterpolated` <br/> `InformationInterpolated` <br/> `WarningInterpolated` <br/> `ErrorInterpolated` <br/> `FatalInterpolated` |
 
 In order to perform structured logging you must also add and configure the underlying logging provider (e.g. [Serilog](https://serilog.net)).
 
 To begin using ISLE you must install the corresponding package from NuGet.
 
-> If you are using Serilog only indirectly via `Microsoft.Extensions.Logging.ILogger`, there is no need to install Isle.Serilog. Install just Isle.Extensions.Logging instead.
+> [!TIP]
+> If you are using Serilog only indirectly via `Microsoft.Extensions.Logging.ILogger`, there is no need to install `Isle.Serilog`. Install just `Isle.Extensions.Logging` package instead.
 
 Next, at the beginning of your program you must configure ISLE. The simplest configuration looks like this:
+```cs
+// For use with Microsoft.Extensions.Logging
+IsleConfiguration.Configure(builder => builder.AddExtensionsLogging());
+// or for use with Serilog
+IsleConfiguration.Configure(builder => builder.AddSerilog());
 ```
-IsleConfiguration.Configure(builder => {});
-```
-> Configure method must be called before calling any of the ISLE extension methods for the first time.
+> [!IMPORTANT]
+> The `Configure` method must be called before calling any of the ISLE extension methods for the first time, thus you should place it either at the beginning of your program, or to the module initializer of your executable assembly. Note that it is allowed to call configure **only once** unless resettable configuration is being used, so the subsequent calls with throw an exception. See the [Advanced Configuration](#advanced-configuration) section below for more details.
 
 Now you can simply pass interpolated strings to the ILogger's methods and ISLE will capture the variables names and make the correct template string for the structured logging.
 
