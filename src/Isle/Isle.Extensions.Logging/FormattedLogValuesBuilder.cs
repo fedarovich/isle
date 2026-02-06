@@ -3,30 +3,19 @@ using Isle.Extensions.Logging.Configuration;
 
 namespace Isle.Extensions.Logging;
 
-internal abstract class FormattedLogValuesBuilder
+internal static class FormattedLogValuesBuilder
 {
-    protected internal const string OriginalFormatName = "{OriginalFormat}";
+    internal const string OriginalFormatName = "{OriginalFormat}";
 
-    // We do not want to inline this method as it will add about additional 80 bytes of code each time we use logging.
-    [MethodImpl(MethodImplOptions.NoInlining)]
-    public static FormattedLogValuesBuilder Acquire(int literalLength, int formattedCount)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static IFormattedLogValuesBuilder Acquire(int literalLength, int formattedCount)
     {
-        bool enableCaching = ExtensionsLoggingConfiguration.Current.EnableMessageTemplateCaching;
+        var formattedLogValues = FormattedLogValuesBase.Create(formattedCount);
         
-        FormattedLogValuesBuilder builder = enableCaching
-            ? CachingFormattedLogValuesBuilder.AcquireAndInitialize(formattedCount)
-            : SimpleFormattedLogValuesBuilder.AcquireAndInitialize(literalLength, formattedCount);
+        IFormattedLogValuesBuilder builder = ExtensionsLoggingConfiguration.EnableMessageTemplateCaching
+            ? CachingFormattedLogValuesBuilder.AcquireAndInitialize(formattedLogValues)
+            : SimpleFormattedLogValuesBuilder.AcquireAndInitialize(literalLength, formattedCount, formattedLogValues);
         
         return builder;
     }
-
-    public abstract FormattedLogValuesBase BuildAndReset();
-
-    public abstract void AppendLiteral(string str);
-
-    public abstract void AppendLiteralValue(in LiteralValue literalValue);
-
-    public abstract void AppendFormatted(string name, object? value);
-
-    public abstract void AppendFormatted(string name, object? value, int alignment, string? format);
 }

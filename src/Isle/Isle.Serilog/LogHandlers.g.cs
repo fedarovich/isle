@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.Runtime.CompilerServices;
+using Isle.Serilog.Configuration;
 using Serilog;
 using Serilog.Events;
 
@@ -48,7 +49,18 @@ public ref partial struct VerboseLogInterpolatedStringHandler
     {
         if (!string.IsNullOrEmpty(str))
         {
-            _builder.AppendLiteral(str!);
+            if (SerilogConfiguration.IsResettable)
+            {
+                _builder.AppendLiteral(str!);
+            }
+            else if (SerilogConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingLogEventBuilder>(_builder).AppendLiteral(str!); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleLogEventBuilder>(_builder).AppendLiteral(str!); // Devirtualize the call
+            }
         }
     }
 
@@ -60,7 +72,18 @@ public ref partial struct VerboseLogInterpolatedStringHandler
     {
         if (!string.IsNullOrEmpty(literal.Value))
         {
-            _builder.AppendLiteralValue(literal);
+            if (SerilogConfiguration.IsResettable)
+            {
+                _builder.AppendLiteralValue(literal);
+            }
+            else if (SerilogConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingLogEventBuilder>(_builder).AppendLiteralValue(literal); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleLogEventBuilder>(_builder).AppendLiteralValue(literal); // Devirtualize the call
+            }
         }
     }
 
@@ -72,11 +95,33 @@ public ref partial struct VerboseLogInterpolatedStringHandler
     {
         if (alignment == 0 && string.IsNullOrEmpty(format))
         {
-            _builder.AppendFormatted(name, value);
+            if (SerilogConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(name, value);
+            }
+            else if (SerilogConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingLogEventBuilder>(_builder).AppendFormatted(name, value); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleLogEventBuilder>(_builder).AppendFormatted(name, value); // Devirtualize the call
+            }
         }
         else
         {
-            _builder.AppendFormatted(name, value, alignment, format);
+            if (SerilogConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(name, value, alignment, format);
+            }
+            else if (SerilogConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingLogEventBuilder>(_builder).AppendFormatted(name, value, alignment, format); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleLogEventBuilder>(_builder).AppendFormatted(name, value, alignment, format); // Devirtualize the call
+            }
         }
     }
 
@@ -88,18 +133,52 @@ public ref partial struct VerboseLogInterpolatedStringHandler
     {
         if (alignment == 0 && string.IsNullOrEmpty(format))
         {
-            _builder.AppendFormatted(namedLogValue);
+            if (SerilogConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(namedLogValue);
+            }
+            else if (SerilogConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingLogEventBuilder>(_builder).AppendFormatted(namedLogValue); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleLogEventBuilder>(_builder).AppendFormatted(namedLogValue); // Devirtualize the call
+            }
         }
         else
         {
-            _builder.AppendFormatted(namedLogValue, alignment, format);
+            if (SerilogConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(namedLogValue, alignment, format);
+            }
+            else if (SerilogConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingLogEventBuilder>(_builder).AppendFormatted(namedLogValue, alignment, format); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleLogEventBuilder>(_builder).AppendFormatted(namedLogValue, alignment, format); // Devirtualize the call
+            }
         }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal LogEvent GetLogEventAndReset(Exception? exception = null)
     {
-        var result = _builder.BuildAndReset(LogEventLevel.Verbose, exception);
+        LogEvent result;
+        if (SerilogConfiguration.IsResettable)
+        {
+            result = _builder.BuildAndReset(LogEventLevel.Verbose, exception);
+        }
+        else if (SerilogConfiguration.EnableMessageTemplateCaching)
+        {
+            result = Unsafe.As<CachingLogEventBuilder>(_builder).BuildAndReset(LogEventLevel.Verbose, exception); // Devirtualize the call
+        }
+        else
+        {
+            result = Unsafe.As<SimpleLogEventBuilder>(_builder).BuildAndReset(LogEventLevel.Verbose, exception); // Devirtualize the call
+        }
         _builder = null!;
         return result;
     }
@@ -148,7 +227,18 @@ public ref partial struct DebugLogInterpolatedStringHandler
     {
         if (!string.IsNullOrEmpty(str))
         {
-            _builder.AppendLiteral(str!);
+            if (SerilogConfiguration.IsResettable)
+            {
+                _builder.AppendLiteral(str!);
+            }
+            else if (SerilogConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingLogEventBuilder>(_builder).AppendLiteral(str!); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleLogEventBuilder>(_builder).AppendLiteral(str!); // Devirtualize the call
+            }
         }
     }
 
@@ -160,7 +250,18 @@ public ref partial struct DebugLogInterpolatedStringHandler
     {
         if (!string.IsNullOrEmpty(literal.Value))
         {
-            _builder.AppendLiteralValue(literal);
+            if (SerilogConfiguration.IsResettable)
+            {
+                _builder.AppendLiteralValue(literal);
+            }
+            else if (SerilogConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingLogEventBuilder>(_builder).AppendLiteralValue(literal); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleLogEventBuilder>(_builder).AppendLiteralValue(literal); // Devirtualize the call
+            }
         }
     }
 
@@ -172,11 +273,33 @@ public ref partial struct DebugLogInterpolatedStringHandler
     {
         if (alignment == 0 && string.IsNullOrEmpty(format))
         {
-            _builder.AppendFormatted(name, value);
+            if (SerilogConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(name, value);
+            }
+            else if (SerilogConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingLogEventBuilder>(_builder).AppendFormatted(name, value); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleLogEventBuilder>(_builder).AppendFormatted(name, value); // Devirtualize the call
+            }
         }
         else
         {
-            _builder.AppendFormatted(name, value, alignment, format);
+            if (SerilogConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(name, value, alignment, format);
+            }
+            else if (SerilogConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingLogEventBuilder>(_builder).AppendFormatted(name, value, alignment, format); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleLogEventBuilder>(_builder).AppendFormatted(name, value, alignment, format); // Devirtualize the call
+            }
         }
     }
 
@@ -188,18 +311,52 @@ public ref partial struct DebugLogInterpolatedStringHandler
     {
         if (alignment == 0 && string.IsNullOrEmpty(format))
         {
-            _builder.AppendFormatted(namedLogValue);
+            if (SerilogConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(namedLogValue);
+            }
+            else if (SerilogConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingLogEventBuilder>(_builder).AppendFormatted(namedLogValue); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleLogEventBuilder>(_builder).AppendFormatted(namedLogValue); // Devirtualize the call
+            }
         }
         else
         {
-            _builder.AppendFormatted(namedLogValue, alignment, format);
+            if (SerilogConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(namedLogValue, alignment, format);
+            }
+            else if (SerilogConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingLogEventBuilder>(_builder).AppendFormatted(namedLogValue, alignment, format); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleLogEventBuilder>(_builder).AppendFormatted(namedLogValue, alignment, format); // Devirtualize the call
+            }
         }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal LogEvent GetLogEventAndReset(Exception? exception = null)
     {
-        var result = _builder.BuildAndReset(LogEventLevel.Debug, exception);
+        LogEvent result;
+        if (SerilogConfiguration.IsResettable)
+        {
+            result = _builder.BuildAndReset(LogEventLevel.Debug, exception);
+        }
+        else if (SerilogConfiguration.EnableMessageTemplateCaching)
+        {
+            result = Unsafe.As<CachingLogEventBuilder>(_builder).BuildAndReset(LogEventLevel.Debug, exception); // Devirtualize the call
+        }
+        else
+        {
+            result = Unsafe.As<SimpleLogEventBuilder>(_builder).BuildAndReset(LogEventLevel.Debug, exception); // Devirtualize the call
+        }
         _builder = null!;
         return result;
     }
@@ -248,7 +405,18 @@ public ref partial struct InformationLogInterpolatedStringHandler
     {
         if (!string.IsNullOrEmpty(str))
         {
-            _builder.AppendLiteral(str!);
+            if (SerilogConfiguration.IsResettable)
+            {
+                _builder.AppendLiteral(str!);
+            }
+            else if (SerilogConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingLogEventBuilder>(_builder).AppendLiteral(str!); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleLogEventBuilder>(_builder).AppendLiteral(str!); // Devirtualize the call
+            }
         }
     }
 
@@ -260,7 +428,18 @@ public ref partial struct InformationLogInterpolatedStringHandler
     {
         if (!string.IsNullOrEmpty(literal.Value))
         {
-            _builder.AppendLiteralValue(literal);
+            if (SerilogConfiguration.IsResettable)
+            {
+                _builder.AppendLiteralValue(literal);
+            }
+            else if (SerilogConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingLogEventBuilder>(_builder).AppendLiteralValue(literal); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleLogEventBuilder>(_builder).AppendLiteralValue(literal); // Devirtualize the call
+            }
         }
     }
 
@@ -272,11 +451,33 @@ public ref partial struct InformationLogInterpolatedStringHandler
     {
         if (alignment == 0 && string.IsNullOrEmpty(format))
         {
-            _builder.AppendFormatted(name, value);
+            if (SerilogConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(name, value);
+            }
+            else if (SerilogConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingLogEventBuilder>(_builder).AppendFormatted(name, value); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleLogEventBuilder>(_builder).AppendFormatted(name, value); // Devirtualize the call
+            }
         }
         else
         {
-            _builder.AppendFormatted(name, value, alignment, format);
+            if (SerilogConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(name, value, alignment, format);
+            }
+            else if (SerilogConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingLogEventBuilder>(_builder).AppendFormatted(name, value, alignment, format); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleLogEventBuilder>(_builder).AppendFormatted(name, value, alignment, format); // Devirtualize the call
+            }
         }
     }
 
@@ -288,18 +489,52 @@ public ref partial struct InformationLogInterpolatedStringHandler
     {
         if (alignment == 0 && string.IsNullOrEmpty(format))
         {
-            _builder.AppendFormatted(namedLogValue);
+            if (SerilogConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(namedLogValue);
+            }
+            else if (SerilogConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingLogEventBuilder>(_builder).AppendFormatted(namedLogValue); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleLogEventBuilder>(_builder).AppendFormatted(namedLogValue); // Devirtualize the call
+            }
         }
         else
         {
-            _builder.AppendFormatted(namedLogValue, alignment, format);
+            if (SerilogConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(namedLogValue, alignment, format);
+            }
+            else if (SerilogConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingLogEventBuilder>(_builder).AppendFormatted(namedLogValue, alignment, format); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleLogEventBuilder>(_builder).AppendFormatted(namedLogValue, alignment, format); // Devirtualize the call
+            }
         }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal LogEvent GetLogEventAndReset(Exception? exception = null)
     {
-        var result = _builder.BuildAndReset(LogEventLevel.Information, exception);
+        LogEvent result;
+        if (SerilogConfiguration.IsResettable)
+        {
+            result = _builder.BuildAndReset(LogEventLevel.Information, exception);
+        }
+        else if (SerilogConfiguration.EnableMessageTemplateCaching)
+        {
+            result = Unsafe.As<CachingLogEventBuilder>(_builder).BuildAndReset(LogEventLevel.Information, exception); // Devirtualize the call
+        }
+        else
+        {
+            result = Unsafe.As<SimpleLogEventBuilder>(_builder).BuildAndReset(LogEventLevel.Information, exception); // Devirtualize the call
+        }
         _builder = null!;
         return result;
     }
@@ -348,7 +583,18 @@ public ref partial struct WarningLogInterpolatedStringHandler
     {
         if (!string.IsNullOrEmpty(str))
         {
-            _builder.AppendLiteral(str!);
+            if (SerilogConfiguration.IsResettable)
+            {
+                _builder.AppendLiteral(str!);
+            }
+            else if (SerilogConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingLogEventBuilder>(_builder).AppendLiteral(str!); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleLogEventBuilder>(_builder).AppendLiteral(str!); // Devirtualize the call
+            }
         }
     }
 
@@ -360,7 +606,18 @@ public ref partial struct WarningLogInterpolatedStringHandler
     {
         if (!string.IsNullOrEmpty(literal.Value))
         {
-            _builder.AppendLiteralValue(literal);
+            if (SerilogConfiguration.IsResettable)
+            {
+                _builder.AppendLiteralValue(literal);
+            }
+            else if (SerilogConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingLogEventBuilder>(_builder).AppendLiteralValue(literal); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleLogEventBuilder>(_builder).AppendLiteralValue(literal); // Devirtualize the call
+            }
         }
     }
 
@@ -372,11 +629,33 @@ public ref partial struct WarningLogInterpolatedStringHandler
     {
         if (alignment == 0 && string.IsNullOrEmpty(format))
         {
-            _builder.AppendFormatted(name, value);
+            if (SerilogConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(name, value);
+            }
+            else if (SerilogConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingLogEventBuilder>(_builder).AppendFormatted(name, value); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleLogEventBuilder>(_builder).AppendFormatted(name, value); // Devirtualize the call
+            }
         }
         else
         {
-            _builder.AppendFormatted(name, value, alignment, format);
+            if (SerilogConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(name, value, alignment, format);
+            }
+            else if (SerilogConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingLogEventBuilder>(_builder).AppendFormatted(name, value, alignment, format); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleLogEventBuilder>(_builder).AppendFormatted(name, value, alignment, format); // Devirtualize the call
+            }
         }
     }
 
@@ -388,18 +667,52 @@ public ref partial struct WarningLogInterpolatedStringHandler
     {
         if (alignment == 0 && string.IsNullOrEmpty(format))
         {
-            _builder.AppendFormatted(namedLogValue);
+            if (SerilogConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(namedLogValue);
+            }
+            else if (SerilogConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingLogEventBuilder>(_builder).AppendFormatted(namedLogValue); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleLogEventBuilder>(_builder).AppendFormatted(namedLogValue); // Devirtualize the call
+            }
         }
         else
         {
-            _builder.AppendFormatted(namedLogValue, alignment, format);
+            if (SerilogConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(namedLogValue, alignment, format);
+            }
+            else if (SerilogConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingLogEventBuilder>(_builder).AppendFormatted(namedLogValue, alignment, format); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleLogEventBuilder>(_builder).AppendFormatted(namedLogValue, alignment, format); // Devirtualize the call
+            }
         }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal LogEvent GetLogEventAndReset(Exception? exception = null)
     {
-        var result = _builder.BuildAndReset(LogEventLevel.Warning, exception);
+        LogEvent result;
+        if (SerilogConfiguration.IsResettable)
+        {
+            result = _builder.BuildAndReset(LogEventLevel.Warning, exception);
+        }
+        else if (SerilogConfiguration.EnableMessageTemplateCaching)
+        {
+            result = Unsafe.As<CachingLogEventBuilder>(_builder).BuildAndReset(LogEventLevel.Warning, exception); // Devirtualize the call
+        }
+        else
+        {
+            result = Unsafe.As<SimpleLogEventBuilder>(_builder).BuildAndReset(LogEventLevel.Warning, exception); // Devirtualize the call
+        }
         _builder = null!;
         return result;
     }
@@ -448,7 +761,18 @@ public ref partial struct ErrorLogInterpolatedStringHandler
     {
         if (!string.IsNullOrEmpty(str))
         {
-            _builder.AppendLiteral(str!);
+            if (SerilogConfiguration.IsResettable)
+            {
+                _builder.AppendLiteral(str!);
+            }
+            else if (SerilogConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingLogEventBuilder>(_builder).AppendLiteral(str!); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleLogEventBuilder>(_builder).AppendLiteral(str!); // Devirtualize the call
+            }
         }
     }
 
@@ -460,7 +784,18 @@ public ref partial struct ErrorLogInterpolatedStringHandler
     {
         if (!string.IsNullOrEmpty(literal.Value))
         {
-            _builder.AppendLiteralValue(literal);
+            if (SerilogConfiguration.IsResettable)
+            {
+                _builder.AppendLiteralValue(literal);
+            }
+            else if (SerilogConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingLogEventBuilder>(_builder).AppendLiteralValue(literal); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleLogEventBuilder>(_builder).AppendLiteralValue(literal); // Devirtualize the call
+            }
         }
     }
 
@@ -472,11 +807,33 @@ public ref partial struct ErrorLogInterpolatedStringHandler
     {
         if (alignment == 0 && string.IsNullOrEmpty(format))
         {
-            _builder.AppendFormatted(name, value);
+            if (SerilogConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(name, value);
+            }
+            else if (SerilogConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingLogEventBuilder>(_builder).AppendFormatted(name, value); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleLogEventBuilder>(_builder).AppendFormatted(name, value); // Devirtualize the call
+            }
         }
         else
         {
-            _builder.AppendFormatted(name, value, alignment, format);
+            if (SerilogConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(name, value, alignment, format);
+            }
+            else if (SerilogConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingLogEventBuilder>(_builder).AppendFormatted(name, value, alignment, format); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleLogEventBuilder>(_builder).AppendFormatted(name, value, alignment, format); // Devirtualize the call
+            }
         }
     }
 
@@ -488,18 +845,52 @@ public ref partial struct ErrorLogInterpolatedStringHandler
     {
         if (alignment == 0 && string.IsNullOrEmpty(format))
         {
-            _builder.AppendFormatted(namedLogValue);
+            if (SerilogConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(namedLogValue);
+            }
+            else if (SerilogConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingLogEventBuilder>(_builder).AppendFormatted(namedLogValue); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleLogEventBuilder>(_builder).AppendFormatted(namedLogValue); // Devirtualize the call
+            }
         }
         else
         {
-            _builder.AppendFormatted(namedLogValue, alignment, format);
+            if (SerilogConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(namedLogValue, alignment, format);
+            }
+            else if (SerilogConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingLogEventBuilder>(_builder).AppendFormatted(namedLogValue, alignment, format); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleLogEventBuilder>(_builder).AppendFormatted(namedLogValue, alignment, format); // Devirtualize the call
+            }
         }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal LogEvent GetLogEventAndReset(Exception? exception = null)
     {
-        var result = _builder.BuildAndReset(LogEventLevel.Error, exception);
+        LogEvent result;
+        if (SerilogConfiguration.IsResettable)
+        {
+            result = _builder.BuildAndReset(LogEventLevel.Error, exception);
+        }
+        else if (SerilogConfiguration.EnableMessageTemplateCaching)
+        {
+            result = Unsafe.As<CachingLogEventBuilder>(_builder).BuildAndReset(LogEventLevel.Error, exception); // Devirtualize the call
+        }
+        else
+        {
+            result = Unsafe.As<SimpleLogEventBuilder>(_builder).BuildAndReset(LogEventLevel.Error, exception); // Devirtualize the call
+        }
         _builder = null!;
         return result;
     }
@@ -548,7 +939,18 @@ public ref partial struct FatalLogInterpolatedStringHandler
     {
         if (!string.IsNullOrEmpty(str))
         {
-            _builder.AppendLiteral(str!);
+            if (SerilogConfiguration.IsResettable)
+            {
+                _builder.AppendLiteral(str!);
+            }
+            else if (SerilogConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingLogEventBuilder>(_builder).AppendLiteral(str!); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleLogEventBuilder>(_builder).AppendLiteral(str!); // Devirtualize the call
+            }
         }
     }
 
@@ -560,7 +962,18 @@ public ref partial struct FatalLogInterpolatedStringHandler
     {
         if (!string.IsNullOrEmpty(literal.Value))
         {
-            _builder.AppendLiteralValue(literal);
+            if (SerilogConfiguration.IsResettable)
+            {
+                _builder.AppendLiteralValue(literal);
+            }
+            else if (SerilogConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingLogEventBuilder>(_builder).AppendLiteralValue(literal); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleLogEventBuilder>(_builder).AppendLiteralValue(literal); // Devirtualize the call
+            }
         }
     }
 
@@ -572,11 +985,33 @@ public ref partial struct FatalLogInterpolatedStringHandler
     {
         if (alignment == 0 && string.IsNullOrEmpty(format))
         {
-            _builder.AppendFormatted(name, value);
+            if (SerilogConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(name, value);
+            }
+            else if (SerilogConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingLogEventBuilder>(_builder).AppendFormatted(name, value); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleLogEventBuilder>(_builder).AppendFormatted(name, value); // Devirtualize the call
+            }
         }
         else
         {
-            _builder.AppendFormatted(name, value, alignment, format);
+            if (SerilogConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(name, value, alignment, format);
+            }
+            else if (SerilogConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingLogEventBuilder>(_builder).AppendFormatted(name, value, alignment, format); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleLogEventBuilder>(_builder).AppendFormatted(name, value, alignment, format); // Devirtualize the call
+            }
         }
     }
 
@@ -588,18 +1023,52 @@ public ref partial struct FatalLogInterpolatedStringHandler
     {
         if (alignment == 0 && string.IsNullOrEmpty(format))
         {
-            _builder.AppendFormatted(namedLogValue);
+            if (SerilogConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(namedLogValue);
+            }
+            else if (SerilogConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingLogEventBuilder>(_builder).AppendFormatted(namedLogValue); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleLogEventBuilder>(_builder).AppendFormatted(namedLogValue); // Devirtualize the call
+            }
         }
         else
         {
-            _builder.AppendFormatted(namedLogValue, alignment, format);
+            if (SerilogConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(namedLogValue, alignment, format);
+            }
+            else if (SerilogConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingLogEventBuilder>(_builder).AppendFormatted(namedLogValue, alignment, format); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleLogEventBuilder>(_builder).AppendFormatted(namedLogValue, alignment, format); // Devirtualize the call
+            }
         }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal LogEvent GetLogEventAndReset(Exception? exception = null)
     {
-        var result = _builder.BuildAndReset(LogEventLevel.Fatal, exception);
+        LogEvent result;
+        if (SerilogConfiguration.IsResettable)
+        {
+            result = _builder.BuildAndReset(LogEventLevel.Fatal, exception);
+        }
+        else if (SerilogConfiguration.EnableMessageTemplateCaching)
+        {
+            result = Unsafe.As<CachingLogEventBuilder>(_builder).BuildAndReset(LogEventLevel.Fatal, exception); // Devirtualize the call
+        }
+        else
+        {
+            result = Unsafe.As<SimpleLogEventBuilder>(_builder).BuildAndReset(LogEventLevel.Fatal, exception); // Devirtualize the call
+        }
         _builder = null!;
         return result;
     }
@@ -651,7 +1120,18 @@ public ref partial struct LogInterpolatedStringHandler
     {
         if (!string.IsNullOrEmpty(str))
         {
-            _builder.AppendLiteral(str!);
+            if (SerilogConfiguration.IsResettable)
+            {
+                _builder.AppendLiteral(str!);
+            }
+            else if (SerilogConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingLogEventBuilder>(_builder).AppendLiteral(str!); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleLogEventBuilder>(_builder).AppendLiteral(str!); // Devirtualize the call
+            }
         }
     }
 
@@ -663,7 +1143,18 @@ public ref partial struct LogInterpolatedStringHandler
     {
         if (!string.IsNullOrEmpty(literal.Value))
         {
-            _builder.AppendLiteralValue(literal);
+            if (SerilogConfiguration.IsResettable)
+            {
+                _builder.AppendLiteralValue(literal);
+            }
+            else if (SerilogConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingLogEventBuilder>(_builder).AppendLiteralValue(literal); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleLogEventBuilder>(_builder).AppendLiteralValue(literal); // Devirtualize the call
+            }
         }
     }
 
@@ -675,11 +1166,33 @@ public ref partial struct LogInterpolatedStringHandler
     {
         if (alignment == 0 && string.IsNullOrEmpty(format))
         {
-            _builder.AppendFormatted(name, value);
+            if (SerilogConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(name, value);
+            }
+            else if (SerilogConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingLogEventBuilder>(_builder).AppendFormatted(name, value); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleLogEventBuilder>(_builder).AppendFormatted(name, value); // Devirtualize the call
+            }
         }
         else
         {
-            _builder.AppendFormatted(name, value, alignment, format);
+            if (SerilogConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(name, value, alignment, format);
+            }
+            else if (SerilogConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingLogEventBuilder>(_builder).AppendFormatted(name, value, alignment, format); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleLogEventBuilder>(_builder).AppendFormatted(name, value, alignment, format); // Devirtualize the call
+            }
         }
     }
 
@@ -691,18 +1204,52 @@ public ref partial struct LogInterpolatedStringHandler
     {
         if (alignment == 0 && string.IsNullOrEmpty(format))
         {
-            _builder.AppendFormatted(namedLogValue);
+            if (SerilogConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(namedLogValue);
+            }
+            else if (SerilogConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingLogEventBuilder>(_builder).AppendFormatted(namedLogValue); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleLogEventBuilder>(_builder).AppendFormatted(namedLogValue); // Devirtualize the call
+            }
         }
         else
         {
-            _builder.AppendFormatted(namedLogValue, alignment, format);
+            if (SerilogConfiguration.IsResettable)
+            {
+                _builder.AppendFormatted(namedLogValue, alignment, format);
+            }
+            else if (SerilogConfiguration.EnableMessageTemplateCaching)
+            {
+                Unsafe.As<CachingLogEventBuilder>(_builder).AppendFormatted(namedLogValue, alignment, format); // Devirtualize the call
+            }
+            else
+            {
+                Unsafe.As<SimpleLogEventBuilder>(_builder).AppendFormatted(namedLogValue, alignment, format); // Devirtualize the call
+            }
         }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal LogEvent GetLogEventAndReset(Exception? exception = null)
     {
-        var result = _builder.BuildAndReset(_logEventLevel, exception);
+        LogEvent result;
+        if (SerilogConfiguration.IsResettable)
+        {
+            result = _builder.BuildAndReset(_logEventLevel, exception);
+        }
+        else if (SerilogConfiguration.EnableMessageTemplateCaching)
+        {
+            result = Unsafe.As<CachingLogEventBuilder>(_builder).BuildAndReset(_logEventLevel, exception); // Devirtualize the call
+        }
+        else
+        {
+            result = Unsafe.As<SimpleLogEventBuilder>(_builder).BuildAndReset(_logEventLevel, exception); // Devirtualize the call
+        }
         _builder = null!;
         return result;
     }

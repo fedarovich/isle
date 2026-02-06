@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using Isle.Configuration;
 
 namespace Isle.Extensions;
@@ -34,10 +35,9 @@ public static class LoggingExtensions
     /// </remarks>
     /// <seealso cref="Named{T}(T,string,bool)"/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static NamedLogValue Named<T>(this T value, string name)
+    public static NamedLogValue Named<T>(this T value, [ConstantExpected] string name)
     {
-        var configuration = IsleConfiguration.Current;
-        return Named(value, name, configuration.PreserveDefaultValueRepresentationForExplicitNames, configuration);
+        return Named(value, name, CoreConfiguration.PreserveDefaultValueRepresentationForExplicitNames);
     }
 
     /// <summary>
@@ -52,13 +52,7 @@ public static class LoggingExtensions
     /// </param>
     /// <exception cref="ArgumentException"><paramref name="name"/> is null or blank string.</exception>
     /// <seealso cref="Named{T}(T,string)"/>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static NamedLogValue Named<T>(this T value, string name, bool preserveDefaultValueRepresentation)
-    {
-        return Named(value, name, preserveDefaultValueRepresentation, IsleConfiguration.Current);
-    }
-
-    internal static NamedLogValue Named<T>(this T value, string name, bool preserveDefaultValueRepresentation, IsleConfiguration configuration)
+    public static NamedLogValue Named<T>(this T value, [ConstantExpected] string name, bool preserveDefaultValueRepresentation)
     {
         if (string.IsNullOrWhiteSpace(name))
             throw new ArgumentException("The name cannot be null or empty string.", nameof(name));
@@ -66,7 +60,7 @@ public static class LoggingExtensions
         string rawName = name;
         if (!preserveDefaultValueRepresentation && !name.StartsWith(DestructureOperator) && !name.StartsWith(StringifyOperator))
         {
-            var representation = configuration.ValueRepresentationPolicy.GetRepresentationOfType<T>();
+            var representation = CoreConfiguration.GetRepresentationOfType<T>();
             switch (representation)
             {
                 case ValueRepresentation.Destructure:
@@ -82,12 +76,12 @@ public static class LoggingExtensions
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static string GetNameFromCallerArgumentExpression<T>(this string expression, IsleConfiguration configuration)
+    internal static string GetNameFromCallerArgumentExpression<T>(this string expression)
     {
-        var name = configuration.ConvertValueName(expression);
+        var name = CoreConfiguration.ConvertValueName(expression);
         if (!name.StartsWith(DestructureOperator) && !name.StartsWith(StringifyOperator))
         {
-            var representation = configuration.ValueRepresentationPolicy.GetRepresentationOfType<T>();
+            var representation = CoreConfiguration.GetRepresentationOfType<T>();
             switch (representation)
             {
                 case ValueRepresentation.Destructure:

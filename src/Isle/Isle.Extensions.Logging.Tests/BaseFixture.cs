@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Isle.Configuration;
 using Isle.Extensions.Logging.Tests.MEL;
@@ -33,8 +32,9 @@ public abstract class BaseFixture
     protected virtual void OneTimeSetUp()
     {
         IsleConfiguration.Configure(builder => builder
+            .IsResettable()
             .WithAutomaticDestructuring()
-            .ConfigureExtensionsLogging(cfg => cfg.EnableMessageTemplateCaching = EnableCaching));
+            .AddExtensionsLogging(cfg => cfg.EnableMessageTemplateCaching = EnableCaching));
         LoggerFactory = Microsoft.Extensions.Logging.LoggerFactory.Create(builder =>
         {
             builder

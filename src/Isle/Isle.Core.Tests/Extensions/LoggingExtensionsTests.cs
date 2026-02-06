@@ -4,6 +4,8 @@ using Isle.Configuration;
 using Isle.Extensions;
 using NUnit.Framework;
 
+#pragma warning disable CA1857 // The argument should be a constant for optimal performance
+
 namespace Isle.Core.Tests.Extensions;
 
 public class LoggingExtensionsTests
@@ -15,6 +17,7 @@ public class LoggingExtensionsTests
     public void OneTimeSetUp()
     {
         IsleConfiguration.Configure(builder => builder
+            .IsResettable()
             .WithValueRepresentationPolicy(new TestValueRepresentationPolicy())
             .WithNameConverter(n => n.ToUpperInvariant()));
     }
@@ -73,21 +76,21 @@ public class LoggingExtensionsTests
     [Test]
     public void GetNameFromCallerArgumentExpressionWithDefaultValueRepresentation([Values("x", "$x", "@x")] string name)
     {
-        var newName = name.GetNameFromCallerArgumentExpression<int>(IsleConfiguration.Current);
+        var newName = name.GetNameFromCallerArgumentExpression<int>();
         newName.Should().Be(name.ToUpperInvariant());
     }
 
     [Test]
     public void GetNameFromCallerArgumentExpressionWithDestructureValueRepresentation([Values("x", "$x", "@x")] string name)
     {
-        var newName = name.GetNameFromCallerArgumentExpression<TimeSpan>(IsleConfiguration.Current);
+        var newName = name.GetNameFromCallerArgumentExpression<TimeSpan>();
         newName.Should().Be(name == "x" ? "@X" : name.ToUpperInvariant());
     }
 
     [Test]
     public void GetNameFromCallerArgumentExpressionWithStringifyValueRepresentation([Values("x", "$x", "@x")] string name)
     {
-        var newName = name.GetNameFromCallerArgumentExpression<DateTime>(IsleConfiguration.Current);
+        var newName = name.GetNameFromCallerArgumentExpression<DateTime>();
         newName.Should().Be(name == "x" ? "$X" : name.ToUpperInvariant());
     }
 

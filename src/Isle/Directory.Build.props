@@ -1,6 +1,6 @@
 <Project>
   <PropertyGroup>
-	<Deterministic>true</Deterministic>
+	  <Deterministic>true</Deterministic>
 
     <ContinuousIntegrationBuild Condition="'$(TF_BUILD)' == 'true'">True</ContinuousIntegrationBuild>
   
@@ -14,10 +14,23 @@
     <!-- You must publish both packages, the package that contains the DLL (.nupkg) and the one that contains the symbols (.snupkg) -->
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+
+    <SuppressTfmSupportBuildWarnings>True</SuppressTfmSupportBuildWarnings>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageIcon>PackageIcon.png</PackageIcon>
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)PackageIcon.png">
+      <Pack>True</Pack>
+      <PackagePath>/</PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
     <!-- Required if your repository is on GitHub -->
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-*" PrivateAssets="All"/>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All"/>
   </ItemGroup>
 </Project>

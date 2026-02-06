@@ -35,9 +35,7 @@ internal abstract class Node
 
     public abstract MessageTemplateToken GetToken();
 
-#if NETCOREAPP
-    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-#endif
+    [MethodImpl(MethodImplOptions.NoInlining)]
     public TextNode GetOrAddTextNode(string rawLiteral)
     {
         var nextNode = Volatile.Read(ref _textNodes);
@@ -78,9 +76,8 @@ internal abstract class Node
             : children.GetOrAdd(rawLiteral, static (rl, parent) => new TextNode(parent, rl), this);
     }
 
-#if NETCOREAPP
-    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-#endif
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
     public PropertyNode GetOrAddPropertyNode(string name, string rawName)
     {
         var nextNode = Volatile.Read(ref _propertyNodes);
@@ -120,9 +117,7 @@ internal abstract class Node
             : children.GetOrAdd(name, static (name, arg) => new PropertyNode(arg.parent, name, arg.rawName), (parent: this, rawName));
     }
 
-#if NETCOREAPP
-    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-#endif
+    [MethodImpl(MethodImplOptions.NoInlining)]
     public PropertyNode GetOrAddPropertyNode(string name, string rawName, int alignment, string? format)
     {
         var nextNode = Volatile.Read(ref _formattedPropertyNodes);
@@ -165,6 +160,7 @@ internal abstract class Node
                 static (formatKey, arg) => new PropertyNode(arg.parent, formatKey.Name, arg.rawName, formatKey.Alignment, formatKey.Format), (parent: this, rawName));
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public TextNode CreateNotCachedTextNode(string rawLiteral)
     {
         return new TextNode(this, rawLiteral);
@@ -174,6 +170,7 @@ internal abstract class Node
     {
         return Volatile.Read(ref _templateNode) ?? InitializeTemplateNode();
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
         TemplateNode InitializeTemplateNode()
         {
             var templateNode = new TemplateNode(this);

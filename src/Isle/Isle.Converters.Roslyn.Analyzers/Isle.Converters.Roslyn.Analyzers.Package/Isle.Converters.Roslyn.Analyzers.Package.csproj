@@ -1,0 +1,50 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageId>Isle.Converters.Roslyn.Analyzers</PackageId>
+    <Copyright>© Pavel Fedarovich, 2022-$([System.DateTime]::Now.Year)</Copyright>
+    <PackageProjectUrl>https://github.com/fedarovich/isle</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/fedarovich/isle.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>structured logging; semantic logging; interpolated strings</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <LangVersion>LatestMajor</LangVersion>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <DevelopmentDependency>true</DevelopmentDependency>
+    <NoPackageAnalysis>true</NoPackageAnalysis>
+    <IncludeSymbols>false</IncludeSymbols>
+
+    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddAnalyzersToOutput</TargetsForTfmSpecificContentInPackage>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Isle.Converters.Roslyn.Analyzers.CodeFixes\Isle.Converters.Roslyn.Analyzers.CodeFixes.csproj" />
+    <ProjectReference Include="..\Isle.Converters.Roslyn.Analyzers\Isle.Converters.Roslyn.Analyzers.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="tools\*.ps1" CopyToOutputDirectory="PreserveNewest" Pack="true" PackagePath="" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="buildTransitive\*">
+      <PackagePath>/</PackagePath>
+      <Pack>True</Pack>
+    </None>
+  </ItemGroup>
+
+  <Target Name="_AddAnalyzersToOutput">
+    <ItemGroup>
+      <TfmSpecificPackageFile Include="$(OutputPath)\Isle.Converters.Roslyn.Analyzers.dll" PackagePath="analyzers/dotnet/cs" />
+      <TfmSpecificPackageFile Include="$(OutputPath)\Isle.Converters.Roslyn.Analyzers.CodeFixes.dll" PackagePath="analyzers/dotnet/cs" />
+    </ItemGroup>
+  </Target>
+
+</Project>

@@ -41,8 +41,10 @@ public abstract class SerilogBaseFixture
     [OneTimeSetUp]
     protected virtual void OneTimeSetUp()
     {
-        IsleConfiguration.Configure(builder => builder.WithAutomaticDestructuring()
-            .ConfigureExtensionsLogging(cfg => cfg.EnableMessageTemplateCaching = EnableCaching));
+        IsleConfiguration.Configure(builder => builder
+            .IsResettable()
+            .WithAutomaticDestructuring()
+            .AddExtensionsLogging(cfg => cfg.EnableMessageTemplateCaching = EnableCaching));
         LoggerFactory = Microsoft.Extensions.Logging.LoggerFactory.Create(builder =>
         {
             builder

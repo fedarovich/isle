@@ -1,23 +1,29 @@
-﻿namespace Isle.Extensions.Logging.Configuration;
+﻿using System.Runtime.CompilerServices;
 
-internal class ExtensionsLoggingConfiguration
+namespace Isle.Extensions.Logging.Configuration;
+
+internal static class ExtensionsLoggingConfiguration
 {
-    private static ExtensionsLoggingConfiguration? _current;
+    internal static readonly bool IsResettable;
 
-    public static ExtensionsLoggingConfiguration Current
+    private static readonly bool _enableMessageTemplateCaching;
+
+    static ExtensionsLoggingConfiguration()
     {
-        get => _current ?? DefaultConfiguration.Value;
-        set => _current = value;
+        if (ExtensionsLoggingConfigurationSnapshot.TryGetCurrent(out var snapshot) && !snapshot.IsResettable)
+        {
+            IsResettable = false;
+            _enableMessageTemplateCaching = snapshot.EnableMessageTemplateCaching;
+        }
+        else
+        {
+            IsResettable = true;
+        }
     }
 
-    public bool EnableMessageTemplateCaching { get; init; } = true;
-
-    internal static class DefaultConfiguration
+    public static bool EnableMessageTemplateCaching
     {
-        public static readonly ExtensionsLoggingConfiguration Value = new();
-
-        static DefaultConfiguration()
-        {
-        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => IsResettable ? ExtensionsLoggingConfigurationSnapshot.Current.EnableMessageTemplateCaching : _enableMessageTemplateCaching;
     }
 }

@@ -23,7 +23,6 @@ internal sealed class SimpleLogEventBuilder : LogEventBuilder
     private LogEventProperty[] _properties = null!;
     private ILogger _logger = null!;
     private StringBuilder _messageTemplateBuilder = null!;
-    private IsleConfiguration _configuration = null!;
     private int _propertyIndex;
 
     private SimpleLogEventBuilder()
@@ -46,7 +45,6 @@ internal sealed class SimpleLogEventBuilder : LogEventBuilder
         _properties = new LogEventProperty[formattedCount];
         _messageTemplateBuilder = AcquireStringBuilder();
         _logger = logger;
-        _configuration = IsleConfiguration.Current;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         StringBuilder AcquireStringBuilder()
@@ -61,6 +59,7 @@ internal sealed class SimpleLogEventBuilder : LogEventBuilder
         }
     }
 
+    [MethodImpl(MethodImplOptions.NoInlining)]
     public override LogEvent BuildAndReset(LogEventLevel level, Exception? exception = null)
     {
         var logEvent = new LogEvent(
@@ -72,7 +71,6 @@ internal sealed class SimpleLogEventBuilder : LogEventBuilder
         _tokens = null!;
         _properties = null!;
         _propertyIndex = 0;
-        _configuration = null!;
         
         _cachedInstance ??= this;
 
@@ -92,6 +90,7 @@ internal sealed class SimpleLogEventBuilder : LogEventBuilder
         }
     }
 
+    [MethodImpl(MethodImplOptions.NoInlining)]
     public override void AppendLiteral(string literal)
     {
         _tokens.Add(new TextToken(literal));
@@ -100,6 +99,7 @@ internal sealed class SimpleLogEventBuilder : LogEventBuilder
         var end = _messageTemplateBuilder.Length;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override void AppendLiteralValue(in LiteralValue literalValue)
     {
         AppendLiteral(literalValue.Value!);
@@ -107,8 +107,7 @@ internal sealed class SimpleLogEventBuilder : LogEventBuilder
 
     public override void AppendFormatted<T>(string name, T value)
     {
-        var configuration = _configuration;
-        name = configuration.ConvertValueName(name);
+        name = CoreConfiguration.ConvertValueName(name);
         Destructuring destructuring;
         if (name.StartsWith(DestructureOperator))
         {
@@ -122,8 +121,7 @@ internal sealed class SimpleLogEventBuilder : LogEventBuilder
         }
         else
         {
-            destructuring = GetDestructuring(
-                configuration.ValueRepresentationPolicy.GetRepresentationOfType<T>());
+            destructuring = GetDestructuring(CoreConfiguration.GetRepresentationOfType<T>());
         }
 
         if (name == string.Empty)
@@ -136,8 +134,7 @@ internal sealed class SimpleLogEventBuilder : LogEventBuilder
 
     public override void AppendFormatted<T>(string name, T value, int alignment, string? format)
     {
-        var configuration = _configuration;
-        name = configuration.ConvertValueName(name);
+        name = CoreConfiguration.ConvertValueName(name);
         Destructuring destructuring;
         if (name.StartsWith(DestructureOperator))
         {
@@ -151,8 +148,7 @@ internal sealed class SimpleLogEventBuilder : LogEventBuilder
         }
         else
         {
-            destructuring = GetDestructuring(
-                configuration.ValueRepresentationPolicy.GetRepresentationOfType<T>());
+            destructuring = GetDestructuring(CoreConfiguration.GetRepresentationOfType<T>());
         }
 
         if (name == string.Empty)
@@ -163,6 +159,7 @@ internal sealed class SimpleLogEventBuilder : LogEventBuilder
         AppendProperty(name, value, alignment, format, rawText, destructuring);
     }
 
+    [MethodImpl(MethodImplOptions.NoInlining)]
     public override void AppendFormatted(in NamedLogValue namedLogValue)
     {
         var destructuring = Destructuring.Default;
@@ -187,6 +184,7 @@ internal sealed class SimpleLogEventBuilder : LogEventBuilder
         AppendProperty(name, namedLogValue.Value, 0, null, rawText, destructuring);
     }
 
+    [MethodImpl(MethodImplOptions.NoInlining)]
     public override void AppendFormatted(in NamedLogValue namedLogValue, int alignment, string? format)
     {
         var destructuring = Destructuring.Default;

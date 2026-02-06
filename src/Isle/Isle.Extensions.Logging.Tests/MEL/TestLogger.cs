@@ -30,6 +30,9 @@ public class TestLogger : ILogger
     public bool IsEnabled(LogLevel logLevel) => logLevel >= _options.CurrentValue.MinLogLevel;
 
     public IDisposable BeginScope<TState>(TState state)
+#if NET8_0_OR_GREATER
+        where TState : notnull
+#endif
     {
         return new Scope(_scopes, state);
     }

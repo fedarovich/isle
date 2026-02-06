@@ -4,56 +4,56 @@
 # https://aka.ms/yaml
 
 trigger:
-- main
+- 2.x
 
 pool:
   vmImage: windows-2022
 
 parameters:
-  - name: IsRelease
-    displayName: 'Is Release'
-    default: false
-    type: boolean
+  - name: BuildType
+    displayName: 'Build Type'
+    type: string
+    default: CI
+    values:
+    - CI
+    - Pre-release
+    - Release
 
 variables:
   BuildConfiguration: 'Release'
-  MajorVersion: 1
-  MinorVersion: 6
-  ${{ if eq(parameters.IsRelease, false) }}:
-    Suffix: 'pre' 
+  MajorVersion: 2
+  MinorVersion: 0
+  Patch: 0
+  VersionPrefix: $[format('{0}.{1}.{2}', variables.MajorVersion, variables.MinorVersion, variables.Patch )]
+  ${{ if ne(parameters.BuildType, 'Release') }}:
+    VersionSuffix: $[format('pre.{0}', split(variables['Build.BuildNumber'], '.')[3])]
   ${{ else }}:
-    Suffix: ''
+    VersionSuffix: ''
 
-name: '$(MajorVersion).$(MinorVersion).$(rev:r)'
+
+name: '$(MajorVersion).$(MinorVersion).$(Patch).$(rev:r)'
 
 steps:
+- script: |
+    echo "FileVersion:   $(Build.BuildNumber)"
+    echo "SourceVersion: $(Build.SourceVersion)"
+    echo "VersionPrefix: $(VersionPrefix)"
+    echo "VersionSuffix: $(VersionSuffix)"
+  displayName: 'Print Variables'
+
 - task: UseDotNet@2
   displayName: 'Install .Net 3.1'
   inputs:
     packageType: sdk
     version: '3.1.x'
     performMultiLevelLookup: true
-
+    
 - task: UseDotNet@2
-  displayName: 'Install .Net 5'
+  displayName: 'Install .Net 6'
   inputs:
     packageType: sdk
-    version: '5.x'
-    performMultiLevelLookup: true    
-
-- task: UseDotNet@2
-  displayName: 'Install .Net 7'
-  inputs:
-    packageType: sdk
-    version: '7.x'
-    performMultiLevelLookup: true  
-
-- task: UseDotNet@2
-  displayName: 'Install .Net 8'
-  inputs:
-    packageType: sdk
-    version: '8.x'
-    performMultiLevelLookup: true    
+    version: '6.0.x'
+    performMultiLevelLookup: true
 
 - task: DotNetCoreCLI@2
   displayName: 'dotnet restore'
@@ -83,7 +83,7 @@ steps:
     command: custom
     custom: pack
     projects: 'src/Isle/Isle.Compatibility/Isle.Compatibility.csproj'
-    arguments: '-c $(BuildConfiguration) -p:VersionPrefix=$(Build.BuildNumber) --version-suffix "$(Suffix)" --no-build --include-symbols -o "$(Build.ArtifactStagingDirectory)"'
+    arguments: '-c $(BuildConfiguration) -p:VersionPrefix=$(VersionPrefix) --version-suffix "$(VersionSuffix)" --no-build --include-symbols -o "$(Build.ArtifactStagingDirectory)"'
 
 - task: DotNetCoreCLI@2
   displayName: 'dotnet pack Isle.Core'
@@ -91,7 +91,7 @@ steps:
     command: custom
     custom: pack
     projects: 'src/Isle/Isle.Core/Isle.Core.csproj'
-    arguments: '-c $(BuildConfiguration) -p:VersionPrefix=$(Build.BuildNumber) --version-suffix "$(Suffix)" --no-build --include-symbols -o "$(Build.ArtifactStagingDirectory)"'
+    arguments: '-c $(BuildConfiguration) -p:VersionPrefix=$(VersionPrefix) --version-suffix "$(VersionSuffix)" --no-build --include-symbols -o "$(Build.ArtifactStagingDirectory)"'
 
 - task: DotNetCoreCLI@2
   displayName: 'dotnet pack Isle.Extensions.Logging'
@@ -99,7 +99,7 @@ steps:
     command: custom
     custom: pack
     projects: 'src/Isle/Isle.Extensions.Logging/Isle.Extensions.Logging.csproj'
-    arguments: '-c $(BuildConfiguration) -p:VersionPrefix=$(Build.BuildNumber) --version-suffix "$(Suffix)" --no-build --include-symbols -o "$(Build.ArtifactStagingDirectory)"'
+    arguments: '-c $(BuildConfiguration) -p:VersionPrefix=$(VersionPrefix) --version-suffix "$(VersionSuffix)" --no-build --include-symbols -o "$(Build.ArtifactStagingDirectory)"'
     
 - task: DotNetCoreCLI@2
   displayName: 'dotnet pack Isle.Serilog'
@@ -107,7 +107,23 @@ steps:
     command: custom
     custom: pack
     projects: 'src/Isle/Isle.Serilog/Isle.Serilog.csproj'
-    arguments: '-c $(BuildConfiguration) -p:VersionPrefix=$(Build.BuildNumber) --version-suffix "$(Suffix)" --no-build --include-symbols -o "$(Build.ArtifactStagingDirectory)"'
+    arguments: '-c $(BuildConfiguration) -p:VersionPrefix=$(VersionPrefix) --version-suffix "$(VersionSuffix)" --no-build --include-symbols -o "$(Build.ArtifactStagingDirectory)"'
+
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet pack Isle.Converters.Roslyn'
+  inputs:
+    command: custom
+    custom: pack
+    projects: 'src/Isle/Isle.Converters.Roslyn/Isle.Converters.Roslyn.csproj'
+    arguments: '-c $(BuildConfiguration) -p:VersionPrefix=$(VersionPrefix) --version-suffix "$(VersionSuffix)" --no-build --include-symbols -o "$(Build.ArtifactStagingDirectory)"'
+
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet pack Isle.Converters.Roslyn.Analyzers'
+  inputs:
+    command: custom
+    custom: pack
+    projects: 'src/Isle/Isle.Converters.Roslyn.Analyzers/Isle.Converters.Roslyn.Analyzers.Package/Isle.Converters.Roslyn.Analyzers.Package.csproj'
+    arguments: '-c $(BuildConfiguration) -p:VersionPrefix=$(VersionPrefix) --version-suffix "$(VersionSuffix)" --no-build -o "$(Build.ArtifactStagingDirectory)"'
 
 - task: PublishBuildArtifacts@1
 
@@ -118,7 +134,7 @@ steps:
 
 - task: NuGetCommand@2
   displayName: 'MyGet push'
-  condition: ${{ eq(parameters.IsRelease, false) }}
+  condition: ${{ eq(parameters.BuildType, 'CI') }}
   inputs:
     command: push
     nuGetFeedType: external
@@ -127,7 +143,7 @@ steps:
 
 - task: NuGetCommand@2
   displayName: 'NuGet push'
-  condition: ${{ eq(parameters.IsRelease, true) }}
+  condition: ${{ ne(parameters.BuildType, 'CI') }}
   inputs:
     command: push
     nuGetFeedType: external

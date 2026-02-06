@@ -33,4 +33,13 @@ public static class IsleConfigurationBuilderExtensions
         builder.ValueNameConverter = nameConverter ?? throw new ArgumentNullException(nameof(nameConverter));
         return builder;
     }
+
+    /// <summary>
+    /// Assigns the <paramref name="isResettable"/> value to the <see cref="IIsleConfigurationBuilder.IsResettable"/> property.
+    /// </summary>
+    public static IIsleConfigurationBuilder IsResettable(this IIsleConfigurationBuilder builder, bool isResettable = true)
+    {
+        builder.IsResettable = isResettable;
+        return builder;
+    }
 }
