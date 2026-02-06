@@ -4,7 +4,7 @@
 
 ISLE (Interpolated String Logging Extensions) is a library that allows developers to perform structured logging using interpolated strings in C# 10 or later.
 
-| Package | Release | Prerelease | Dev Build | Description |
+| Package | Release | Prerelease | Dev Build | Description |
 | ------- | ---------- | ------- | --------- | ----------- |
 | Isle.Core | [![nuget](https://img.shields.io/nuget/v/Isle.Core.svg?label=nuget)](https://www.nuget.org/packages/Isle.Core) | [![nuget](https://img.shields.io/nuget/vpre/Isle.Core.svg?label=nuget)](https://www.nuget.org/packages/Isle.Core) | [![myget](https://img.shields.io/myget/fedarovich/vpre/Isle.Core.svg?label=myget)](https://www.myget.org/feed/fedarovich/package/nuget/Isle.Core) | Core package containing shared logic. |
 | Isle.Extensions.Logging | [![nuget](https://img.shields.io/nuget/v/Isle.Extensions.Logging.svg?label=nuget)](https://www.nuget.org/packages/Isle.Extensions.Logging) | [![nuget](https://img.shields.io/nuget/vpre/Isle.Extensions.Logging.svg?label=nuget)](https://www.nuget.org/packages/Isle.Extensions.Logging) | [![myget](https://img.shields.io/myget/fedarovich/vpre/Isle.Extensions.Logging.svg?label=myget)](https://www.myget.org/feed/fedarovich/package/nuget/Isle.Extensions.Logging) | Integration package for Microsoft.Extensions.Logging. |
@@ -33,6 +33,10 @@ ISLE works on any modern .Net version and also supports .Net Standard 2.0, thus 
   + [Adding Intergrations](#adding-integrations)
   + [Template Caching](#template-caching)
   + [Resettable vs Non-Resettable Configuration](#resettable-vs-non-resettable-configuration)
++ [Roslyn Name Converter](#roslyn-name-converter)
+  + [Getting Started with Roslyn Name Converter](#getting-started-with-roslyn-name-converter)
+  + [Full Configuration Example](#full-configuration-example)
+  + [How It Works](#how-it-works)
 + [Migrating from v1.x to v2.x](#migrating-from-v1x-to-v2x)
 
 ## Why ISLE?
@@ -53,6 +57,12 @@ ISLE provides a set of extension methods to be used in combination with well-kno
 In order to perform structured logging you must also add and configure the underlying logging provider (e.g. [Serilog](https://serilog.net)).
 
 To begin using ISLE you must install the corresponding package from NuGet.
+
+```bash
+dotnet add package Isle.Extensions.Logging
+# AND/OR
+dotnet add package Isle.Serilog
+```
 
 > [!TIP]
 > If you are using Serilog only indirectly via `Microsoft.Extensions.Logging.ILogger` facade, there is no need to install `Isle.Serilog`. Install just `Isle.Extensions.Logging` package instead.
@@ -272,6 +282,155 @@ When message template caching is enabled, the interpolated string handler will i
 Starting from version 2.0, ISLE uses non-resettable configuration by default. It means that one ISLE is configured, you cannot use the `Reset` method to reset the configuration and reconfigure ISLE in a different way. The motivation behind it is to make some parts of the configuration JIT-time constants and allow JIT to perform some additional optimizations.
 
 If you for some reason want to be able to configure ISLE, you can still make the configuration resettable by setting [`IsResettable`](#isresettable) property to true during the initial and subsequent `Configure` method calls.
+
+> [!NOTE]
+> While non-resettable configuration is faster in syntetic benchmarks, there is a tiny chance that under some load profiles resettable configuration might be better. Please, use some profiling tools if you have any concerns.
+
+### Sample Configuration
+
+Here is a full sample configuration for using Microsoft.Extensions.Logging with Serilog backend:
+```cs
+IsleConfiguration.Configure(builder => builder
+    .AddExtensionsLogging(opt => opt.EnableMessageTemplateCaching = true)
+    .WithNameValueConverter(ValueNameConverters.SerilogCompatible()));
+```
+
+## Roslyn Name Converter
+
+### Getting Started with Roslyn Name Converter
+
+Starting from version 2.0, ISLE comes with `RoslynNameConverter` - a powerful [value name converter](#custom-argument-names) using Roslyn to extract the argument names from the C# expressions. It is shipped as a separate NuGet package that can be installed using your IDE or by the following command:
+```bash
+dotnet add package Isle.Converters.Roslyn
+```
+
+Next, you can add it to your ISLE configuration:
+```cs
+IsleConfiguration.Configure(builder => builder.WithRoslynNameConverter(opt => { /* Configure converter here */ }));
+```
+
+Now, it is important to set a few configure for the converter itself. The configuration can be done using a few extension methods, that can be called on the delegate parameter called `opt` in the sample above.
+
+#### CapitalizeFirstCharacter
+By default, the converter keep the name untouched. You can add `opt.CapitalizeFirstCharacter()` to enable capitalization of the first character, so that the argument name is always in `PascalCase`.
+
+#### RemoveMethodPrefixes
+Let's consider the following example
+```cs
+logger.LogInformation($"The value is {GetValue()}.");
+```
+
+The argument name will be captured as `GetValue` by default, however it would be better to capture it as `Value`. It is possible, of cause, to use `.Named("Value")` to specify the name manually, but `RoslynNameConverter` provides a better solution for it. You can configure removal of certain method prefixes by using `RemoveMethodPrefixes` methods:
+```cs
+IsleConfiguration.Configure(builder => builder.WithRoslynNameConverter(opt => opt.RemoveMethodPrefixes("Get", "Is")));
+```
+
+This method is using case sensitive ordinal comparison by default, but you can use another overload to specify the comparison method. E.g. to use ordinal case insensitive comparison, you can configure it in the following way:
+```cs
+IsleConfiguration.Configure(builder => builder.WithRoslynNameConverter(opt => opt.RemoveMethodPrefixes(["Get", "Is"], StringComparison.OrdinalIgnoreCase)));
+```
+
+#### AddTransformation
+The `CapitalizeFirstCharacter` and `RemoveMethodPrefixes` are examples of transformation that can be applied to the argument name. You can add your own transformations using `AddTransformation` method.
+
+> [!IMPORTANT]
+> All transformations, including `CapitalizeFirstCharacter` and `RemoveMethodPrefixes`, are applied in the order they were added.
+
+#### WithFallback
+It is obvious that `RoslynNameConverter` cannot extract a valid name from an arbitrary C# expression, just consider an expression like `2 + 2 * 2`. Thus, you can specify a callback that will be used for such cases using `WithFallbackMethod`.
+
+See the list of supported expressions [below](#how-it-works).
+
+#### WithMemoisation
+> [!IMPORTANT]
+> While Roslyn is pretty fast, it still adds some overhead, so it's **highly recommended to use memoisation** with the `RoslynNameConverter`.
+```cs
+IsleConfiguration.Configure(builder => builder.WithRoslynNameConverter(opt => opt.WithMemoisation()));
+```
+
+### Full Configuration Example
+Here is a complete example configuration:
+```cs
+IsleConfiguration.Configure(builder => builder
+    .AddExtensionsLogging()
+    .WithRoslynNameConverter(opt => opt
+        .CapitalizeFirstCharacter()
+        .RemoveMethodPrefixes("Get")
+        .WithMemoisation()
+        .WithFallback(ValueNameConverters.SerilogCompatible())));
+```
+
+### How It Works
+`RoslynNameConverter` uses C# compiler library (named Roslyn) to parse the argument expression into C# Abstract Syntax Tree (AST). Then it traverses the tree to find the member name that produces the actual value, extracts this member name, applies the configured transformations and returns it to the logging framework.
+
+Thus, for example, if you have the code like this
+```cs
+logger.LogInformation($"The int property is {unchecked((short) value.IntProperty)}")
+```
+the converter will successfully extract `IntProperty` as the member name.
+
+The following C# contructs are supported:
++ identifiers (e.g. `value`)
++ member access (e.g. `obj.Property`)
++ method invokation (e.g. `Method(a, b)`, `GetValue()`)
++ conditional member access (e.g. `obj?.Property`, `obj?.Method()`)
++ cast expression (e.g. `(short) value`)
++ pre- and post-increment and decrement (e.g. `++a`, `b--`)
++ pointer indirection (e.g. `*a`)
++ not-null assertion (e.g. `a!`)
++ `checked`/`unchecked` expressions is their content is also supported
++ any valid and unambiguous combinations of them
+
+### Code Analysis
+
+As described above `RoslynNameConverter` cannot support an arbitrary C# expression. While there is a [fallback](WithFallback) for unsupported cases, it's better to prevent them at all by finding such expression and adding `.Named("SomeName")` to them.
+
+Another corner case can be seen in the following example:
+```cs
+logger.LogInformation($"{a.X} {b.X}");
+```
+In this case the both argument names will be `X`, which is undesirable.
+
+To find and fix such cases ISLE provides one more package containing code analyzers: Isle.Converters.Roslyn.Analyzers.
+
+If you are using Isle.Converters.Roslyn, it is highly recommended that you also install Isle.Converters.Roslyn.Analyzers to **every project** using ISLE for logging.
+
+> [!TIP]
+> If you are using [Centralized Package Management](https://learn.microsoft.com/en-us/nuget/consume-packages/central-package-management), the easiest way is to add it a global package reference to your Directory.Packages.props:
+> ```xml
+> <ItemGroup>
+>   <GlobalPackageReference Include="Isle.Converters.Roslyn.Analyzers" Version="2.0.0" />
+> </ItemGroup>
+> ```
+> Otherwise, consider adding a package reference to Directory.Build.props:
+> ```xml
+> <ItemGroup>
+>   <PackageReference Include="Isle.Converters.Roslyn.Analyzers" Version="2.0.0">
+>     <PrivateAssets>all</PrivateAssets>
+>     <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+>   </PackageReference>
+> </ItemGroup>
+> ```
+
+The analyzer can produces the following warnings and provides the code fixes:
+| Warning | Description | Code Fixes |
+| ------- | ----------- | ---------- |
+| ISLE4000 | The converter could not extract a valid name from the expression. | Yes: wrap the expression with `(...).Named("")` |
+| ISLE4001 | The name is not unique. | No |
+| ISLE4002 | The explicit name in `Named()` is not a constant. | No |
+| ISLE4003 | The explicit name in `Named()` is not a valid C# identifier. | No |
+| ISLE4004 | The explicit name in `Named()` has leading or trailing whitespace characters. | Yes: trim the name. |
+
+In case you use [`RemoveMethodPrefixes`](#removemethodprefixes) in your configuration, it also necessary to let the analyzer know which prefixes are trimmed. In order to do that add the following to your Directory.Build.props (or individual project file):
+```xml
+<PropertyGroup>
+    <!-- IsleRoslynNameConverterRemoveMethodPrefixes accepts a semicolon-separated list of prefixes that must much the ones you've added in the configuration. -->
+    <IsleRoslynNameConverterRemoveMethodPrefixes>Get;Is</IsleRoslynNameConverterRemoveMethodPrefixes>
+
+    <!-- Optional: Ordinal is used by default. The value must much the one you have used in the configuration. -->
+    <IsleRoslynNameConverterRemoveMethodPrefixesStringComparison>Ordinal</IsleRoslynNameConverterRemoveMethodPrefixesStringComparison>
+</PropertyGroup>
+```
 
 ## Migrating from v1.x to v2.x
 
