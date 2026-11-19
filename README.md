@@ -292,7 +292,7 @@ Here is a full sample configuration for using Microsoft.Extensions.Logging with 
 ```cs
 IsleConfiguration.Configure(builder => builder
     .AddExtensionsLogging(opt => opt.EnableMessageTemplateCaching = true)
-    .WithNameValueConverter(ValueNameConverters.SerilogCompatible()));
+    .WithNameConverter(ValueNameConverters.SerilogCompatible()));
 ```
 
 ## Roslyn Name Converter
@@ -337,15 +337,15 @@ The `CapitalizeFirstCharacter` and `RemoveMethodPrefixes` are examples of transf
 > All transformations, including `CapitalizeFirstCharacter` and `RemoveMethodPrefixes`, are applied in the order they were added.
 
 #### WithFallback
-It is obvious that `RoslynNameConverter` cannot extract a valid name from an arbitrary C# expression, just consider an expression like `2 + 2 * 2`. Thus, you can specify a callback that will be used for such cases using `WithFallbackMethod`.
+It is obvious that `RoslynNameConverter` cannot extract a valid name from an arbitrary C# expression, just consider an expression like `2 + 2 * 2`. Thus, you can specify a callback that will be used for such cases using `WithFallback`.
 
 See the list of supported expressions [below](#how-it-works).
 
-#### WithMemoisation
+#### WithMemoization
 > [!IMPORTANT]
-> While Roslyn is pretty fast, it still adds some overhead, so it's **highly recommended to use memoisation** with the `RoslynNameConverter`.
+> While Roslyn is pretty fast, it still adds some overhead, so it's **highly recommended to use memoization** with the `RoslynNameConverter`.
 ```cs
-IsleConfiguration.Configure(builder => builder.WithRoslynNameConverter(opt => opt.WithMemoisation()));
+IsleConfiguration.Configure(builder => builder.WithRoslynNameConverter(opt => opt.WithMemoization()));
 ```
 
 ### Full Configuration Example
@@ -356,7 +356,7 @@ IsleConfiguration.Configure(builder => builder
     .WithRoslynNameConverter(opt => opt
         .CapitalizeFirstCharacter()
         .RemoveMethodPrefixes("Get")
-        .WithMemoisation()
+        .WithMemoization()
         .WithFallback(ValueNameConverters.SerilogCompatible())));
 ```
 
@@ -383,7 +383,7 @@ The following C# contructs are supported:
 
 ### Code Analysis
 
-As described above `RoslynNameConverter` cannot support an arbitrary C# expression. While there is a [fallback](WithFallback) for unsupported cases, it's better to prevent them at all by finding such expression and adding `.Named("SomeName")` to them.
+As described above `RoslynNameConverter` cannot support an arbitrary C# expression. While there is a [fallback](#withfallback) for unsupported cases, it's better to prevent them at all by finding such expression and adding `.Named("SomeName")` to them.
 
 Another corner case can be seen in the following example:
 ```cs
