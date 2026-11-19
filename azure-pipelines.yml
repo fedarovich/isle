@@ -142,9 +142,9 @@ steps:
 - task: PublishBuildArtifacts@1
 
 - task: NuGetToolInstaller@1
-  displayName: 'Install NuGet 6.x'
+  displayName: 'Install NuGet 7.x'
   inputs:
-    versionSpec: 6.x
+    versionSpec: 7.x
 
 - task: NuGetCommand@2
   displayName: 'MyGet push'
