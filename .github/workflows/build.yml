@@ -1,0 +1,160 @@
+name: Build
+
+on:
+  push:
+    branches: [dev]
+  pull_request:
+    branches: [dev, main]
+  workflow_dispatch:
+    inputs:
+      build-type:
+        description: Build type
+        type: choice
+        options: [CI, Pre-release, Release]
+        default: CI
+
+env:
+  VERSION_PREFIX: 2.1.0
+  CONFIGURATION: Release
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  build:
+    name: Build, test and pack
+    runs-on: windows-2025
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: |
+            8.0.x
+            9.0.x
+            10.0.x
+            11.0.x
+
+      - name: Compute version
+        env:
+          BUILD_TYPE: ${{ inputs.build-type || 'CI' }}
+        run: |
+          $fileVersion = "$env:VERSION_PREFIX.$env:GITHUB_RUN_NUMBER"
+          $packageVersion = if ($env:BUILD_TYPE -eq 'Release') { $env:VERSION_PREFIX } else { "$env:VERSION_PREFIX-pre.$env:GITHUB_RUN_NUMBER" }
+          "FILE_VERSION=$fileVersion" >> $env:GITHUB_ENV
+          "PACKAGE_VERSION=$packageVersion" >> $env:GITHUB_ENV
+          Write-Host "Build type:      $env:BUILD_TYPE"
+          Write-Host "FileVersion:     $fileVersion"
+          Write-Host "PackageVersion:  $packageVersion"
+          Write-Host "SourceVersion:   $env:GITHUB_SHA"
+
+      - name: Restore
+        run: dotnet restore src/Isle/Isle.sln
+
+      - name: Build
+        run: >
+          dotnet build src/Isle/Isle.sln -c $env:CONFIGURATION --no-restore
+          "-p:Version=$env:PACKAGE_VERSION"
+          "-p:FileVersion=$env:FILE_VERSION"
+          "-p:InformationalVersion=$env:FILE_VERSION-$env:GITHUB_SHA"
+
+      - name: Test
+        run: dotnet test src/Isle/Isle.sln -c $env:CONFIGURATION --no-build --logger trx --results-directory TestResults
+
+      - name: Pack
+        run: |
+          $projects = @(
+            'src/Isle/Isle.Compatibility/Isle.Compatibility.csproj',
+            'src/Isle/Isle.Core/Isle.Core.csproj',
+            'src/Isle/Isle.Extensions.Logging/Isle.Extensions.Logging.csproj',
+            'src/Isle/Isle.Serilog/Isle.Serilog.csproj',
+            'src/Isle/Isle.Converters.Roslyn/Isle.Converters.Roslyn.csproj',
+            'src/Isle/Isle.Converters.Roslyn.Analyzers/Isle.Converters.Roslyn.Analyzers.Package/Isle.Converters.Roslyn.Analyzers.Package.csproj'
+          )
+          foreach ($project in $projects) {
+            dotnet pack $project -c $env:CONFIGURATION --no-build "-p:Version=$env:PACKAGE_VERSION" -o artifacts
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
+
+      - name: Upload packages
+        uses: actions/upload-artifact@v7
+        with:
+          name: packages
+          path: artifacts/
+          if-no-files-found: error
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-results
+          path: TestResults/
+          if-no-files-found: ignore
+
+  publish-myget:
+    name: Publish to MyGet
+    needs: build
+    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.build-type == 'CI')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: packages
+          path: artifacts
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 11.0.x
+
+      - name: Push packages
+        env:
+          MYGET_API_KEY: ${{ secrets.MYGET_API_KEY }}
+        run: >
+          dotnet nuget push "artifacts/*.nupkg"
+          --source https://www.myget.org/F/fedarovich/api/v3/index.json
+          --api-key "$MYGET_API_KEY"
+          --symbol-api-key "$MYGET_API_KEY"
+          --skip-duplicate
+
+  publish-nuget:
+    name: Publish to nuget.org
+    needs: build
+    if: github.event_name == 'workflow_dispatch' && inputs.build-type != 'CI'
+    runs-on: ubuntu-latest
+    environment: nuget
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: packages
+          path: artifacts
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 11.0.x
+
+      - name: Log in to nuget.org
+        id: login
+        uses: NuGet/login@v1
+        with:
+          user: ${{ vars.NUGET_USER }}
+
+      - name: Push packages
+        env:
+          NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
+        run: >
+          dotnet nuget push "artifacts/*.nupkg"
+          --source https://api.nuget.org/v3/index.json
+          --api-key "$NUGET_API_KEY"
+          --skip-duplicate
