@@ -1,8 +1,6 @@
 ﻿#if !NET6_0_OR_GREATER
 
-#if !NETCOREAPP
 #nullable disable warnings
-#endif
 
 using System;
 using System.Buffers;
@@ -39,7 +37,7 @@ internal ref struct DefaultInterpolatedStringHandler
 
     private const int MaxLength = 0x3FFFFFDF;
 
-    /// <summary>Optional provider to pass to IFormattable.ToString or ISpanFormattable.TryFormat calls.</summary>
+    /// <summary>Optional provider to pass to ICustomFormatter.Format or IFormattable.ToString calls.</summary>
     private readonly IFormatProvider? _provider;
     /// <summary>Array rented from the array pool and used to back <see cref="_chars"/>.</summary>
     private char[]? _arrayToReturnToPool;
@@ -288,9 +286,8 @@ internal ref struct DefaultInterpolatedStringHandler
     //
     // Hole values are formatted according to the following policy:
     // 1. If an IFormatProvider was supplied and it provides an ICustomFormatter, use ICustomFormatter.Format (even if the value is null).
-    // 2. If the type implements ISpanFormattable, use ISpanFormattable.TryFormat.
-    // 3. If the type implements IFormattable, use IFormattable.ToString.
-    // 4. Otherwise, use object.ToString.
+    // 2. If the type implements IFormattable, use IFormattable.ToString.
+    // 3. Otherwise, use object.ToString.
     // This matches the behavior of string.Format, StringBuilder.AppendFormat, etc.  The only overloads for which this doesn't
     // apply is ReadOnlySpan<char>, which isn't supported by either string.Format nor StringBuilder.AppendFormat, but more
     // importantly which can't be boxed to be passed to ICustomFormatter.Format.
@@ -300,10 +297,6 @@ internal ref struct DefaultInterpolatedStringHandler
     /// <param name="value">The value to write.</param>
     public void AppendFormatted<T>(T value)
     {
-        // This method could delegate to AppendFormatted with a null format, but explicitly passing
-        // default as the format to TryFormat helps to improve code quality in some cases when TryFormat is inlined,
-        // e.g. for Int32 it enables the JIT to eliminate code in the inlined method based on a length check on the format.
-
         // If there's a custom formatter, always use it.
         if (_hasCustomFormatter)
         {
@@ -311,30 +304,9 @@ internal ref struct DefaultInterpolatedStringHandler
             return;
         }
 
-        // Check first for IFormattable, even though we'll prefer to use ISpanFormattable, as the latter
-        // requires the former.  For value types, it won't matter as the type checks devolve into
-        // JIT-time constants.  For reference types, they're more likely to implement IFormattable
-        // than they are to implement ISpanFormattable: if they don't implement either, we save an
-        // interface check over first checking for ISpanFormattable and then for IFormattable, and
-        // if it only implements IFormattable, we come out even: only if it implements both do we
-        // end up paying for an extra interface check.
         string? s;
         if (value is IFormattable)
         {
-            // If the value can format itself directly into our buffer, do so.
-
-            if (SpanFormattableHelper.IsSpanFormattable<T>())
-            {
-                int charsWritten;
-                while (!SpanFormattableHelper.TryFormat(value, _chars.Slice(_pos), out charsWritten, default, _provider))
-                {
-                    Grow();
-                }
-
-                _pos += charsWritten;
-                return;
-            }
-
             s = ((IFormattable)value).ToString(format: null, _provider); // constrained call avoiding boxing for value types
         }
         else
@@ -359,29 +331,9 @@ internal ref struct DefaultInterpolatedStringHandler
             return;
         }
 
-        // Check first for IFormattable, even though we'll prefer to use ISpanFormattable, as the latter
-        // requires the former.  For value types, it won't matter as the type checks devolve into
-        // JIT-time constants.  For reference types, they're more likely to implement IFormattable
-        // than they are to implement ISpanFormattable: if they don't implement either, we save an
-        // interface check over first checking for ISpanFormattable and then for IFormattable, and
-        // if it only implements IFormattable, we come out even: only if it implements both do we
-        // end up paying for an extra interface check.
         string? s;
         if (value is IFormattable)
         {
-            // If the value can format itself directly into our buffer, do so.
-            if (SpanFormattableHelper.IsSpanFormattable<T>())
-            {
-                int charsWritten;
-                while (SpanFormattableHelper.TryFormat(value, _chars.Slice(_pos), out charsWritten, format, _provider))
-                {
-                    Grow();
-                }
-
-                _pos += charsWritten;
-                return;
-            }
-
             s = ((IFormattable)value).ToString(format, _provider); // constrained call avoiding boxing for value types
         }
         else
@@ -570,7 +522,7 @@ internal ref struct DefaultInterpolatedStringHandler
         ICustomFormatter? formatter = (ICustomFormatter?)_provider.GetFormat(typeof(ICustomFormatter));
         Debug.Assert(formatter != null, "An incorrectly written provider said it implemented ICustomFormatter, and then didn't");
 
-        if (formatter is not null && formatter.Format(format, value, _provider) is string customFormatted)
+        if (formatter is not null && formatter.Format(format, value, _provider) is { } customFormatted)
         {
             AppendStringDirect(customFormatted);
         }
@@ -688,7 +640,6 @@ internal ref struct DefaultInterpolatedStringHandler
         }
     }
 
-#if NETFRAMEWORK || NETSTANDARD2_0
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static unsafe string CreateString(in ReadOnlySpan<char> text)
     {
@@ -697,12 +648,10 @@ internal ref struct DefaultInterpolatedStringHandler
             return new string(pText, 0, text.Length);
         }
     }
-#endif
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static uint Clamp(uint value, uint min, uint max)
     {
-#if NETFRAMEWORK || NETSTANDARD2_0
         if (min > max)
         {
             ThrowMinMaxException(min, max);
@@ -712,7 +661,7 @@ internal ref struct DefaultInterpolatedStringHandler
         {
             return min;
         }
-        
+
         if (value > max)
         {
             return max;
@@ -725,9 +674,6 @@ internal ref struct DefaultInterpolatedStringHandler
         {
             throw new ArgumentException("The min value must be less than or equal to max value.");
         }
-#else
-        return Math.Clamp(value, min, max);
-#endif
     }
 }
 #endif

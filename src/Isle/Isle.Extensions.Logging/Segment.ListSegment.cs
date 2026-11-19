@@ -4,7 +4,6 @@ using System.Diagnostics;
 
 namespace Isle.Extensions.Logging;
 
-
 internal readonly partial record struct Segment
 {
     public readonly ref struct ListSegment<T>
@@ -32,7 +31,15 @@ internal readonly partial record struct Segment
 
         public ListSegmentEnumerator<T> GetEnumerator() => new(_list, _offset, _length);
 
-        public T[] ToArray() => _list.Skip(_offset).Take(_length).ToArray();
+        public T[] ToArray()
+        {
+            if (_length == 0)
+                return [];
+
+            var array = new T[_length];
+            _list.CopyTo(_offset, array, 0, _length);
+            return array;
+        }
     }
 
     public ref struct ListSegmentEnumerator<T>

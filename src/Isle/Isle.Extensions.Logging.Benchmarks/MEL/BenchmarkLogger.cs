@@ -28,10 +28,7 @@ public class BenchmarkLogger : ILogger
 
     public bool IsEnabled(LogLevel logLevel) => logLevel >= _options.CurrentValue.MinLogLevel;
     
-    public IDisposable BeginScope<TState>(TState state)
-#if NET8_0_OR_GREATER
-        where TState : notnull
-#endif
+    public IDisposable BeginScope<TState>(TState state) where TState : notnull
     {
         throw new NotSupportedException();
     }

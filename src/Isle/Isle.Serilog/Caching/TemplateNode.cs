@@ -12,7 +12,7 @@ internal sealed class TemplateNode
         if (parent.Depth == 0)
         {
             MessageTemplate = MessageTemplate.Empty;
-            PropertyNodes = Array.Empty<PropertyNode>();
+            PropertyNodes = [];
             return;
         }
 

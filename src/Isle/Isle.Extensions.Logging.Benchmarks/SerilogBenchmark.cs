@@ -45,7 +45,7 @@ public class SerilogBenchmark
             .AddExtensionsLogging(cfg => cfg.EnableMessageTemplateCaching = EnableCaching));
     }
 
-    [GlobalSetup(Targets = new[] { nameof(InterpolatedWithExplicitAutomaticDestructuring), nameof(InterpolatedWithImplicitAutomaticDestructuring) })]
+    [GlobalSetup(Targets = [nameof(InterpolatedWithExplicitAutomaticDestructuring), nameof(InterpolatedWithImplicitAutomaticDestructuring)])]
     public void GlobalSetupWithAutoDestructuring()
     {
         GlobalSetup();

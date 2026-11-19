@@ -11,7 +11,7 @@ internal sealed class TemplateNode
     {
         if (parent.Depth == 0)
         {
-            Segments = Array.Empty<Segment>();
+            Segments = [];
             MessageTemplate = string.Empty;
             return;
         }

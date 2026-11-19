@@ -35,7 +35,7 @@ public class SerilogBenchmark
         GlobalSetup();
     }
 
-    [GlobalSetup(Targets = new[] { nameof(InterpolatedWithManualDestructuring), nameof(InterpolatedWithLiteralValue) })]
+    [GlobalSetup(Targets = [nameof(InterpolatedWithManualDestructuring), nameof(InterpolatedWithLiteralValue)])]
     public void GlobalSetupWithManualDestructuring()
     {
         GlobalSetup();
@@ -43,7 +43,7 @@ public class SerilogBenchmark
             .AddSerilog(cfg => cfg.EnableMessageTemplateCaching = EnableCaching));
     }
 
-    [GlobalSetup(Targets = new[] { nameof(InterpolatedWithExplicitAutomaticDestructuring), nameof(InterpolatedWithImplicitAutomaticDestructuring) })]
+    [GlobalSetup(Targets = [nameof(InterpolatedWithExplicitAutomaticDestructuring), nameof(InterpolatedWithImplicitAutomaticDestructuring)])]
     public void GlobalSetupWithAutoDestructuring()
     {
         GlobalSetup();

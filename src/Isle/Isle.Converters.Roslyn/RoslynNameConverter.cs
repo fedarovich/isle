@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Runtime.CompilerServices;
-using Microsoft.CodeAnalysis.CSharp;
+﻿using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Isle.Converters.Roslyn;
@@ -20,17 +18,11 @@ public class RoslynNameConverter
     /// <param name="transformations">Additional custom transformations to be applied to the converted name.</param>
     public RoslynNameConverter(Func<string, string> fallback, IEnumerable<Func<string, NameExpressionType, string>> transformations)
     {
-#if NET6_0_OR_GREATER
-        ArgumentNullException.
-#endif
-            ThrowIfNull(fallback);
-#if NET6_0_OR_GREATER
-        ArgumentNullException.
-#endif
-            ThrowIfNull(transformations);
+        ArgumentNullException.ThrowIfNull(fallback);
+        ArgumentNullException.ThrowIfNull(transformations);
 
         _fallback = fallback;
-        _transformations = transformations.ToArray();
+        _transformations = [.. transformations];
     }
 
     /// <summary>
@@ -146,22 +138,4 @@ public class RoslynNameConverter
 
         return (null, NameExpressionType.Invalid);
     }
-
-
-#if !NET6_0_OR_GREATER
-    /// <summary>Throws an <see cref="ArgumentNullException"/> if <paramref name="argument"/> is null.</summary>
-    /// <param name="argument">The reference type argument to validate as non-null.</param>
-    /// <param name="paramName">The name of the parameter with which <paramref name="argument"/> corresponds.</param>
-    private static void ThrowIfNull([NotNull] object? argument, [CallerArgumentExpression(nameof(argument))] string? paramName = null)
-    {
-        if (argument is null)
-        {
-            Throw(paramName);
-        }
-    }
-
-    [DoesNotReturn]
-    private static void Throw(string? paramName) =>
-        throw new ArgumentNullException(paramName);
-#endif
 }

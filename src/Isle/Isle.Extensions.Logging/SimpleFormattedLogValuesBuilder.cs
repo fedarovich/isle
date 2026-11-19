@@ -100,7 +100,7 @@ internal sealed class SimpleFormattedLogValuesBuilder : IFormattedLogValuesBuild
                 {
                     case Segment.SegmentType.Literal:
                     {
-                        prevSegment = new Segment(prevSegment, str, _literalList ??= new List<string>());
+                        prevSegment = new Segment(prevSegment, str, _literalList ??= []);
                         return;
                     }
                     case Segment.SegmentType.LiteralList:

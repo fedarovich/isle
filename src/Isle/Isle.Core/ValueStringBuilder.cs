@@ -324,13 +324,11 @@ internal ref struct ValueStringBuilder
     {
 #if NET6_0_OR_GREATER
         if (value.TryFormat(_chars.Slice(_pos), out int charsWritten, format, provider))
-#else
-        if (SpanFormattableHelper.TryFormat(value, _chars.Slice(_pos), out int charsWritten, format, provider))
-#endif
         {
             _pos += charsWritten;
         }
         else
+#endif
         {
             Append(value.ToString(format, provider));
         }

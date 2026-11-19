@@ -40,7 +40,7 @@ public class MELBenchmarks
         GlobalSetup();
     }
 
-    [GlobalSetup(Targets = new[] { nameof(InterpolatedWithManualDestructuring), nameof(InterpolatedWithNamed), nameof(InterpolatedWithLiteralValue) })]
+    [GlobalSetup(Targets = [nameof(InterpolatedWithManualDestructuring), nameof(InterpolatedWithNamed), nameof(InterpolatedWithLiteralValue)])]
     public void GlobalSetupWithManualDestructuring()
     {
         GlobalSetup();
@@ -48,7 +48,7 @@ public class MELBenchmarks
             .AddExtensionsLogging(cfg => cfg.EnableMessageTemplateCaching = EnableCaching));
     }
 
-    [GlobalSetup(Targets = new[] { nameof(InterpolatedWithExplicitAutomaticDestructuring), nameof(InterpolatedWithImplicitAutomaticDestructuring) })]
+    [GlobalSetup(Targets = [nameof(InterpolatedWithExplicitAutomaticDestructuring), nameof(InterpolatedWithImplicitAutomaticDestructuring)])]
     public void GlobalSetupWithAutoDestructuring()
     {
         GlobalSetup();

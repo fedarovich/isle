@@ -18,11 +18,10 @@ internal static class TestExtensions
 
     private static LogEventPropertyValue ToLogEventPropertyValueCore(TestObject value) =>
         new StructureValue(
-            new[]
-            {
+            [
                 new LogEventProperty(nameof(value.X), ToLogEventPropertyValueCore((dynamic) value.X)),
                 new LogEventProperty(nameof(value.Y), ToLogEventPropertyValueCore((dynamic) value.Y))
-            },
+            ],
             nameof(TestObject));
 
     private static LogEventPropertyValue ToLogEventPropertyValueCore<T>(T value) where T : unmanaged => new ScalarValue(value);

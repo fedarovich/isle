@@ -24,7 +24,7 @@ public class TestLogger : ILogger
         if (!IsEnabled(logLevel))
             return;
 
-        _logItems.Add(new TestLogItem(_categoryName, logLevel, eventId, state, exception, formatter(state, exception), _scopes.ToArray()));
+        _logItems.Add(new TestLogItem(_categoryName, logLevel, eventId, state, exception, formatter(state, exception), [.. _scopes]));
     }
 
     public bool IsEnabled(LogLevel logLevel) => logLevel >= _options.CurrentValue.MinLogLevel;

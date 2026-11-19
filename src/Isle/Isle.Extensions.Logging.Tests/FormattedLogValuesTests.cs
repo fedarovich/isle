@@ -9,12 +9,14 @@ namespace Isle.Extensions.Logging.Tests;
 
 public class FormattedLogValuesTests
 {
-    private static readonly int[] FormattedCounts = Enumerable.Range(0, 9).ToArray();
+    private static readonly int[] FormattedCounts = [.. Enumerable.Range(0, 9)];
 
     private static readonly (int formattedCount, int trimmedCount)[] TrimmedCounts =
-        (from fc in Enumerable.Range(0, 9)
-         from c in Enumerable.Range(0, fc + 1)
-         select (fc, c)).ToArray();
+    [
+        .. from fc in Enumerable.Range(0, 9)
+        from c in Enumerable.Range(0, fc + 1)
+        select (fc, c)
+    ];
 
 #if !NETFRAMEWORK
     [Test]

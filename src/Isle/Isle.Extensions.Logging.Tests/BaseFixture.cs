@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Isle.Configuration;
 using Isle.Extensions.Logging.Tests.MEL;
@@ -9,18 +10,20 @@ namespace Isle.Extensions.Logging.Tests;
 
 public abstract class BaseFixture
 {
-    protected static readonly IReadOnlyList<object> FixtureArgs = (
-        from logLevel in EnumHelper.GetValues<LogLevel>()
+    protected static readonly IReadOnlyList<object> FixtureArgs =
+    [
+        .. from logLevel in Enum.GetValues<LogLevel>()
         from enableCaching in new[] { false, true }
-        select new object[] { logLevel, enableCaching }).ToArray();
+        select new object[] { logLevel, enableCaching }
+    ];
 
-    protected static readonly IReadOnlyList<LogLevel> LogLevels = EnumHelper.GetValues<LogLevel>().Where(x => x != LogLevel.None).ToArray();
+    protected static readonly IReadOnlyList<LogLevel> LogLevels = [.. Enum.GetValues<LogLevel>().Where(x => x != LogLevel.None)];
 
-    protected static readonly IReadOnlyList<string?> Literals = new[] { null, "A", "ABC", "ABCDE", "ABCDEFGHIJKLMNOPQRSTUVWXYZ" };
+    protected static readonly IReadOnlyList<string?> Literals = [null, "A", "ABC", "ABCDE", "ABCDEFGHIJKLMNOPQRSTUVWXYZ"];
 
-    protected static readonly IReadOnlyList<object?> Scalars = new object[] { 1000, 3.5, 2.5m, "ABC" };
+    protected static readonly IReadOnlyList<object?> Scalars = [1000, 3.5, 2.5m, "ABC"];
 
-    private readonly List<TestLogItem> _logItems = new ();
+    private readonly List<TestLogItem> _logItems = [];
 
     protected BaseFixture(LogLevel minLogLevel, bool enableCaching)
     {

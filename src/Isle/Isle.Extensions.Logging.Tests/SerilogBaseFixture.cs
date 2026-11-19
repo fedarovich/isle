@@ -17,20 +17,22 @@ namespace Isle.Extensions.Logging.Tests;
 
 public abstract class SerilogBaseFixture
 {
-    protected static readonly IReadOnlyList<LogLevel> LogLevels = EnumHelper.GetValues<LogLevel>().Where(x => x != LogLevel.None).ToArray();
+    protected static readonly IReadOnlyList<LogLevel> LogLevels = [.. Enum.GetValues<LogLevel>().Where(x => x != LogLevel.None)];
         
-    protected static readonly IReadOnlyList<object> FixtureArgs = (
-        from logLevel in LogLevels
+    protected static readonly IReadOnlyList<object> FixtureArgs =
+    [
+        .. from logLevel in LogLevels
         from enableCaching in new[] { false, true }
-        select new object[] { logLevel, enableCaching }).ToArray();
+        select new object[] { logLevel, enableCaching }
+    ];
 
-    protected static readonly IReadOnlyList<string?> Literals = new[] { null, "A", "ABC", "ABCDE", "ABCDEFGHIJKLMNOPQRSTUVWXYZ" };
+    protected static readonly IReadOnlyList<string?> Literals = [null, "A", "ABC", "ABCDE", "ABCDEFGHIJKLMNOPQRSTUVWXYZ"];
 
-    protected static readonly IReadOnlyList<object?> Scalars = new object[] { 1000, 3.5, 2.5m, "ABC" };
+    protected static readonly IReadOnlyList<object?> Scalars = [1000, 3.5, 2.5m, "ABC"];
 
     protected static readonly MessageTemplateParser Parser = new ();
 
-    private readonly List<LogEvent> _serilogLogEvents = new();
+    private readonly List<LogEvent> _serilogLogEvents = [];
 
     protected SerilogBaseFixture(LogLevel minLogLevel, bool enableCaching)
     {
@@ -167,5 +169,5 @@ public abstract class SerilogBaseFixture
 
     protected LogEventProperty EventIdProperty(EventId eventId) =>
         new LogEventProperty("EventId",
-            new StructureValue(new[] { new LogEventProperty(nameof(eventId.Id), new ScalarValue(eventId.Id)) }));
+            new StructureValue([new LogEventProperty(nameof(eventId.Id), new ScalarValue(eventId.Id))]));
 }

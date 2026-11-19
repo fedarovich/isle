@@ -13,20 +13,22 @@ namespace Isle.Serilog.Tests;
 
 public abstract class BaseFixture
 {
-    protected static readonly IReadOnlyList<LogEventLevel> LogEventLevels = EnumHelper.GetValues<LogEventLevel>().ToArray();
+    protected static readonly IReadOnlyList<LogEventLevel> LogEventLevels = Enum.GetValues<LogEventLevel>();
         
-    protected static readonly IReadOnlyList<object> FixtureArgs = (
-        from logEventLevel in LogEventLevels
+    protected static readonly IReadOnlyList<object> FixtureArgs =
+    [
+        .. from logEventLevel in LogEventLevels
         from enableCaching in new[] { false, true }
-        select new object[] { logEventLevel, enableCaching }).ToArray();
+        select new object[] { logEventLevel, enableCaching }
+    ];
 
-    protected static readonly IReadOnlyList<string?> Literals = new[] { null, "A", "ABC", "ABCDE", "ABCDEFGHIJKLMNOPQRSTUVWXYZ" };
+    protected static readonly IReadOnlyList<string?> Literals = [null, "A", "ABC", "ABCDE", "ABCDEFGHIJKLMNOPQRSTUVWXYZ"];
 
-    protected static readonly IReadOnlyList<object?> Scalars = new object[] { 1000, 3.5, 2.5m, "ABC" };
+    protected static readonly IReadOnlyList<object?> Scalars = [1000, 3.5, 2.5m, "ABC"];
 
     protected static readonly MessageTemplateParser Parser = new ();
 
-    private readonly List<LogEvent> _logEvents = new();
+    private readonly List<LogEvent> _logEvents = [];
 
     protected BaseFixture(LogEventLevel minLogEventLevel, bool enableCaching)
     {

@@ -17,11 +17,10 @@ internal static class SerilogTestExtensions
 
     private static LogEventPropertyValue ToLogEventPropertyValue(TestObject value) =>
         new StructureValue(
-            new[]
-            {
+            [
                 new LogEventProperty(nameof(value.X), ToLogEventPropertyValue((dynamic) value.X)),
                 new LogEventProperty(nameof(value.Y), ToLogEventPropertyValue((dynamic) value.Y))
-            },
+            ],
             nameof(TestObject));
 
     private static LogEventPropertyValue ToLogEventPropertyValue<T>(T value) where T : unmanaged => new ScalarValue(value);

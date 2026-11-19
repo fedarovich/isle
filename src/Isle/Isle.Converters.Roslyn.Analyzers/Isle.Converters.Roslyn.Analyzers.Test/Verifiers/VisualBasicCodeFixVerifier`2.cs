@@ -42,7 +42,7 @@ namespace Isle.Converters.Roslyn.Analyzers.Test
 
         /// <inheritdoc cref="CodeFixVerifier{TAnalyzer, TCodeFix, TTest, TVerifier}.VerifyCodeFixAsync(string, DiagnosticResult, string)"/>
         public static async Task VerifyCodeFixAsync(string source, DiagnosticResult expected, string fixedSource)
-            => await VerifyCodeFixAsync(source, new[] { expected }, fixedSource);
+            => await VerifyCodeFixAsync(source, [expected], fixedSource);
 
         /// <inheritdoc cref="CodeFixVerifier{TAnalyzer, TCodeFix, TTest, TVerifier}.VerifyCodeFixAsync(string, DiagnosticResult[], string)"/>
         public static async Task VerifyCodeFixAsync(string source, DiagnosticResult[] expected, string fixedSource)

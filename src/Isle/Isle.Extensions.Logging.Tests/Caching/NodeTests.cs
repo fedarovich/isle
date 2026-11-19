@@ -133,10 +133,10 @@ internal abstract class NodeTests<TNode> where TNode : Node
     public void GetOrAddLiteralNodesMultithreaded()
     {
         string[] literals =
-        {
+        [
             Guid.NewGuid().ToString(),
             Guid.NewGuid().ToString()
-        };
+        ];
 
         var threadCount = Math.Max(Environment.ProcessorCount, 4);
 
@@ -211,10 +211,10 @@ internal abstract class NodeTests<TNode> where TNode : Node
     public void GetOrAddHoleNodesMultithreaded()
     {
         string[] names =
-        {
+        [
             "X" + Guid.NewGuid().ToString("N"),
             "Y" + Guid.NewGuid().ToString("N")
-        };
+        ];
 
         var threadCount = Math.Max(Environment.ProcessorCount, 4);
 
@@ -291,10 +291,10 @@ internal abstract class NodeTests<TNode> where TNode : Node
     public void GetOrAddFormattedHoleNodesMultithreaded()
     {
         string[] names =
-        {
+        [
             "X" + Guid.NewGuid().ToString("N"),
             "Y" + Guid.NewGuid().ToString("N")
-        };
+        ];
         var format = "F3";
         var alignment = -6;
 

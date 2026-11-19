@@ -177,10 +177,10 @@ internal abstract class NodeTests<TNode> where TNode : Node
     public void GetOrAddTextNodesMultithreaded()
     {
         string[] texts =
-        {
+        [
             Guid.NewGuid().ToString(),
             Guid.NewGuid().ToString()
-        };
+        ];
 
         var threadCount = Math.Max(Environment.ProcessorCount, 4);
 
@@ -255,10 +255,10 @@ internal abstract class NodeTests<TNode> where TNode : Node
     public void GetOrAddPropertyNodesMultithreaded()
     {
         string[] names =
-        {
+        [
             "X" + Guid.NewGuid().ToString("N"),
             "Y" + Guid.NewGuid().ToString("N")
-        };
+        ];
 
         var threadCount = Math.Max(Environment.ProcessorCount, 4);
 
@@ -335,10 +335,10 @@ internal abstract class NodeTests<TNode> where TNode : Node
     public void GetOrAddFormattedPropertyNodesMultithreaded()
     {
         string[] names =
-        {
+        [
             "X" + Guid.NewGuid().ToString("N"),
             "Y" + Guid.NewGuid().ToString("N")
-        };
+        ];
         var format = "F3";
         var alignment = -6;
 
