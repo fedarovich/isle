@@ -24,7 +24,7 @@ internal static class CapitalizeFirstCharacterConverter
     [SkipLocalsInit]
     private static string CapitalizeFirstCharacter(string expression)
     {
-#if NETCOREAPP || NETSTANDARD2_1
+#if NETCOREAPP
         return string.Create(expression.Length, expression, static (span, expr) =>
         {
             int index = 0;

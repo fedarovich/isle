@@ -10,7 +10,7 @@ internal static class SpanFormattableHelper
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static bool IsSpanFormattable<T>()
     {
-#if NETCOREAPP || NETSTANDARD2_1
+#if NETCOREAPP
         return typeof(T) == typeof(byte)
                || typeof(T) == typeof(sbyte)
                || typeof(T) == typeof(short)
@@ -38,14 +38,14 @@ internal static class SpanFormattableHelper
         T value, 
         Span<char> destination, 
         out int charsWritten,
-#if NETCOREAPP || NETSTANDARD2_1
+#if NETCOREAPP
         ReadOnlySpan<char> format,
 #else
         string? format,
 #endif
         IFormatProvider? provider)
     {
-#if NETCOREAPP || NETSTANDARD2_1
+#if NETCOREAPP
         return value switch
         {
             byte v => v.TryFormat(destination, out charsWritten, format, provider),

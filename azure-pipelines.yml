@@ -42,17 +42,31 @@ steps:
   displayName: 'Print Variables'
 
 - task: UseDotNet@2
-  displayName: 'Install .Net 3.1'
+  displayName: 'Install .Net 8 Runtime'
   inputs:
-    packageType: sdk
-    version: '3.1.x'
+    packageType: runtime
+    version: '8.0.x'
     performMultiLevelLookup: true
-    
+
 - task: UseDotNet@2
-  displayName: 'Install .Net 6'
+  displayName: 'Install .Net 9 Runtime'
+  inputs:
+    packageType: runtime
+    version: '9.0.x'
+    performMultiLevelLookup: true
+
+- task: UseDotNet@2
+  displayName: 'Install .Net 10 Runtime'
+  inputs:
+    packageType: runtime
+    version: '10.0.x'
+    performMultiLevelLookup: true
+
+- task: UseDotNet@2
+  displayName: 'Install .Net 11 SDK'
   inputs:
     packageType: sdk
-    version: '6.0.x'
+    version: '11.0.x'
     performMultiLevelLookup: true
 
 - task: DotNetCoreCLI@2

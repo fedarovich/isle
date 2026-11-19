@@ -161,7 +161,7 @@ public class ValueStringBuilderTests
         vsb.ToString().Should().Be(sb.ToString());
     }
 
-#if NETCOREAPP || NETSTANDARD2_1
+#if NETCOREAPP
     [Test]
     public void AsSpan_ReturnsCorrectValue_DoesntClearBuilder()
     {
@@ -220,7 +220,7 @@ public class ValueStringBuilderTests
         vsb.Length.Should().Be(0);
     }
 
-#if NETCOREAPP || NETSTANDARD2_1
+#if NETCOREAPP
     [Test]
     public void TryCopyTo_ClearsBuilder_ThenReusable()
     {

@@ -37,7 +37,7 @@ namespace Isle.Converters.Roslyn.Analyzers.Test
             var test = new Test
             {
                 TestCode = source,
-                ReferenceAssemblies = ReferenceAssemblies.Net.Net90,
+                ReferenceAssemblies = ReferenceAssemblies.Net.Net100,
                 TestState =
                 {
                     AnalyzerConfigFiles =
@@ -66,7 +66,7 @@ namespace Isle.Converters.Roslyn.Analyzers.Test
             {
                 TestCode = source,
                 FixedCode = fixedSource,
-                ReferenceAssemblies = ReferenceAssemblies.Net.Net90,
+                ReferenceAssemblies = ReferenceAssemblies.Net.Net100,
                 TestState =
                 {
                     AnalyzerConfigFiles =

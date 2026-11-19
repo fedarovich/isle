@@ -1,6 +1,6 @@
 ﻿#if !NET6_0_OR_GREATER
 
-#if !NETCOREAPP && !NETSTANDARD2_1
+#if !NETCOREAPP
 #nullable disable warnings
 #endif
 

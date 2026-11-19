@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-ISLE (Interpolated String Logging Extensions) is a set of NuGet libraries that let C# 10+ code do structured logging with interpolated strings (`logger.LogInformation($"Area is {area}")`). The argument names are captured with `[CallerArgumentExpression]` and turned into a message template. The libraries target `net10.0;net9.0;net8.0;net6.0;netstandard2.1;netstandard2.0`. User-facing docs are in `README.md`.
+ISLE (Interpolated String Logging Extensions) is a set of NuGet libraries that let C# 10+ code do structured logging with interpolated strings (`logger.LogInformation($"Area is {area}")`). The argument names are captured with `[CallerArgumentExpression]` and turned into a message template. The libraries target `net11.0;net10.0;net9.0;net8.0;netstandard2.0`. User-facing docs are in `README.md`.
 
 ## Commands
 
@@ -25,7 +25,7 @@ dotnet test src/Isle/Isle.Serilog.Tests -f net10.0 --filter "FullyQualifiedName~
 dotnet run -c Release -f net10.0 --project src/Isle/Isle.Extensions.Logging.Benchmarks -- --filter *
 ```
 
-- Test projects target `net10.0;net9.0;net8.0;net6.0;netcoreapp3.1;net48`. Running them without `-f` requires every one of those runtimes; CI (`azure-pipelines.yml`, `windows-2022`) installs the .NET Core 3.1 and 6 SDKs for this. `Isle.Converters.Roslyn.Analyzers.Test` targets `net9.0` only.
+- Test projects target `net11.0;net10.0;net9.0;net8.0;net48`. Running them without `-f` requires every one of those runtimes; CI (`azure-pipelines.yml`, `windows-2022`) installs the .NET 11 SDK and the .NET 8, 9 and 10 runtimes for this. `Isle.Converters.Roslyn.Analyzers.Test` targets `net9.0` only.
 - Tests use NUnit 3 and FluentAssertions 7 (NSubstitute in `Isle.Core.Tests`).
 - CI builds, tests and packs 6 packages: Compatibility, Core, Extensions.Logging, Serilog, Converters.Roslyn, and Converters.Roslyn.Analyzers (packed from the `.Package` project). The version comes from `MajorVersion`/`MinorVersion`/`Patch` in `azure-pipelines.yml`. CI triggers on the `2.x` branch.
 
@@ -35,7 +35,7 @@ Much of the public surface and many tests are generated from T4 templates (`*.tt
 
 - `Isle.Extensions.Logging/LogHandlers.tt`: one `[InterpolatedStringHandler] ref struct` per log level, plus a generic `Log(LogLevel)` handler and a `BeginScope` handler.
 - `Isle.Extensions.Logging/LoggerExtensions.tt`: the `ILogger` extension methods that take those handlers.
-- `Isle.Extensions.Logging/FormattedLogValues.tt`: fixed-size `FormattedLogValues0..7` state objects (only for `NETCOREAPP || NETSTANDARD2_1`).
+- `Isle.Extensions.Logging/FormattedLogValues.tt`: fixed-size `FormattedLogValues0..7` state objects (only for `NETCOREAPP`).
 - `Isle.Serilog/LogHandlers.tt` and `LoggerExtensions.tt`: the same pattern for `Serilog.ILogger`. These methods use an `*Interpolated` suffix because of overload resolution.
 - Test projects: `LogHandlerTests.tt`, `LoggerExtensionsTests.tt`, `MELTests.tt`, `SerilogLoggerExtensionsTests.tt`.
 
@@ -43,7 +43,7 @@ Much of the public surface and many tests are generated from T4 templates (`*.tt
 
 ### Project layering
 
-`Isle.Compatibility` (polyfills such as `DefaultInterpolatedStringHandler`, `Index`/`Range`, and attributes; referenced only for pre-`net6.0` TFMs) → `Isle.Core` → `Isle.Extensions.Logging` / `Isle.Serilog` / `Isle.Converters.Roslyn`. Core shares internals with the integration projects and tests through `InternalsVisibleTo`, so internal types such as `CoreConfiguration` and `ValueStringBuilder` are effectively shared API.
+`Isle.Compatibility` (polyfills such as `DefaultInterpolatedStringHandler`, `Index`/`Range`, and attributes; referenced only for the `netstandard2.0` TFM) → `Isle.Core` → `Isle.Extensions.Logging` / `Isle.Serilog` / `Isle.Converters.Roslyn`. Core shares internals with the integration projects and tests through `InternalsVisibleTo`, so internal types such as `CoreConfiguration` and `ValueStringBuilder` are effectively shared API.
 
 `Isle.Core.Analyzers` (`ISLE0001`, which requires C# 10) is not referenced as an assembly. `Isle.Core.csproj` packs its DLL into `analyzers/dotnet/cs`. The `buildTransitive/*.targets` files add global usings (`Isle.Extensions`, `Isle.Serilog`). Consumers can opt out with `UsingIsleExtensions=False` and `UsingIsleSerilog=False`.
 
@@ -81,5 +81,5 @@ Interpolated string handler (generated) → builder → logger:
 ## Conventions
 
 - `LangVersion` is `LatestMajor`, with `Nullable` and `AllowUnsafeBlocks` enabled. `IsAotCompatible` is set for `net7.0+` TFMs.
-- Code that differs per TFM uses `#if NETCOREAPP`, `NETSTANDARD2_1`, `NETCOREAPP3_0_OR_GREATER`, and so on. Anything new that must work on `netstandard2.0` may need a polyfill in `Isle.Compatibility`.
-- `Microsoft.Extensions.Logging.Abstractions` is pinned per TFM (6.0 for pre-net8 TFMs, then 8/9/10 to match). Serilog is pinned to 3.0.0.
+- Code that differs per TFM uses `#if NETCOREAPP`, `NETFRAMEWORK || NETSTANDARD2_0`, `NET6_0_OR_GREATER`, and so on. Anything new that must work on `netstandard2.0` may need a polyfill in `Isle.Compatibility`.
+- `Microsoft.Extensions.Logging.Abstractions` is pinned per TFM (6.0 for `netstandard2.0`/`net48`, then 8/9/10/11 to match). Serilog is pinned to 3.0.0.

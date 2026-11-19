@@ -1,5 +1,5 @@
 ﻿#nullable enable
-#if NETCOREAPP || NETSTANDARD2_1
+#if NETCOREAPP
 using System.Runtime.InteropServices;
 
 namespace Isle.Extensions.Logging;
