@@ -25,9 +25,13 @@ dotnet test src/Isle/Isle.Serilog.Tests -f net10.0 --filter "FullyQualifiedName~
 dotnet run -c Release -f net10.0 --project src/Isle/Isle.Extensions.Logging.Benchmarks -- --filter *
 ```
 
-- Test projects target `net11.0;net10.0;net9.0;net8.0;net48`. Running them without `-f` requires every one of those runtimes; CI (`azure-pipelines.yml`, `windows-2022`) installs the .NET 11 SDK and the .NET 8, 9 and 10 runtimes for this. `Isle.Converters.Roslyn.Analyzers.Test` targets `net9.0` only.
+- Test projects target `net11.0;net10.0;net9.0;net8.0;net48`. Running them without `-f` requires every one of those runtimes; CI installs the .NET 8, 9, 10 and 11 SDKs for this. `Isle.Converters.Roslyn.Analyzers.Test` targets `net10.0` only.
 - Tests use NUnit 3 and FluentAssertions 7 (NSubstitute in `Isle.Core.Tests`).
-- CI builds, tests and packs 6 packages: Compatibility, Core, Extensions.Logging, Serilog, Converters.Roslyn, and Converters.Roslyn.Analyzers (packed from the `.Package` project). The version comes from `MajorVersion`/`MinorVersion`/`Patch` in `azure-pipelines.yml`. CI triggers on the `dev` branch.
+- CI is GitHub Actions (`.github/workflows/build.yml`, `windows-2025`). It builds, tests and packs 6 packages: Compatibility, Core, Extensions.Logging, Serilog, Converters.Roslyn, and Converters.Roslyn.Analyzers (packed from the `.Package` project).
+  - Push to `dev`: CI build, published to MyGet as `<VERSION_PREFIX>-pre.<run_number>`.
+  - Pull requests to `dev`/`main`: build, test and pack only.
+  - Manual run (`workflow_dispatch`, `build-type` = `Pre-release`/`Release`): published to nuget.org via trusted publishing (`NuGet/login`, `nuget` environment).
+  - The version comes from `VERSION_PREFIX` in the workflow plus `github.run_number`; bump `VERSION_PREFIX` after each release.
 
 ## T4 templates: generated code is checked in
 
