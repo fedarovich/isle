@@ -27,7 +27,7 @@ dotnet run -c Release -f net10.0 --project src/Isle/Isle.Extensions.Logging.Benc
 
 - Test projects target `net11.0;net10.0;net9.0;net8.0;net48`. Running them without `-f` requires every one of those runtimes; CI (`azure-pipelines.yml`, `windows-2022`) installs the .NET 11 SDK and the .NET 8, 9 and 10 runtimes for this. `Isle.Converters.Roslyn.Analyzers.Test` targets `net9.0` only.
 - Tests use NUnit 3 and FluentAssertions 7 (NSubstitute in `Isle.Core.Tests`).
-- CI builds, tests and packs 6 packages: Compatibility, Core, Extensions.Logging, Serilog, Converters.Roslyn, and Converters.Roslyn.Analyzers (packed from the `.Package` project). The version comes from `MajorVersion`/`MinorVersion`/`Patch` in `azure-pipelines.yml`. CI triggers on the `2.x` branch.
+- CI builds, tests and packs 6 packages: Compatibility, Core, Extensions.Logging, Serilog, Converters.Roslyn, and Converters.Roslyn.Analyzers (packed from the `.Package` project). The version comes from `MajorVersion`/`MinorVersion`/`Patch` in `azure-pipelines.yml`. CI triggers on the `dev` branch.
 
 ## T4 templates: generated code is checked in
 
