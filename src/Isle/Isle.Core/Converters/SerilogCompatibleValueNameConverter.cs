@@ -36,7 +36,8 @@ internal sealed class SerilogCompatibleValueNameConverter
             char c = expression[pos];
             if (!(char.IsLetterOrDigit(c) || c == '_'))
             {
-                if (c == '@' && !hasAt)
+                // Keep '@' only as the leading character. Any other '@' follows kept characters and must be removed.
+                if (c == '@' && pos == 0)
                 {
                     hasAt = true;
                     continue;
@@ -65,7 +66,8 @@ internal sealed class SerilogCompatibleValueNameConverter
             if (char.IsLetterOrDigit(c) || c == '_')
                 continue;
 
-            if (c == '@' && !hasAt)
+            // Keep '@' only if nothing has been kept before it, so that it becomes the first character of the result.
+            if (c == '@' && vsb.Length == 0 && start == position)
             {
                 hasAt = true;
                 continue;

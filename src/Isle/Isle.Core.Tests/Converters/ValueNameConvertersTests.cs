@@ -84,6 +84,10 @@ public class ValueNameConvertersTests
     [TestCase(" @ab ", ExpectedResult = "@ab")]
     [TestCase("@ab + @c", ExpectedResult = "@abc")]
     [TestCase("(@ab + @c)", ExpectedResult = "@abc")]
+    [TestCase("@point", ExpectedResult = "@point")]
+    [TestCase("obj.@class", ExpectedResult = "objclass")]
+    [TestCase("@obj.@class", ExpectedResult = "@objclass")]
+    [TestCase("(obj.@class)", ExpectedResult = "objclass")]
     [TestCase(
         "abcdefghijklmnopqrstuvwxyz.ABCDEFGHIJKLMNOPQRSTUVWXYZ_1234567890 + " +
         "abcdefghijklmnopqrstuvwxyz.ABCDEFGHIJKLMNOPQRSTUVWXYZ_1234567890 + " +
@@ -117,6 +121,10 @@ public class ValueNameConvertersTests
     [TestCase(" @ab ", ExpectedResult = "@Ab")]
     [TestCase("@ab + @c", ExpectedResult = "@Abc")]
     [TestCase("(@ab + @c)", ExpectedResult = "@Abc")]
+    [TestCase("@point", ExpectedResult = "@Point")]
+    [TestCase("obj.@class", ExpectedResult = "Objclass")]
+    [TestCase("@obj.@class", ExpectedResult = "@Objclass")]
+    [TestCase("(obj.@class)", ExpectedResult = "Objclass")]
     [TestCase(
         "abcdefghijklmnopqrstuvwxyz.ABCDEFGHIJKLMNOPQRSTUVWXYZ_1234567890 + " +
         "abcdefghijklmnopqrstuvwxyz.ABCDEFGHIJKLMNOPQRSTUVWXYZ_1234567890 + " +
