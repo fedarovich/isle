@@ -63,8 +63,9 @@ public static class ValueNameConverters
     /// <returns>The value name converter.</returns>
     /// <remarks>
     /// <para>
-    /// The first <c>@</c> character is preserved, so that the destructuring operator is kept.
-    /// If <paramref name="capitalizeFirstCharacter"/> is <see langword="true"/> and the first character is <c>@</c>,
+    /// A leading <c>@</c> character (one that comes before any letter, digit or underscore) is preserved,
+    /// so that the destructuring operator is kept. Any other <c>@</c> character, such as the one in <c>obj.@class</c>, is removed.
+    /// If <paramref name="capitalizeFirstCharacter"/> is <see langword="true"/> and the result starts with <c>@</c>,
     /// the next character will be capitalized.
     /// </para>
     /// <para>

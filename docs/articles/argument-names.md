@@ -63,7 +63,7 @@ The `Isle.Converters.ValueNameConverters` class provides these converters:
 | Converter | What it does | Example |
 | --------- | ------------ | ------- |
 | `CapitalizeFirstCharacter()` | Makes the first character upper-case (invariant culture) if it is a lower-case letter. A leading `@` is skipped. | `order.Id` → `Order.Id`<br/>`@point` → `@Point` |
-| `SerilogCompatible(capitalizeFirstCharacter: true)` | Removes every character except letters, digits and `_`, keeping a leading `@`. Optionally capitalizes the first letter. | `order.Id` → `OrderId`<br/>`GetTotal()` → `GetTotal`<br/>`@point` → `@Point` |
+| `SerilogCompatible(capitalizeFirstCharacter: true)` | Removes every character except letters, digits and `_`. A leading `@` is kept; any other `@` is removed. Optionally capitalizes the first letter. | `order.Id` → `OrderId`<br/>`GetTotal()` → `GetTotal`<br/>`@point` → `@Point`<br/>`obj.@class` → `Objclass` |
 
 `SerilogCompatible` makes any expression a valid Serilog property name. Its results can be awkward (`items.Count()` → `ItemsCount`), and it throws `ArgumentException` if nothing is left after removing the invalid characters. The [Roslyn name converter](roslyn-name-converter.md) gives better names.
 

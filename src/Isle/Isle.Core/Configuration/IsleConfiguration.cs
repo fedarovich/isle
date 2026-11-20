@@ -146,6 +146,9 @@ public sealed class IsleConfiguration
     /// If ISLE has not been configured yet or the configuration has been reset, this method will have no effect.
     /// </para>
     /// </remarks>
+    /// <exception cref="InvalidOperationException">
+    /// The configuration is not resettable. The configuration is left unchanged.
+    /// </exception>
     public static void Reset()
     {
         // Check before changing any state, so that a failed reset leaves the configuration intact.

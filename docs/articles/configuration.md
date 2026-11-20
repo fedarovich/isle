@@ -139,7 +139,7 @@ IsleConfiguration.Configure(builder => builder
     .IsResettable());
 ```
 
-`Reset()` throws `InvalidOperationException` if the configuration is not resettable. If ISLE isn't configured, it does nothing.
+`Reset()` throws `InvalidOperationException` if the configuration is not resettable, and the configuration stays in place. If ISLE isn't configured, it does nothing.
 
 > [!NOTE]
 > The mode is fixed for the whole process the first time ISLE reads its settings. If ISLE code reads the settings before `Configure` is called, for example through an enabled-level log call or `LiteralValue(string)`, the process stays on the slower resettable path even after a non-resettable configuration. Logging still works correctly. Configuring ISLE first avoids this.
