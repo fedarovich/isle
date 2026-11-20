@@ -72,9 +72,9 @@ namespace Isle.Converters.Roslyn.Analyzers {
         /// <summary>
         ///   Looks up a localized string similar to Trim white spaces from the name..
         /// </summary>
-        internal static string ExplicitNameShouldNotHaveWhiteSpacesCodeFixProvider {
+        internal static string ExplicitNameShouldNotHaveWhiteSpacesCodeFixProviderTitle {
             get {
-                return ResourceManager.GetString("ExplicitNameShouldNotHaveWhiteSpacesCodeFixProvider", resourceCulture);
+                return ResourceManager.GetString("ExplicitNameShouldNotHaveWhiteSpacesCodeFixProviderTitle", resourceCulture);
             }
         }
     }

@@ -2015,6 +2015,49 @@ public class CapturedNamesAnalyzerMELTests
     ];
 
     [Test]
+    public async Task ExplicitNameShouldNotHaveWhiteSpaces_CodeFixTitle()
+    {
+        var test =
+            $$"""
+            {{Usings}}
+
+            namespace Test
+            {
+                {{SharedCode}}
+
+                class TestClass
+                {
+                    public static void TestLog(ILogger logger, Value value)
+                    {
+                        logger.LogInformation($"Test {value.Named({|#0:" Value "|})}.");
+                    }
+                }
+            }
+            """;
+
+        var fix =
+            $$"""
+            {{Usings}}
+
+            namespace Test
+            {
+                {{SharedCode}}
+
+                class TestClass
+                {
+                    public static void TestLog(ILogger logger, Value value)
+                    {
+                        logger.LogInformation($"Test {value.Named("Value")}.");
+                    }
+                }
+            }
+            """;
+
+        DiagnosticResult expected = VerifyExplicitNamesCS.Diagnostic("ISLE4004").WithLocation(0).WithArguments(" Value ");
+        await VerifyExplicitNamesCS.VerifyCodeFixAsync(test, expected, fix, "Trim white spaces from the name.");
+    }
+
+    [Test]
     public async Task Log_WithNameWithWhiteSpaces_ExplicitNameShouldNotHaveWhiteSpacesDiagnosticId(
         [ValueSource(nameof(LogLevels))] LogLevel level,
         [ValueSource(nameof(NamesWithWhiteSpaces))] string name)

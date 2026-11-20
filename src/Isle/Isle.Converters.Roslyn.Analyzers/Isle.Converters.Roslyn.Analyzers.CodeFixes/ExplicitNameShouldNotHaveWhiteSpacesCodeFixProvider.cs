@@ -37,7 +37,7 @@ public sealed class ExplicitNameShouldNotHaveWhiteSpacesCodeFixProvider : CodeFi
 
         context.RegisterCodeFix(
             CodeAction.Create(
-                CodeFixResources.CapturedNameMustBeValidIdentifierCodeFixProviderTitle,
+                CodeFixResources.ExplicitNameShouldNotHaveWhiteSpacesCodeFixProviderTitle,
                 createChangedDocument: ct => CreateChangedDocument(context.Document, argumentSyntax.Expression, name, ct),
                 equivalenceKey: nameof(ExplicitNameShouldNotHaveWhiteSpacesCodeFixProvider)
             ),

@@ -121,7 +121,8 @@
     <value>Add named and specify custom name.</value>
     <comment>The title of the code fix.</comment>
   </data>
-  <data name="ExplicitNameShouldNotHaveWhiteSpacesCodeFixProvider" xml:space="preserve">
+  <data name="ExplicitNameShouldNotHaveWhiteSpacesCodeFixProviderTitle" xml:space="preserve">
     <value>Trim white spaces from the name.</value>
+    <comment>The title of the code fix.</comment>
   </data>
 </root>

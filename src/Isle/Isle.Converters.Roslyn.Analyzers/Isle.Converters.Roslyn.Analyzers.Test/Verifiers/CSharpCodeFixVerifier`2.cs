@@ -1,4 +1,6 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -61,6 +63,18 @@ namespace Isle.Converters.Roslyn.Analyzers.Test
 
         /// <inheritdoc cref="CodeFixVerifier{TAnalyzer, TCodeFix, TTest, TVerifier}.VerifyCodeFixAsync(string, DiagnosticResult[], string)"/>
         public static async Task VerifyCodeFixAsync(string source, DiagnosticResult[] expected, string fixedSource)
+            => await VerifyCodeFixAsync(source, expected, fixedSource, codeActionVerifier: null);
+
+        /// <summary>
+        /// Verifies the code fix like <see cref="VerifyCodeFixAsync(string, DiagnosticResult, string)"/>
+        /// and checks that the applied code action has the expected title.
+        /// </summary>
+        public static async Task VerifyCodeFixAsync(string source, DiagnosticResult expected, string fixedSource, string expectedCodeActionTitle)
+            => await VerifyCodeFixAsync(source, [expected], fixedSource,
+                (codeAction, verifier) => verifier.Equal(expectedCodeActionTitle, codeAction.Title, "Unexpected code action title."));
+
+        private static async Task VerifyCodeFixAsync(string source, DiagnosticResult[] expected, string fixedSource,
+            Action<CodeAction, IVerifier> codeActionVerifier)
         {
             var test = new Test
             {
@@ -73,7 +87,8 @@ namespace Isle.Converters.Roslyn.Analyzers.Test
                     {
                         ("/CapturedNamesAnalyzer.editorconfig", CapturedNamesAnalyzerEditorConfig)
                     }
-                }
+                },
+                CodeActionVerifier = codeActionVerifier
             };
 
             test.ExpectedDiagnostics.AddRange(expected);
