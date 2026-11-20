@@ -148,6 +148,11 @@ public sealed class IsleConfiguration
     /// </remarks>
     public static void Reset()
     {
+        // Check before changing any state, so that a failed reset leaves the configuration intact.
+        // The extension snapshots copy IsResettable from the core snapshot, so their resets cannot fail after this check.
+        if (CoreConfigurationSnapshot.TryGetCurrent(out var snapshot) && !snapshot.IsResettable)
+            throw new InvalidOperationException("The ISLE configuration is not resettable.");
+
         var configuration = Interlocked.Exchange(ref _current, null);
         if (configuration != null)
         {

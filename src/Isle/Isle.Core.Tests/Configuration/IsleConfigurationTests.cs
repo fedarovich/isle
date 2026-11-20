@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using FluentAssertions;
 using Isle.Configuration;
 using NSubstitute;
@@ -72,6 +73,51 @@ internal class IsleConfigurationTests
         IsleConfiguration.Reset();
         hook.DidNotReceive().ApplyExtensionConfiguration();
         hook.DidNotReceive().ResetExtensionConfiguration();
+    }
+
+    [Test]
+    public void ResetThrowsWithoutChangingStateIfNotResettable([Values] bool withHook)
+    {
+        var hook = Substitute.For<IIsleExtensionConfigurationHook>();
+
+        // This test must not touch CoreConfiguration: its static constructor would see the non-resettable
+        // configuration and lock the whole test process into the non-resettable mode.
+        IsleConfiguration.Configure(builder =>
+        {
+            builder.IsResettable = false;
+            if (withHook)
+            {
+                builder.RegisterExtensionConfigurationHook(hook);
+            }
+        });
+
+        try
+        {
+            var configuration = IsleConfiguration.Current;
+
+            var reset = () => IsleConfiguration.Reset();
+            reset.Should().Throw<InvalidOperationException>().WithMessage("*not resettable*");
+            hook.DidNotReceive().ResetExtensionConfiguration();
+            IsleConfiguration.Current.Should().BeSameAs(configuration);
+
+            var configure = () => IsleConfiguration.Configure(b => b.IsResettable());
+            configure.Should().Throw<InvalidOperationException>().WithMessage("*already been configured*");
+            IsleConfiguration.Current.Should().BeSameAs(configuration);
+        }
+        finally
+        {
+            ForceReset();
+        }
+    }
+
+    /// <summary>
+    /// Clears a non-resettable configuration, which <see cref="IsleConfiguration.Reset"/> refuses to do.
+    /// </summary>
+    private static void ForceReset()
+    {
+        const BindingFlags flags = BindingFlags.NonPublic | BindingFlags.Static;
+        typeof(IsleConfiguration).GetField("_current", flags)!.SetValue(null, null);
+        typeof(CoreConfigurationSnapshot).GetField("_current", flags)!.SetValue(null, null);
     }
 
     [TearDown]
