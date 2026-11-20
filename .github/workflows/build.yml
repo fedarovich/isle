@@ -14,7 +14,7 @@ on:
         default: CI
 
 env:
-  VERSION_PREFIX: 2.1.1
+  VERSION_PREFIX: 2.1.2
   CONFIGURATION: Release
   DOTNET_NOLOGO: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
