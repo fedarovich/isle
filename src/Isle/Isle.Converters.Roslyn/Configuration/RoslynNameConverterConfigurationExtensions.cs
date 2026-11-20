@@ -11,8 +11,11 @@ namespace Isle.Configuration;
 public static class RoslynNameConverterConfigurationExtensions
 {
     /// <summary>
-    /// Assigns the <see cref="RoslynNameConverter"/>> to the <see cref="IIsleConfigurationBuilder.ValueNameConverter"/> property.
+    /// Assigns the <see cref="RoslynNameConverter"/> to the <see cref="IIsleConfigurationBuilder.ValueNameConverter"/> property.
     /// </summary>
+    /// <param name="builder">The ISLE configuration builder.</param>
+    /// <param name="configure">The action used to configure the <see cref="RoslynNameConverter"/>.</param>
+    /// <returns>The <paramref name="builder"/>, for chaining.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="configure"/> is <see langword="null"/>.</exception>
     public static IIsleConfigurationBuilder WithRoslynNameConverter(this IIsleConfigurationBuilder builder, Action<IRoslynNameConverterConfigurationBuilder> configure)
     {

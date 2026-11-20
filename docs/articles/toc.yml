@@ -1,0 +1,30 @@
+- name: Introduction
+  href: introduction.md
+- name: Getting Started
+  href: getting-started.md
+- name: Logging
+  items:
+  - name: Microsoft.Extensions.Logging
+    href: microsoft-extensions-logging.md
+  - name: Serilog
+    href: serilog.md
+- name: Message Templates
+  items:
+  - name: Argument Names
+    href: argument-names.md
+  - name: Value Representation
+    href: value-representation.md
+  - name: Literal Values
+    href: literal-values.md
+- name: Configuration
+  href: configuration.md
+- name: Roslyn Name Converter
+  href: roslyn-name-converter.md
+- name: Code Analysis
+  href: code-analysis.md
+- name: MSBuild Properties
+  href: msbuild-properties.md
+- name: How It Works
+  href: how-it-works.md
+- name: Migrating from v1.x to v2.x
+  href: migration-v2.md

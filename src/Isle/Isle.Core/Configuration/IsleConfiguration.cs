@@ -5,8 +5,17 @@ using Isle.Extensions;
 namespace Isle.Configuration;
 
 /// <summary>
-/// ISLE Configuration.
+/// Configures ISLE and provides read-only access to the current configuration.
 /// </summary>
+/// <remarks>
+/// <para>
+/// Call <see cref="Configure"/> once, at the start of the application and before any ISLE logging method is called.
+/// Unless the configuration is resettable, it cannot be changed afterwards.
+/// </para>
+/// <para>
+/// The configuration is process-wide. Configure ISLE in applications, not in libraries.
+/// </para>
+/// </remarks>
 public sealed class IsleConfiguration
 {
     private static volatile IsleConfiguration? _current;
@@ -64,10 +73,10 @@ public sealed class IsleConfiguration
     public Func<string, string> ValueNameConverter => _valueNameConverter ?? DefaultValueNameConverter;
 
     /// <summary>
-    /// Converts the value name using <see cref="ValueNameConverter"/> if one has been configured; otherwise returns the name unmodified.
+    /// Converts the value name using the configured <see cref="IIsleConfigurationBuilder.ValueNameConverter"/>, if any; otherwise returns the name unmodified.
     /// </summary>
-    /// <param name="name">The arg</param>
-    /// <returns></returns>
+    /// <param name="name">The name captured from the C# expression.</param>
+    /// <returns>The converted name, or <paramref name="name"/> itself if no converter has been configured.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public string ConvertValueName(string name) => _valueNameConverter == null ? name : _valueNameConverter(name);
 

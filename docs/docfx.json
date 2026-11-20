@@ -1,0 +1,61 @@
+{
+  "$schema": "https://raw.githubusercontent.com/dotnet/docfx/main/schemas/docfx.schema.json",
+  "metadata": [
+    {
+      "src": [
+        {
+          "src": "../src/Isle",
+          "files": [
+            "Isle.Core/Isle.Core.csproj",
+            "Isle.Extensions.Logging/Isle.Extensions.Logging.csproj",
+            "Isle.Serilog/Isle.Serilog.csproj",
+            "Isle.Converters.Roslyn/Isle.Converters.Roslyn.csproj"
+          ]
+        }
+      ],
+      "dest": "api",
+      "properties": {
+        "TargetFramework": "net10.0"
+      },
+      "namespaceLayout": "flattened",
+      "memberLayout": "samePage",
+      "enumSortOrder": "declaringOrder"
+    }
+  ],
+  "build": {
+    "content": [
+      {
+        "files": [ "**/*.{md,yml}" ],
+        "exclude": [ "_site/**", "obj/**", "template/**" ]
+      }
+    ],
+    "resource": [
+      {
+        "files": [ "images/**" ]
+      }
+    ],
+    "output": "_site",
+    "template": [ "default", "modern", "template" ],
+    "xref": [ "https://learn.microsoft.com/en-us/dotnet/.xrefmap.json" ],
+    "globalMetadata": {
+      "_appName": "ISLE",
+      "_appTitle": "ISLE",
+      "_appLogoPath": "images/logo.png",
+      "_appFaviconPath": "images/logo.png",
+      "_appFooter": "ISLE &mdash; Interpolated String Logging Extensions. Licensed under the <a href=\"https://github.com/fedarovich/isle/blob/main/LICENSE\">MIT License</a>.",
+      "_enableSearch": true,
+      "_gitContribute": {
+        "repo": "https://github.com/fedarovich/isle",
+        "branch": "main"
+      }
+    },
+    "fileMetadata": {
+      "_disableContribution": {
+        "api/**.yml": true
+      }
+    },
+    "sitemap": {
+      "baseUrl": "https://isle.fedarovich.com/"
+    }
+  }
+}

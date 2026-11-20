@@ -14,8 +14,20 @@ public class RoslynNameConverter
     /// <summary>
     /// Initializes a new instance of <see cref="RoslynNameConverter"/>.
     /// </summary>
-    /// <param name="fallback">A fallback to be used if this converter cannot produce a meaningful value.</param>
-    /// <param name="transformations">Additional custom transformations to be applied to the converted name.</param>
+    /// <param name="fallback">
+    /// A converter to be used if this converter cannot extract a name from the expression.
+    /// It receives the original expression, and its result is used as is.
+    /// </param>
+    /// <param name="transformations">
+    /// The transformations to be applied, in order, to the extracted name.
+    /// </param>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="fallback"/> or <paramref name="transformations"/> is <see langword="null"/>.
+    /// </exception>
+    /// <remarks>
+    /// In most cases you don't need to create this class directly.
+    /// Use <see cref="Isle.Configuration.RoslynNameConverterConfigurationExtensions.WithRoslynNameConverter"/> instead.
+    /// </remarks>
     public RoslynNameConverter(Func<string, string> fallback, IEnumerable<Func<string, NameExpressionType, string>> transformations)
     {
         ArgumentNullException.ThrowIfNull(fallback);
@@ -26,10 +38,24 @@ public class RoslynNameConverter
     }
 
     /// <summary>
-    /// 
+    /// Extracts the member name from the C# <paramref name="expression"/> and applies the transformations to it.
     /// </summary>
-    /// <param name="expression"></param>
-    /// <returns></returns>
+    /// <param name="expression">The source code of the C# expression, as captured by the compiler.</param>
+    /// <returns>
+    /// The extracted and transformed name. If no name can be extracted from the <paramref name="expression"/>,
+    /// or if parsing or a transformation fails, the result of the fallback converter applied to the original expression.
+    /// </returns>
+    /// <remarks>
+    /// <para>
+    /// The expression is unwrapped down to a simple name. Identifiers, member access, conditional member access,
+    /// method invocations, casts, parentheses, increments and decrements, pointer indirection,
+    /// the null-forgiving operator, and <c>checked</c>/<c>unchecked</c> expressions are supported.
+    /// For example, <c>unchecked((short)value.IntProperty)</c> produces <c>IntProperty</c>.
+    /// </para>
+    /// <para>
+    /// A leading <c>@</c> of a verbatim identifier is removed before the transformations are applied and added back afterwards.
+    /// </para>
+    /// </remarks>
     public string Convert(string expression)
     {
         try

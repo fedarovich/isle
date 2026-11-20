@@ -12,6 +12,12 @@ public static class SerilogConfigurationExtensions
     /// <summary>
     /// Adds and configures the ISLE extension for integration with <see cref="ILogger"/>.
     /// </summary>
+    /// <param name="this">The ISLE configuration builder.</param>
+    /// <param name="buildConfiguration">An optional action to configure the integration.</param>
+    /// <returns>The ISLE configuration builder, for chaining.</returns>
+    /// <remarks>
+    /// The integration must be added before the Isle.Serilog logging methods can be used. Add it only once.
+    /// </remarks>
     public static IIsleConfigurationBuilder AddSerilog(this IIsleConfigurationBuilder @this,
         Action<ISerilogConfigurationBuilder>? buildConfiguration = null)
     {
@@ -22,8 +28,12 @@ public static class SerilogConfigurationExtensions
     }
 
     /// <summary>
-    /// Adds and configures the parameters for integration with <see cref="ILogger"/>.
+    /// Adds and configures the ISLE extension for integration with <see cref="ILogger"/>.
     /// </summary>
+    /// <param name="this">The ISLE configuration builder.</param>
+    /// <param name="buildConfiguration">An optional action to configure the integration.</param>
+    /// <returns>The ISLE configuration builder, for chaining.</returns>
+    /// <remarks>This method is obsolete. Use <see cref="AddSerilog"/> instead.</remarks>
     /// <seealso cref="AddSerilog" />
     [Obsolete($"Use {nameof(AddSerilog)} method instead."
 #if NETCOREAPP

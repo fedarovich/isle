@@ -83,13 +83,21 @@ public static class LoggerExtensions
 	/// <summary>
 	/// Formats the message and creates a logical operation scope.
 	/// </summary>
+	/// <param name="logger">The <see cref="ILogger" /> to create the scope in.</param>
+	/// <param name="handler">The interpolated string of the scope message.</param>
 	/// <returns>
 	/// An <see cref="T:System.IDisposable" /> that ends the logical operation scope on dispose.
 	/// </returns>
+	/// <remarks>
+	/// Unlike the logging methods, this method does not check whether any log level is enabled,
+	/// so the interpolation expressions are always evaluated.
+	/// </remarks>
     /// <example>
-    /// using(logger.BeginScopeInterpolated($"Processing request from {Address}"))
+    /// <code>
+    /// using (logger.BeginScopeInterpolated($"Processing request from {Address}"))
     /// {
     /// }
+    /// </code>
     /// </example>
     public static IDisposable? BeginScopeInterpolated(this ILogger logger, [InterpolatedStringHandlerArgument("logger")] ref ScopeLogInterpolatedStringHandler handler)
 	{

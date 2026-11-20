@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-ISLE (Interpolated String Logging Extensions) is a set of NuGet libraries that let C# 10+ code do structured logging with interpolated strings (`logger.LogInformation($"Area is {area}")`). The argument names are captured with `[CallerArgumentExpression]` and turned into a message template. The libraries target `net11.0;net10.0;net9.0;net8.0;netstandard2.0`. User-facing docs are in `README.md`.
+ISLE (Interpolated String Logging Extensions) is a set of NuGet libraries that let C# 10+ code do structured logging with interpolated strings (`logger.LogInformation($"Area is {area}")`). The argument names are captured with `[CallerArgumentExpression]` and turned into a message template. The libraries target `net11.0;net10.0;net9.0;net8.0;netstandard2.0`. User-facing docs are the docfx site in `docs/` (published to https://isle.fedarovich.com/); `README.md` is a short quick start that links to it.
 
 ## Commands
 
@@ -33,9 +33,27 @@ dotnet run -c Release -f net10.0 --project src/Isle/Isle.Extensions.Logging.Benc
   - Manual run (`workflow_dispatch`, `build-type` = `Pre-release`/`Release`): published to nuget.org via trusted publishing (`NuGet/login`, `nuget` environment).
   - The version comes from `VERSION_PREFIX` in the workflow plus `github.run_number`; bump `VERSION_PREFIX` after each release.
 
+## Documentation site (`docs/`)
+
+The documentation is a docfx site: hand-written articles in `docs/articles/` plus an API reference generated from the XML doc comments of Core, Extensions.Logging, Serilog and Converters.Roslyn (metadata is taken from the `net10.0` TFM).
+
+```powershell
+dotnet tool restore
+dotnet docfx docs/docfx.json            # build into docs/_site (docs/api and docs/_site are generated and git-ignored)
+dotnet docfx docs/docfx.json --serve    # build and serve on http://localhost:8080
+```
+
+- `.github/workflows/docs.yml` builds the site with `--warningsAsErrors` on PRs to `dev`/`main`. It deploys to GitHub Pages on push to `main` and on manual runs. The `github-pages` environment only accepts deployments from `main`.
+- Broken `xref:` links and `#bookmarks` in articles are build warnings, so they fail CI.
+- API pages show the XML doc comments. Doc fixes for the handlers and `LoggerExtensions` belong in the `.tt` templates.
+- Article code samples must match the real API. When public API or default behavior changes, update the affected articles.
+- `docs/template/public/` holds the small `main.css`/`main.js` overrides for the docfx `modern` template.
+
 ## T4 templates: generated code is checked in
 
-Much of the public surface and many tests are generated from T4 templates (`*.tt` → `*.g.cs`, using `TextTemplatingFileGenerator`). The build does **not** run T4. Change the `.tt` file, regenerate the `.g.cs` (in Visual Studio: "Run Custom Tool"), and commit both files. Never hand-edit `*.g.cs`.
+Much of the public surface and many tests are generated from T4 templates (`*.tt` → `*.g.cs`, using `TextTemplatingFileGenerator`). The build does **not** run T4. Change the `.tt` file, regenerate the `.g.cs`, and commit both files. Never hand-edit `*.g.cs`.
+
+To regenerate, use "Run Custom Tool" in Visual Studio, or the `dotnet-t4` local tool: `dotnet tool restore`, then `dotnet t4 src/Isle/Isle.Serilog/LogHandlers.tt`, which writes `LogHandlers.g.cs` next to the template. For the library templates, `dotnet t4` output is byte-identical to the committed files, except that it omits the UTF-8 BOM. Add the BOM back to avoid a noisy diff.
 
 - `Isle.Extensions.Logging/LogHandlers.tt`: one `[InterpolatedStringHandler] ref struct` per log level, plus a generic `Log(LogLevel)` handler and a `BeginScope` handler.
 - `Isle.Extensions.Logging/LoggerExtensions.tt`: the `ILogger` extension methods that take those handlers.

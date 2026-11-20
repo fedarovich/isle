@@ -22,10 +22,11 @@ namespace Isle.Extensions.Logging;
 <# foreach (var logLevel in logLevels) { #>
 
 /// <summary>
-/// Interpolated string handler for <#= logLevel != Scope ? $"Log{logLevel}()" : "BeginScope()" #> method.
+/// Interpolated string handler for the <c><#= logLevel != Scope ? $"Log{logLevel}()" : "BeginScopeInterpolated()" #></c> extension methods
+/// of <see cref="LoggerExtensions"/>.
 /// </summary>
 /// <remarks>
-/// This class should not be used directly in your code.
+/// This type is used by the C# compiler. It should not be used directly in your code.
 /// </remarks>
 [InterpolatedStringHandler]
 public ref partial struct <#= GetTypeName(logLevel) #>
@@ -35,6 +36,18 @@ public ref partial struct <#= GetTypeName(logLevel) #>
     /// <summary>
     /// Creates a new instance of <see cref="<#= GetTypeName(logLevel) #>" />.
     /// </summary>
+    /// <param name="literalLength">The number of constant characters outside of interpolation expressions in the interpolated string.</param>
+    /// <param name="formattedCount">The number of interpolation expressions in the interpolated string.</param>
+    /// <param name="logger">The logger the message will be written to.</param>
+<# if (logLevel == null) { #>
+    /// <param name="logLevel">The level of the log message.</param>
+<# } #>
+<# if (logLevel != Scope) { #>
+    /// <param name="isEnabled">
+    /// When this method returns, contains <see langword="true"/> if the log level is enabled for the <paramref name="logger"/>;
+    /// otherwise, <see langword="false"/>, in which case the interpolation expressions are not evaluated.
+    /// </param>
+<# } #>
     public <#= GetTypeName(logLevel) #>(
         int literalLength, 
         int formattedCount,
@@ -69,6 +82,7 @@ public ref partial struct <#= GetTypeName(logLevel) #>
     /// <summary>
     /// Appends a string literal to the template string.
     /// </summary>
+    /// <param name="str">The literal part of the interpolated string.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendLiteral(string? str)
     {
@@ -92,6 +106,7 @@ public ref partial struct <#= GetTypeName(logLevel) #>
     /// <summary>
     /// Appends a <see cref="LiteralValue" /> to the template string.
     /// </summary>
+    /// <param name="literal">The literal value to be added to the message template as text.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in LiteralValue literal)
     {
@@ -115,6 +130,13 @@ public ref partial struct <#= GetTypeName(logLevel) #>
     /// <summary>
     /// Appends a <paramref name="value" /> to the log message.
     /// </summary>
+    /// <typeparam name="T">The compile-time type of the value.</typeparam>
+    /// <param name="value">The value of the interpolation expression.</param>
+    /// <param name="alignment">The alignment specified in the interpolation expression, or 0 if none.</param>
+    /// <param name="format">The format string specified in the interpolation expression, or <see langword="null"/> if none.</param>
+    /// <param name="nameExpression">
+    /// The source code of the interpolation expression, captured by the compiler. It is used to produce the property name.
+    /// </param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string nameExpression = "")
     {
@@ -155,6 +177,9 @@ public ref partial struct <#= GetTypeName(logLevel) #>
     /// <summary>
     /// Appends a <paramref name="namedLogValue" /> to the log message.
     /// </summary>
+    /// <param name="namedLogValue">The value with an explicit name, created by <see cref="Isle.Extensions.LoggingExtensions.Named{T}(T, string)"/>.</param>
+    /// <param name="alignment">The alignment specified in the interpolation expression, or 0 if none.</param>
+    /// <param name="format">The format string specified in the interpolation expression, or <see langword="null"/> if none.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in NamedLogValue namedLogValue, int alignment = 0, string? format = null)
     {

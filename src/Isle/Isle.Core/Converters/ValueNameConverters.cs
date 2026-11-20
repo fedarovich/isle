@@ -11,6 +11,8 @@ public static class ValueNameConverters
     /// Wraps another <paramref name="converter"/> to add memoization support.
     /// </summary>
     /// <param name="converter">The value name converter to wrap.</param>
+    /// <returns>A converter that caches all results produced by <paramref name="converter"/>.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="converter"/> is <see langword="null"/>.</exception>
     public static Func<string, string> WithMemoization(this Func<string, string> converter)
     {
         ArgumentNullException.ThrowIfNull(converter);
@@ -24,12 +26,14 @@ public static class ValueNameConverters
     /// </summary>
     /// <param name="converter">The value name converter to wrap.</param>
     /// <param name="maxCacheSize">The maximal number of expressions to cache.</param>
+    /// <returns>A converter that caches the results produced by <paramref name="converter"/>.</returns>
     /// <remarks>
     /// <para>If <paramref name="maxCacheSize"/> is 0, the results produced by <paramref name="converter"/> won't be cached.</para>
     /// <para>If <paramref name="maxCacheSize"/> is <see cref="int.MaxValue"/>, all results produced by <paramref name="converter"/> will be cached.</para>
     /// <para>Otherwise, up to <paramref name="maxCacheSize"/> results produced by <paramref name="converter"/> will be cached.</para>
     /// </remarks>
     /// <exception cref="ArgumentNullException"><paramref name="converter"/> is <see langword="null"/>.</exception>
+    /// <exception cref="ArgumentException"><paramref name="maxCacheSize"/> is negative.</exception>
     public static Func<string, string> WithMemoization(this Func<string, string> converter, int maxCacheSize)
     {
         ArgumentNullException.ThrowIfNull(converter);
@@ -56,9 +60,16 @@ public static class ValueNameConverters
     /// and optionally capitalizes the first character if it is a lower case letter.
     /// </summary>
     /// <param name="capitalizeFirstCharacter">The value indicating whether the first character of the string must be capitalized.</param>
+    /// <returns>The value name converter.</returns>
     /// <remarks>
+    /// <para>
+    /// The first <c>@</c> character is preserved, so that the destructuring operator is kept.
     /// If <paramref name="capitalizeFirstCharacter"/> is <see langword="true"/> and the first character is <c>@</c>,
     /// the next character will be capitalized.
+    /// </para>
+    /// <para>
+    /// The converter throws <see cref="ArgumentException"/> if the name is empty or consists only of the removed characters.
+    /// </para>
     /// </remarks>
     public static Func<string, string> SerilogCompatible(bool capitalizeFirstCharacter = true)
     {
@@ -69,6 +80,9 @@ public static class ValueNameConverters
     /// Returns a value name converter that capitalizes the first character if it is a lower case letter.
     /// In case the first character is <c>@</c>, the next character will be capitalized.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The value name converter.</returns>
+    /// <remarks>
+    /// The capitalization uses the invariant culture.
+    /// </remarks>
     public static Func<string, string> CapitalizeFirstCharacter() => CapitalizeFirstCharacterConverter.Convert;
 }

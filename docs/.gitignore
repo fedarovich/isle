@@ -1,0 +1,4 @@
+# docfx output (generated, never committed)
+_site/
+api/
+obj/

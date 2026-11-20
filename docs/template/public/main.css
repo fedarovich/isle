@@ -1,0 +1,42 @@
+/* Navbar logo: the source image is 256x256 pixel art. */
+#logo {
+  width: 40px;
+  height: 40px;
+  margin-right: 0.5rem;
+  border-radius: 6px;
+  image-rendering: pixelated;
+}
+
+/* Landing page hero */
+.isle-hero {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin: 1rem 0 2rem;
+}
+
+/* docfx wraps article images in a link, so the link is the flex item. */
+.isle-hero > a,
+.isle-hero > img {
+  flex: none;
+}
+
+.isle-hero img {
+  width: 128px;
+  height: 128px;
+  max-width: none;
+  border-radius: 12px;
+  image-rendering: pixelated;
+}
+
+.isle-hero p {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+@media (max-width: 576px) {
+  .isle-hero {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

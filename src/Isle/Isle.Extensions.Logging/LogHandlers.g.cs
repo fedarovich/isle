@@ -8,10 +8,11 @@ namespace Isle.Extensions.Logging;
 
 
 /// <summary>
-/// Interpolated string handler for LogTrace() method.
+/// Interpolated string handler for the <c>LogTrace()</c> extension methods
+/// of <see cref="LoggerExtensions"/>.
 /// </summary>
 /// <remarks>
-/// This class should not be used directly in your code.
+/// This type is used by the C# compiler. It should not be used directly in your code.
 /// </remarks>
 [InterpolatedStringHandler]
 public ref partial struct TraceLogInterpolatedStringHandler
@@ -21,6 +22,13 @@ public ref partial struct TraceLogInterpolatedStringHandler
     /// <summary>
     /// Creates a new instance of <see cref="TraceLogInterpolatedStringHandler" />.
     /// </summary>
+    /// <param name="literalLength">The number of constant characters outside of interpolation expressions in the interpolated string.</param>
+    /// <param name="formattedCount">The number of interpolation expressions in the interpolated string.</param>
+    /// <param name="logger">The logger the message will be written to.</param>
+    /// <param name="isEnabled">
+    /// When this method returns, contains <see langword="true"/> if the log level is enabled for the <paramref name="logger"/>;
+    /// otherwise, <see langword="false"/>, in which case the interpolation expressions are not evaluated.
+    /// </param>
     public TraceLogInterpolatedStringHandler(
         int literalLength, 
         int formattedCount,
@@ -43,6 +51,7 @@ public ref partial struct TraceLogInterpolatedStringHandler
     /// <summary>
     /// Appends a string literal to the template string.
     /// </summary>
+    /// <param name="str">The literal part of the interpolated string.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendLiteral(string? str)
     {
@@ -66,6 +75,7 @@ public ref partial struct TraceLogInterpolatedStringHandler
     /// <summary>
     /// Appends a <see cref="LiteralValue" /> to the template string.
     /// </summary>
+    /// <param name="literal">The literal value to be added to the message template as text.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in LiteralValue literal)
     {
@@ -89,6 +99,13 @@ public ref partial struct TraceLogInterpolatedStringHandler
     /// <summary>
     /// Appends a <paramref name="value" /> to the log message.
     /// </summary>
+    /// <typeparam name="T">The compile-time type of the value.</typeparam>
+    /// <param name="value">The value of the interpolation expression.</param>
+    /// <param name="alignment">The alignment specified in the interpolation expression, or 0 if none.</param>
+    /// <param name="format">The format string specified in the interpolation expression, or <see langword="null"/> if none.</param>
+    /// <param name="nameExpression">
+    /// The source code of the interpolation expression, captured by the compiler. It is used to produce the property name.
+    /// </param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string nameExpression = "")
     {
@@ -129,6 +146,9 @@ public ref partial struct TraceLogInterpolatedStringHandler
     /// <summary>
     /// Appends a <paramref name="namedLogValue" /> to the log message.
     /// </summary>
+    /// <param name="namedLogValue">The value with an explicit name, created by <see cref="Isle.Extensions.LoggingExtensions.Named{T}(T, string)"/>.</param>
+    /// <param name="alignment">The alignment specified in the interpolation expression, or 0 if none.</param>
+    /// <param name="format">The format string specified in the interpolation expression, or <see langword="null"/> if none.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in NamedLogValue namedLogValue, int alignment = 0, string? format = null)
     {
@@ -187,10 +207,11 @@ public ref partial struct TraceLogInterpolatedStringHandler
 
 
 /// <summary>
-/// Interpolated string handler for LogDebug() method.
+/// Interpolated string handler for the <c>LogDebug()</c> extension methods
+/// of <see cref="LoggerExtensions"/>.
 /// </summary>
 /// <remarks>
-/// This class should not be used directly in your code.
+/// This type is used by the C# compiler. It should not be used directly in your code.
 /// </remarks>
 [InterpolatedStringHandler]
 public ref partial struct DebugLogInterpolatedStringHandler
@@ -200,6 +221,13 @@ public ref partial struct DebugLogInterpolatedStringHandler
     /// <summary>
     /// Creates a new instance of <see cref="DebugLogInterpolatedStringHandler" />.
     /// </summary>
+    /// <param name="literalLength">The number of constant characters outside of interpolation expressions in the interpolated string.</param>
+    /// <param name="formattedCount">The number of interpolation expressions in the interpolated string.</param>
+    /// <param name="logger">The logger the message will be written to.</param>
+    /// <param name="isEnabled">
+    /// When this method returns, contains <see langword="true"/> if the log level is enabled for the <paramref name="logger"/>;
+    /// otherwise, <see langword="false"/>, in which case the interpolation expressions are not evaluated.
+    /// </param>
     public DebugLogInterpolatedStringHandler(
         int literalLength, 
         int formattedCount,
@@ -222,6 +250,7 @@ public ref partial struct DebugLogInterpolatedStringHandler
     /// <summary>
     /// Appends a string literal to the template string.
     /// </summary>
+    /// <param name="str">The literal part of the interpolated string.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendLiteral(string? str)
     {
@@ -245,6 +274,7 @@ public ref partial struct DebugLogInterpolatedStringHandler
     /// <summary>
     /// Appends a <see cref="LiteralValue" /> to the template string.
     /// </summary>
+    /// <param name="literal">The literal value to be added to the message template as text.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in LiteralValue literal)
     {
@@ -268,6 +298,13 @@ public ref partial struct DebugLogInterpolatedStringHandler
     /// <summary>
     /// Appends a <paramref name="value" /> to the log message.
     /// </summary>
+    /// <typeparam name="T">The compile-time type of the value.</typeparam>
+    /// <param name="value">The value of the interpolation expression.</param>
+    /// <param name="alignment">The alignment specified in the interpolation expression, or 0 if none.</param>
+    /// <param name="format">The format string specified in the interpolation expression, or <see langword="null"/> if none.</param>
+    /// <param name="nameExpression">
+    /// The source code of the interpolation expression, captured by the compiler. It is used to produce the property name.
+    /// </param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string nameExpression = "")
     {
@@ -308,6 +345,9 @@ public ref partial struct DebugLogInterpolatedStringHandler
     /// <summary>
     /// Appends a <paramref name="namedLogValue" /> to the log message.
     /// </summary>
+    /// <param name="namedLogValue">The value with an explicit name, created by <see cref="Isle.Extensions.LoggingExtensions.Named{T}(T, string)"/>.</param>
+    /// <param name="alignment">The alignment specified in the interpolation expression, or 0 if none.</param>
+    /// <param name="format">The format string specified in the interpolation expression, or <see langword="null"/> if none.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in NamedLogValue namedLogValue, int alignment = 0, string? format = null)
     {
@@ -366,10 +406,11 @@ public ref partial struct DebugLogInterpolatedStringHandler
 
 
 /// <summary>
-/// Interpolated string handler for LogInformation() method.
+/// Interpolated string handler for the <c>LogInformation()</c> extension methods
+/// of <see cref="LoggerExtensions"/>.
 /// </summary>
 /// <remarks>
-/// This class should not be used directly in your code.
+/// This type is used by the C# compiler. It should not be used directly in your code.
 /// </remarks>
 [InterpolatedStringHandler]
 public ref partial struct InformationLogInterpolatedStringHandler
@@ -379,6 +420,13 @@ public ref partial struct InformationLogInterpolatedStringHandler
     /// <summary>
     /// Creates a new instance of <see cref="InformationLogInterpolatedStringHandler" />.
     /// </summary>
+    /// <param name="literalLength">The number of constant characters outside of interpolation expressions in the interpolated string.</param>
+    /// <param name="formattedCount">The number of interpolation expressions in the interpolated string.</param>
+    /// <param name="logger">The logger the message will be written to.</param>
+    /// <param name="isEnabled">
+    /// When this method returns, contains <see langword="true"/> if the log level is enabled for the <paramref name="logger"/>;
+    /// otherwise, <see langword="false"/>, in which case the interpolation expressions are not evaluated.
+    /// </param>
     public InformationLogInterpolatedStringHandler(
         int literalLength, 
         int formattedCount,
@@ -401,6 +449,7 @@ public ref partial struct InformationLogInterpolatedStringHandler
     /// <summary>
     /// Appends a string literal to the template string.
     /// </summary>
+    /// <param name="str">The literal part of the interpolated string.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendLiteral(string? str)
     {
@@ -424,6 +473,7 @@ public ref partial struct InformationLogInterpolatedStringHandler
     /// <summary>
     /// Appends a <see cref="LiteralValue" /> to the template string.
     /// </summary>
+    /// <param name="literal">The literal value to be added to the message template as text.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in LiteralValue literal)
     {
@@ -447,6 +497,13 @@ public ref partial struct InformationLogInterpolatedStringHandler
     /// <summary>
     /// Appends a <paramref name="value" /> to the log message.
     /// </summary>
+    /// <typeparam name="T">The compile-time type of the value.</typeparam>
+    /// <param name="value">The value of the interpolation expression.</param>
+    /// <param name="alignment">The alignment specified in the interpolation expression, or 0 if none.</param>
+    /// <param name="format">The format string specified in the interpolation expression, or <see langword="null"/> if none.</param>
+    /// <param name="nameExpression">
+    /// The source code of the interpolation expression, captured by the compiler. It is used to produce the property name.
+    /// </param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string nameExpression = "")
     {
@@ -487,6 +544,9 @@ public ref partial struct InformationLogInterpolatedStringHandler
     /// <summary>
     /// Appends a <paramref name="namedLogValue" /> to the log message.
     /// </summary>
+    /// <param name="namedLogValue">The value with an explicit name, created by <see cref="Isle.Extensions.LoggingExtensions.Named{T}(T, string)"/>.</param>
+    /// <param name="alignment">The alignment specified in the interpolation expression, or 0 if none.</param>
+    /// <param name="format">The format string specified in the interpolation expression, or <see langword="null"/> if none.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in NamedLogValue namedLogValue, int alignment = 0, string? format = null)
     {
@@ -545,10 +605,11 @@ public ref partial struct InformationLogInterpolatedStringHandler
 
 
 /// <summary>
-/// Interpolated string handler for LogWarning() method.
+/// Interpolated string handler for the <c>LogWarning()</c> extension methods
+/// of <see cref="LoggerExtensions"/>.
 /// </summary>
 /// <remarks>
-/// This class should not be used directly in your code.
+/// This type is used by the C# compiler. It should not be used directly in your code.
 /// </remarks>
 [InterpolatedStringHandler]
 public ref partial struct WarningLogInterpolatedStringHandler
@@ -558,6 +619,13 @@ public ref partial struct WarningLogInterpolatedStringHandler
     /// <summary>
     /// Creates a new instance of <see cref="WarningLogInterpolatedStringHandler" />.
     /// </summary>
+    /// <param name="literalLength">The number of constant characters outside of interpolation expressions in the interpolated string.</param>
+    /// <param name="formattedCount">The number of interpolation expressions in the interpolated string.</param>
+    /// <param name="logger">The logger the message will be written to.</param>
+    /// <param name="isEnabled">
+    /// When this method returns, contains <see langword="true"/> if the log level is enabled for the <paramref name="logger"/>;
+    /// otherwise, <see langword="false"/>, in which case the interpolation expressions are not evaluated.
+    /// </param>
     public WarningLogInterpolatedStringHandler(
         int literalLength, 
         int formattedCount,
@@ -580,6 +648,7 @@ public ref partial struct WarningLogInterpolatedStringHandler
     /// <summary>
     /// Appends a string literal to the template string.
     /// </summary>
+    /// <param name="str">The literal part of the interpolated string.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendLiteral(string? str)
     {
@@ -603,6 +672,7 @@ public ref partial struct WarningLogInterpolatedStringHandler
     /// <summary>
     /// Appends a <see cref="LiteralValue" /> to the template string.
     /// </summary>
+    /// <param name="literal">The literal value to be added to the message template as text.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in LiteralValue literal)
     {
@@ -626,6 +696,13 @@ public ref partial struct WarningLogInterpolatedStringHandler
     /// <summary>
     /// Appends a <paramref name="value" /> to the log message.
     /// </summary>
+    /// <typeparam name="T">The compile-time type of the value.</typeparam>
+    /// <param name="value">The value of the interpolation expression.</param>
+    /// <param name="alignment">The alignment specified in the interpolation expression, or 0 if none.</param>
+    /// <param name="format">The format string specified in the interpolation expression, or <see langword="null"/> if none.</param>
+    /// <param name="nameExpression">
+    /// The source code of the interpolation expression, captured by the compiler. It is used to produce the property name.
+    /// </param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string nameExpression = "")
     {
@@ -666,6 +743,9 @@ public ref partial struct WarningLogInterpolatedStringHandler
     /// <summary>
     /// Appends a <paramref name="namedLogValue" /> to the log message.
     /// </summary>
+    /// <param name="namedLogValue">The value with an explicit name, created by <see cref="Isle.Extensions.LoggingExtensions.Named{T}(T, string)"/>.</param>
+    /// <param name="alignment">The alignment specified in the interpolation expression, or 0 if none.</param>
+    /// <param name="format">The format string specified in the interpolation expression, or <see langword="null"/> if none.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in NamedLogValue namedLogValue, int alignment = 0, string? format = null)
     {
@@ -724,10 +804,11 @@ public ref partial struct WarningLogInterpolatedStringHandler
 
 
 /// <summary>
-/// Interpolated string handler for LogError() method.
+/// Interpolated string handler for the <c>LogError()</c> extension methods
+/// of <see cref="LoggerExtensions"/>.
 /// </summary>
 /// <remarks>
-/// This class should not be used directly in your code.
+/// This type is used by the C# compiler. It should not be used directly in your code.
 /// </remarks>
 [InterpolatedStringHandler]
 public ref partial struct ErrorLogInterpolatedStringHandler
@@ -737,6 +818,13 @@ public ref partial struct ErrorLogInterpolatedStringHandler
     /// <summary>
     /// Creates a new instance of <see cref="ErrorLogInterpolatedStringHandler" />.
     /// </summary>
+    /// <param name="literalLength">The number of constant characters outside of interpolation expressions in the interpolated string.</param>
+    /// <param name="formattedCount">The number of interpolation expressions in the interpolated string.</param>
+    /// <param name="logger">The logger the message will be written to.</param>
+    /// <param name="isEnabled">
+    /// When this method returns, contains <see langword="true"/> if the log level is enabled for the <paramref name="logger"/>;
+    /// otherwise, <see langword="false"/>, in which case the interpolation expressions are not evaluated.
+    /// </param>
     public ErrorLogInterpolatedStringHandler(
         int literalLength, 
         int formattedCount,
@@ -759,6 +847,7 @@ public ref partial struct ErrorLogInterpolatedStringHandler
     /// <summary>
     /// Appends a string literal to the template string.
     /// </summary>
+    /// <param name="str">The literal part of the interpolated string.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendLiteral(string? str)
     {
@@ -782,6 +871,7 @@ public ref partial struct ErrorLogInterpolatedStringHandler
     /// <summary>
     /// Appends a <see cref="LiteralValue" /> to the template string.
     /// </summary>
+    /// <param name="literal">The literal value to be added to the message template as text.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in LiteralValue literal)
     {
@@ -805,6 +895,13 @@ public ref partial struct ErrorLogInterpolatedStringHandler
     /// <summary>
     /// Appends a <paramref name="value" /> to the log message.
     /// </summary>
+    /// <typeparam name="T">The compile-time type of the value.</typeparam>
+    /// <param name="value">The value of the interpolation expression.</param>
+    /// <param name="alignment">The alignment specified in the interpolation expression, or 0 if none.</param>
+    /// <param name="format">The format string specified in the interpolation expression, or <see langword="null"/> if none.</param>
+    /// <param name="nameExpression">
+    /// The source code of the interpolation expression, captured by the compiler. It is used to produce the property name.
+    /// </param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string nameExpression = "")
     {
@@ -845,6 +942,9 @@ public ref partial struct ErrorLogInterpolatedStringHandler
     /// <summary>
     /// Appends a <paramref name="namedLogValue" /> to the log message.
     /// </summary>
+    /// <param name="namedLogValue">The value with an explicit name, created by <see cref="Isle.Extensions.LoggingExtensions.Named{T}(T, string)"/>.</param>
+    /// <param name="alignment">The alignment specified in the interpolation expression, or 0 if none.</param>
+    /// <param name="format">The format string specified in the interpolation expression, or <see langword="null"/> if none.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in NamedLogValue namedLogValue, int alignment = 0, string? format = null)
     {
@@ -903,10 +1003,11 @@ public ref partial struct ErrorLogInterpolatedStringHandler
 
 
 /// <summary>
-/// Interpolated string handler for LogCritical() method.
+/// Interpolated string handler for the <c>LogCritical()</c> extension methods
+/// of <see cref="LoggerExtensions"/>.
 /// </summary>
 /// <remarks>
-/// This class should not be used directly in your code.
+/// This type is used by the C# compiler. It should not be used directly in your code.
 /// </remarks>
 [InterpolatedStringHandler]
 public ref partial struct CriticalLogInterpolatedStringHandler
@@ -916,6 +1017,13 @@ public ref partial struct CriticalLogInterpolatedStringHandler
     /// <summary>
     /// Creates a new instance of <see cref="CriticalLogInterpolatedStringHandler" />.
     /// </summary>
+    /// <param name="literalLength">The number of constant characters outside of interpolation expressions in the interpolated string.</param>
+    /// <param name="formattedCount">The number of interpolation expressions in the interpolated string.</param>
+    /// <param name="logger">The logger the message will be written to.</param>
+    /// <param name="isEnabled">
+    /// When this method returns, contains <see langword="true"/> if the log level is enabled for the <paramref name="logger"/>;
+    /// otherwise, <see langword="false"/>, in which case the interpolation expressions are not evaluated.
+    /// </param>
     public CriticalLogInterpolatedStringHandler(
         int literalLength, 
         int formattedCount,
@@ -938,6 +1046,7 @@ public ref partial struct CriticalLogInterpolatedStringHandler
     /// <summary>
     /// Appends a string literal to the template string.
     /// </summary>
+    /// <param name="str">The literal part of the interpolated string.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendLiteral(string? str)
     {
@@ -961,6 +1070,7 @@ public ref partial struct CriticalLogInterpolatedStringHandler
     /// <summary>
     /// Appends a <see cref="LiteralValue" /> to the template string.
     /// </summary>
+    /// <param name="literal">The literal value to be added to the message template as text.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in LiteralValue literal)
     {
@@ -984,6 +1094,13 @@ public ref partial struct CriticalLogInterpolatedStringHandler
     /// <summary>
     /// Appends a <paramref name="value" /> to the log message.
     /// </summary>
+    /// <typeparam name="T">The compile-time type of the value.</typeparam>
+    /// <param name="value">The value of the interpolation expression.</param>
+    /// <param name="alignment">The alignment specified in the interpolation expression, or 0 if none.</param>
+    /// <param name="format">The format string specified in the interpolation expression, or <see langword="null"/> if none.</param>
+    /// <param name="nameExpression">
+    /// The source code of the interpolation expression, captured by the compiler. It is used to produce the property name.
+    /// </param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string nameExpression = "")
     {
@@ -1024,6 +1141,9 @@ public ref partial struct CriticalLogInterpolatedStringHandler
     /// <summary>
     /// Appends a <paramref name="namedLogValue" /> to the log message.
     /// </summary>
+    /// <param name="namedLogValue">The value with an explicit name, created by <see cref="Isle.Extensions.LoggingExtensions.Named{T}(T, string)"/>.</param>
+    /// <param name="alignment">The alignment specified in the interpolation expression, or 0 if none.</param>
+    /// <param name="format">The format string specified in the interpolation expression, or <see langword="null"/> if none.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in NamedLogValue namedLogValue, int alignment = 0, string? format = null)
     {
@@ -1082,10 +1202,11 @@ public ref partial struct CriticalLogInterpolatedStringHandler
 
 
 /// <summary>
-/// Interpolated string handler for Log() method.
+/// Interpolated string handler for the <c>Log()</c> extension methods
+/// of <see cref="LoggerExtensions"/>.
 /// </summary>
 /// <remarks>
-/// This class should not be used directly in your code.
+/// This type is used by the C# compiler. It should not be used directly in your code.
 /// </remarks>
 [InterpolatedStringHandler]
 public ref partial struct LogInterpolatedStringHandler
@@ -1095,6 +1216,14 @@ public ref partial struct LogInterpolatedStringHandler
     /// <summary>
     /// Creates a new instance of <see cref="LogInterpolatedStringHandler" />.
     /// </summary>
+    /// <param name="literalLength">The number of constant characters outside of interpolation expressions in the interpolated string.</param>
+    /// <param name="formattedCount">The number of interpolation expressions in the interpolated string.</param>
+    /// <param name="logger">The logger the message will be written to.</param>
+    /// <param name="logLevel">The level of the log message.</param>
+    /// <param name="isEnabled">
+    /// When this method returns, contains <see langword="true"/> if the log level is enabled for the <paramref name="logger"/>;
+    /// otherwise, <see langword="false"/>, in which case the interpolation expressions are not evaluated.
+    /// </param>
     public LogInterpolatedStringHandler(
         int literalLength, 
         int formattedCount,
@@ -1118,6 +1247,7 @@ public ref partial struct LogInterpolatedStringHandler
     /// <summary>
     /// Appends a string literal to the template string.
     /// </summary>
+    /// <param name="str">The literal part of the interpolated string.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendLiteral(string? str)
     {
@@ -1141,6 +1271,7 @@ public ref partial struct LogInterpolatedStringHandler
     /// <summary>
     /// Appends a <see cref="LiteralValue" /> to the template string.
     /// </summary>
+    /// <param name="literal">The literal value to be added to the message template as text.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in LiteralValue literal)
     {
@@ -1164,6 +1295,13 @@ public ref partial struct LogInterpolatedStringHandler
     /// <summary>
     /// Appends a <paramref name="value" /> to the log message.
     /// </summary>
+    /// <typeparam name="T">The compile-time type of the value.</typeparam>
+    /// <param name="value">The value of the interpolation expression.</param>
+    /// <param name="alignment">The alignment specified in the interpolation expression, or 0 if none.</param>
+    /// <param name="format">The format string specified in the interpolation expression, or <see langword="null"/> if none.</param>
+    /// <param name="nameExpression">
+    /// The source code of the interpolation expression, captured by the compiler. It is used to produce the property name.
+    /// </param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string nameExpression = "")
     {
@@ -1204,6 +1342,9 @@ public ref partial struct LogInterpolatedStringHandler
     /// <summary>
     /// Appends a <paramref name="namedLogValue" /> to the log message.
     /// </summary>
+    /// <param name="namedLogValue">The value with an explicit name, created by <see cref="Isle.Extensions.LoggingExtensions.Named{T}(T, string)"/>.</param>
+    /// <param name="alignment">The alignment specified in the interpolation expression, or 0 if none.</param>
+    /// <param name="format">The format string specified in the interpolation expression, or <see langword="null"/> if none.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in NamedLogValue namedLogValue, int alignment = 0, string? format = null)
     {
@@ -1262,10 +1403,11 @@ public ref partial struct LogInterpolatedStringHandler
 
 
 /// <summary>
-/// Interpolated string handler for BeginScope() method.
+/// Interpolated string handler for the <c>BeginScopeInterpolated()</c> extension methods
+/// of <see cref="LoggerExtensions"/>.
 /// </summary>
 /// <remarks>
-/// This class should not be used directly in your code.
+/// This type is used by the C# compiler. It should not be used directly in your code.
 /// </remarks>
 [InterpolatedStringHandler]
 public ref partial struct ScopeLogInterpolatedStringHandler
@@ -1275,6 +1417,9 @@ public ref partial struct ScopeLogInterpolatedStringHandler
     /// <summary>
     /// Creates a new instance of <see cref="ScopeLogInterpolatedStringHandler" />.
     /// </summary>
+    /// <param name="literalLength">The number of constant characters outside of interpolation expressions in the interpolated string.</param>
+    /// <param name="formattedCount">The number of interpolation expressions in the interpolated string.</param>
+    /// <param name="logger">The logger the message will be written to.</param>
     public ScopeLogInterpolatedStringHandler(
         int literalLength, 
         int formattedCount,
@@ -1287,6 +1432,7 @@ public ref partial struct ScopeLogInterpolatedStringHandler
     /// <summary>
     /// Appends a string literal to the template string.
     /// </summary>
+    /// <param name="str">The literal part of the interpolated string.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendLiteral(string? str)
     {
@@ -1310,6 +1456,7 @@ public ref partial struct ScopeLogInterpolatedStringHandler
     /// <summary>
     /// Appends a <see cref="LiteralValue" /> to the template string.
     /// </summary>
+    /// <param name="literal">The literal value to be added to the message template as text.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in LiteralValue literal)
     {
@@ -1333,6 +1480,13 @@ public ref partial struct ScopeLogInterpolatedStringHandler
     /// <summary>
     /// Appends a <paramref name="value" /> to the log message.
     /// </summary>
+    /// <typeparam name="T">The compile-time type of the value.</typeparam>
+    /// <param name="value">The value of the interpolation expression.</param>
+    /// <param name="alignment">The alignment specified in the interpolation expression, or 0 if none.</param>
+    /// <param name="format">The format string specified in the interpolation expression, or <see langword="null"/> if none.</param>
+    /// <param name="nameExpression">
+    /// The source code of the interpolation expression, captured by the compiler. It is used to produce the property name.
+    /// </param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted<T>(T value, int alignment = 0, string? format = null, [CallerArgumentExpression("value")] string nameExpression = "")
     {
@@ -1373,6 +1527,9 @@ public ref partial struct ScopeLogInterpolatedStringHandler
     /// <summary>
     /// Appends a <paramref name="namedLogValue" /> to the log message.
     /// </summary>
+    /// <param name="namedLogValue">The value with an explicit name, created by <see cref="Isle.Extensions.LoggingExtensions.Named{T}(T, string)"/>.</param>
+    /// <param name="alignment">The alignment specified in the interpolation expression, or 0 if none.</param>
+    /// <param name="format">The format string specified in the interpolation expression, or <see langword="null"/> if none.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AppendFormatted(in NamedLogValue namedLogValue, int alignment = 0, string? format = null)
     {

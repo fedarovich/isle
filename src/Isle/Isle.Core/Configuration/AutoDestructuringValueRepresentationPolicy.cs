@@ -15,7 +15,8 @@ namespace Isle.Configuration;
 ///     <item>
 ///         <description>
 ///             All integral types: <see cref="byte"/>, <see cref="sbyte"/>, <see cref="short"/>, <see cref="ushort"/>,
-///             <see cref="int"/>, <see cref="uint"/>, <see cref="long"/>, <see cref="ulong"/>, <see cref="IntPtr"/>, <see cref="UIntPtr"/>
+///             <see cref="int"/>, <see cref="uint"/>, <see cref="long"/>, <see cref="ulong"/>, <see cref="IntPtr"/>, <see cref="UIntPtr"/>,
+///             and on .NET 7 or later <see cref="Int128"/> and <see cref="UInt128"/>
 ///         </description>
 ///     </item>
 ///     <item>
@@ -59,6 +60,7 @@ namespace Isle.Configuration;
 ///     </item>
 /// </list>
 /// <para>
+/// For <see cref="Nullable{T}"/>, the underlying type is checked.
 /// All other types are treated as complex and their values will be destructured.
 /// </para>
 /// </remarks>

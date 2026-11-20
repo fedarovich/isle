@@ -12,6 +12,12 @@ public static class ExtensionsLoggingConfigurationExtensions
     /// <summary>
     /// Adds and configures the ISLE extension for integration with <see cref="ILogger"/>.
     /// </summary>
+    /// <param name="this">The ISLE configuration builder.</param>
+    /// <param name="buildConfiguration">An optional action to configure the integration.</param>
+    /// <returns>The ISLE configuration builder, for chaining.</returns>
+    /// <remarks>
+    /// The integration must be added before the Isle.Extensions.Logging logging methods can be used. Add it only once.
+    /// </remarks>
     public static IIsleConfigurationBuilder AddExtensionsLogging(this IIsleConfigurationBuilder @this, 
         Action<IExtensionsLoggingConfigurationBuilder>? buildConfiguration = null)
     {
@@ -24,6 +30,10 @@ public static class ExtensionsLoggingConfigurationExtensions
     /// <summary>
     /// Adds and configures the ISLE extension for integration with <see cref="ILogger"/>.
     /// </summary>
+    /// <param name="this">The ISLE configuration builder.</param>
+    /// <param name="buildConfiguration">An optional action to configure the integration.</param>
+    /// <returns>The ISLE configuration builder, for chaining.</returns>
+    /// <remarks>This method is obsolete. Use <see cref="AddExtensionsLogging"/> instead.</remarks>
     /// <seealso cref="AddExtensionsLogging"/>
     [Obsolete($"Use {nameof(AddExtensionsLogging)} method instead."
 #if NETCOREAPP
